@@ -1,0 +1,19 @@
+# Get Latest .gitignore at https://github.com/RoyalCookieX/NDREngine/.gitignore
+
+# NDREngine
+/[Bb]inaries/
+/[Ii]ntermediates/
+/[Ll]ogs/
+
+# Visual Studio
+.vs/
+*.vsproj
+*.vsproj.filters
+*.vsproj.users
+*.sln
+*.pdb
+*.idb
+
+#JetBrains Rider
+.idea/
+

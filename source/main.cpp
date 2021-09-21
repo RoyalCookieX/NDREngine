@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "core/Engine.h"
+#include "core/Window.h"
 #include "graphics/Mesh.h"
 #include "graphics/Shader.h"
 #include "graphics/Vertex.h"
@@ -25,18 +26,8 @@ int WinMain()
         printf("GLFW did not initalize!");
         glfwTerminate();
     }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    const auto window = glfwCreateWindow(800, 600, "Rendering Test", nullptr, nullptr);
-    if(window == nullptr)
-    {
-        printf("GLFW Window did not initalize!");
-        glfwTerminate();
-    }
-    glfwMakeContextCurrent(window);
+    const NDR::Window window({ 800, 600, "Rendering Test", true });
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
     
     NDR::VertexLayout layout;
     layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE });
@@ -57,7 +48,7 @@ int WinMain()
     shader.Use();
 
     float t = 0.f;
-    while (!glfwWindowShouldClose(window))
+    while (window.Active())
     {
         const float r = (std::sinf(t) + 1.f) * 0.5f;
         t += 0.01f;
@@ -66,13 +57,9 @@ int WinMain()
         glClearColor(0.1f, 0.2f, 0.3f, 1.f);
         shader.SetVec4("u_Col", r, 0.1f, 0.3f, 1.f);
         mesh.Draw();
-        glfwSwapBuffers(window);
+        window.SwapBuffers();
         
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
         glfwPollEvents();
     }
-    
-    glfwDestroyWindow(window);
     glfwTerminate();
 }

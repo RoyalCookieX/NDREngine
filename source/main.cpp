@@ -27,16 +27,19 @@ int WinMain()
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-
-    const NDR::Mesh mesh
-        (
-            {
-                NDR::Vertex({-0.5f, -0.5f, 0.0f }, {0.0f, 0.0f, 1.0f, 1.f }),
-                NDR::Vertex({ 0.0f,  0.5f, 0.0f }, {0.0f, 0.0f, 1.0f, 1.f }),
-                NDR::Vertex({ 0.5f, -0.5f, 0.0f }, {0.0f, 0.0f, 1.0f, 1.f }),
-            },
-            { 0, 1, 2 }
+    NDR::VertexLayout layout;
+    layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE });
+    layout.AddAttribute({ 4, GL_FLOAT, GL_FALSE });
+    NDR::VertexArray* vertexArray = new NDR::VertexArray(
+        {
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+             0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        },
+        layout
         );
+    NDR::IndexBuffer* indexBuffer = new NDR::IndexBuffer({ 0, 1, 2 });
+    const NDR::Mesh mesh(vertexArray, indexBuffer);
 
     const char* vertexSource = R"(
     #version 330 core
@@ -74,13 +77,13 @@ int WinMain()
         glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(0.1f, 0.2f, 0.3f, 1.f);
         mesh.Draw();
+        glfwSwapBuffers(window);
         
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
         glfwPollEvents();
-        glfwSwapBuffers(window);
     }
-
+    
     glfwDestroyWindow(window);
     glfwTerminate();
     

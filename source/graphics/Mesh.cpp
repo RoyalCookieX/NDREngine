@@ -24,10 +24,4 @@ namespace NDR
         _vertexArray->Bind();
         _indexBuffer->Bind();
     }
-
-    void Mesh::Draw() const
-    {
-        Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, _indexBuffer->Count(), GL_UNSIGNED_INT, nullptr));
-    }
 }

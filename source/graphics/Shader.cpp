@@ -23,6 +23,30 @@ namespace NDR
     {
         glUseProgram(_program);
     }
+    
+    void Shader::SetFloat(const std::string& uniformName, GLfloat const x) const
+    {
+        const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
+        glUniform1f(id, x);
+    }
+
+    void Shader::SetVec2(const std::string& uniformName, GLfloat const x, GLfloat const y) const
+    {
+        const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
+        glUniform2f(id, x, y);
+    }
+
+    void Shader::SetVec3(const std::string& uniformName, GLfloat const x, GLfloat const y, GLfloat const z) const
+    {
+        const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
+        glUniform3f(id, x, y, z);
+    }
+
+    void Shader::SetVec4(const std::string& uniformName, GLfloat const x, GLfloat const y, GLfloat const z, const GLfloat w) const
+    {
+        const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
+        glUniform4f(id, x, y, z, w);
+    }
 
     GLuint Shader::CompileSource(GLenum shaderType, const char* source)
     {
@@ -42,7 +66,6 @@ namespace NDR
                 :shaderType == GL_FRAGMENT_SHADER ? "Fragment"
                 :"Unknown") << " Shader Failed to compile!\n" << message << std::endl;;
         }
-        
         return id;
     }
 }

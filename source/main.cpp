@@ -1,5 +1,4 @@
-#include <memory>
-
+#include "utility/AssetManager.h"
 #include "graphics/Mesh.h"
 #include "graphics/Shader.h"
 #include "core/Engine.h"
@@ -30,46 +29,19 @@ int WinMain()
     NDR::VertexLayout layout;
     layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE });
     layout.AddAttribute({ 4, GL_FLOAT, GL_FALSE });
-    NDR::VertexArray* vertexArray = new NDR::VertexArray(
+    NDR::VertexArray vertexArray(
         {
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-             0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f, 0.0f, 0.8f, 0.5f, 1.0f, 1.0f,
+             0.5f, -0.5f, 0.0f, 0.8f, 0.5f, 1.0f, 1.0f,
+             0.5f,  0.5f, 0.0f, 0.8f, 0.5f, 1.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f, 0.8f, 0.5f, 1.0f, 1.0f,
         },
         layout
         );
-    NDR::IndexBuffer* indexBuffer = new NDR::IndexBuffer({ 0, 1, 2 });
-    const NDR::Mesh mesh(vertexArray, indexBuffer);
+    NDR::IndexBuffer indexBuffer({ 0, 1, 2, 2, 3, 0 });
+    const NDR::Mesh mesh(&vertexArray, &indexBuffer);
 
-    const char* vertexSource = R"(
-    #version 330 core
-    
-    layout(location = 0) in vec4 inPos;
-    layout(location = 1) in vec4 inCol;
-
-    out vec4 v_Col;
-    
-    void main()
-    {
-        gl_Position = inPos;
-        v_Col = inCol;
-    }
-    )";
-
-    const char* fragmentSource = R"(
-    #version 330 core
-
-    in vec4 v_Col;
-    
-    out vec4 FragColor;
-
-    void main()
-    {
-        FragColor = v_Col;
-    }
-    )";
-    
-    const NDR::Shader shader(vertexSource, fragmentSource);
+    const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/PosCol.shader");
     shader.Use();
 
     while (!glfwWindowShouldClose(window))

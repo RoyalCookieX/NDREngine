@@ -5,7 +5,6 @@ project "glfw"
     language "C"
     targetdir (TARGET_DIR)
     objdir (OBJECT_DIR)
-    location (PROJECT_LOC)
     files
     {
         "include/GLFW/*.h",

@@ -8,19 +8,24 @@ namespace NDR
     struct VertexAttribute
     {
     public:
-        GLuint count;
-        GLenum type;
-        bool normalized;
-
         VertexAttribute() = default;
         VertexAttribute(GLuint count, GLenum type, bool normalized)
-            : count(count),
-              type(type),
-              normalized(normalized)
+            : _count(count),
+              _type(type),
+              _normalized(normalized)
         {
         }
 
+        GLuint GetCount() const;
+        GLenum GetType() const;
+        bool IsNormalized() const;
+        GLuint GetTypeSize() const;
         GLsizei GetStride() const;
+    private:
+        GLuint _count;
+        GLenum _type;
+        bool _normalized;
+
     };
 
     struct VertexLayout

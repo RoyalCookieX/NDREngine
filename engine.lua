@@ -6,7 +6,6 @@ project "Engine"
     staticruntime "On"
     targetdir (TARGET_DIR)
     objdir (OBJECT_DIR)
-    location (PROJECT_LOC)
     files
     {
         "source/**.h", "source/**.cpp"

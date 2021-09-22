@@ -9,6 +9,8 @@
 #include "graphics/Vertex.h"
 #include "utility/AssetManager.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #if (NDR_RELEASE && NDR_PLATFORM_WINDOWS)
 int WinMain()
 #else
@@ -19,38 +21,53 @@ int main()
     // engine->Run();
     // delete engine;
     // return 0;
+
+    const int windowWidth = 1280;
+    const int windowHeight = 720;
+    const float halfWidth = windowWidth / 2.0f;
+    const float halfHeight = windowHeight / 2.0f;
     
-    const NDR::Window window({ 1280, 720, "NDREngine", true });
+    const NDR::Window window({ windowWidth, windowHeight, "NDREngine", true });
     const NDR::Renderer renderer;
-    renderer.SetBlendMode(NDR::BlendMode::OPAQUE);
+    renderer.SetBlendMode(NDR::BlendMode::TRANSPARENT);
     
     NDR::VertexLayout layout;
-    layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE }); //position
-    layout.AddAttribute({ 2, GL_FLOAT, GL_FALSE }); //texcoords
+    layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE }); // position
+    layout.AddAttribute({ 2, GL_FLOAT, GL_FALSE }); // texcoords
     const NDR::VertexArray vertexArray(
         {
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+            -200.0f, -200.0f, 0.0f, 0.0f, 0.0f,
+             200.0f, -200.0f, 0.0f, 1.0f, 0.0f,
+             200.0f,  200.0f, 0.0f, 1.0f, 1.0f,
+            -200.0f,  200.0f, 0.0f, 0.0f, 1.0f,
         },
         layout
         );
     const NDR::IndexBuffer indexBuffer({ 0, 1, 2, 2, 3, 0 });
     const NDR::Mesh mesh(vertexArray, indexBuffer);
-
-    const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/CPlusPlus17.png");
+    const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/UVTest.png");
     texture.Bind();
-    const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/Texture.shader");
+    const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/MVP.shader");
     shader.Use();
     shader.SetInt("u_Texture", 0);
+
+    float t = 0;
+    const glm::mat4x4 pMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -1.0f, 1.0f);
     
     while (window.Active())
     {
+        const float g = (sinf(t) + 1.0f) * 0.5f;
+        t += 0.05f;
+        shader.SetVec4("u_Color", 1.f, g, 1.f, 1.f);
+
+        shader.SetMat4("u_MVP", pMatrix);
+        
         renderer.Clear();
         renderer.DrawBackground(0.1f, 0.2f, 0.3f, 1.f);
         renderer.Draw(mesh, shader);
         window.SwapBuffers();
+        
         window.PollEvents();
     }
+    return 0;
 }

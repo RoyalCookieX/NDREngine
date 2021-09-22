@@ -38,10 +38,15 @@ namespace NDR
 
         void SwapBuffers() const;
         void PollEvents() const;
+
+        uint32_t GetWidth() const;
+        uint32_t GetHeight() const;
     
     private:
-        inline static uint32_t _windowCount = 0;
-        GLFWwindow* _window;
+        GLFWwindow* _window = nullptr;
+        WindowProps _properties;
         bool _active = true;
+        
+        inline static uint32_t _windowCount = 0;
     };
 }

@@ -37,17 +37,6 @@ namespace NDR
         return Shader(sources[0].str().c_str(), sources[1].str().c_str());
     }
 
-    // Mesh AssetManager::LoadMesh(const std::string& assetPath)
-    // {
-    //     std::string line;
-    //     std::ifstream filestream(GetAssetRootPath().append(assetPath));
-    //     while(std::getline(filestream, line))
-    //     {
-    //         
-    //     }
-    //     return Mesh()
-    // }
-
     Texture AssetManager::LoadTexture(const std::string& assetPath)
     {
         int width, height, bpp;

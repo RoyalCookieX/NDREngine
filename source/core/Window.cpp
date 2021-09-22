@@ -5,7 +5,7 @@
 namespace NDR
 {
     Window::Window(const WindowProps& properties)
-         : _window(nullptr)
+        : _properties(properties)
     {
         // initalize glfw
         if(_windowCount == 0)
@@ -66,4 +66,7 @@ namespace NDR
 
     void Window::SwapBuffers() const { glfwSwapBuffers(_window); }
     void Window::PollEvents() const { glfwPollEvents(); }
+
+    uint32_t Window::GetWidth() const { return _properties.width; }
+    uint32_t Window::GetHeight() const { return _properties.height; }
 }

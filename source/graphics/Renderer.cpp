@@ -26,6 +26,24 @@ namespace NDR
 
     void Renderer::DrawBackground(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const
     {
-        glClearColor(0.1f, 0.2f, 0.3f, 1.f);
+        GLCall(glClearColor(0.1f, 0.2f, 0.3f, 1.f));
+    }
+
+    void Renderer::SetBlendMode(const BlendMode& blendMode) const
+    {
+        switch (blendMode)
+        {
+            case BlendMode::OPAQUE:
+                {
+                    GLCall(glDisable(GL_BLEND));
+                    break;
+                }
+            case BlendMode::TRANSPARENT:
+                {
+                    GLCall(glEnable(GL_BLEND));
+                    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+                    break;
+                }
+        }
     }
 }

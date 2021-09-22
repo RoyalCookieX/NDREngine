@@ -49,7 +49,6 @@ namespace NDR
     class VertexArray
     {
     public:
-        //TODO: VertexArray(const char* file)
         VertexArray(const std::vector<GLfloat>& verts, const VertexLayout& layout);
         ~VertexArray();
 

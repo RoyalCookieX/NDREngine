@@ -13,7 +13,7 @@ namespace NDR
         ~Renderer();
         
         void Clear() const;
-        void Draw(Mesh* mesh, Shader* shader) const;
+        void Draw(const Mesh& mesh, const Shader& shader) const;
         void DrawBackground(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const;
     };
 }

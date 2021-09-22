@@ -18,10 +18,10 @@ namespace NDR
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
-    void Renderer::Draw(Mesh* mesh, Shader* shader) const
+    void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
     {
-        mesh->Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIndexData().Count(), GL_UNSIGNED_INT, nullptr));
+        mesh.Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, mesh.GetIndexData().Count(), GL_UNSIGNED_INT, nullptr));
     }
 
     void Renderer::DrawBackground(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const

@@ -36,7 +36,7 @@ int main()
         NDR::VertexLayout layout;
         layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE }); //position
         layout.AddAttribute({ 2, GL_FLOAT, GL_FALSE }); //texcoords
-        NDR::VertexArray vertexArray(
+        const NDR::VertexArray vertexArray(
             {
                 -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
                  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
@@ -45,12 +45,12 @@ int main()
             },
             layout
             );
-        NDR::IndexBuffer indexBuffer({ 0, 1, 2, 2, 3, 0 });
-        NDR::Mesh mesh(&vertexArray, &indexBuffer);
+        const NDR::IndexBuffer indexBuffer({ 0, 1, 2, 2, 3, 0 });
+        const NDR::Mesh mesh(vertexArray, indexBuffer);
 
-        NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/CPlusPlus17.png");
+        const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/CPlusPlus17.png");
         texture.Bind();
-        NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/Texture.shader");
+        const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/Texture.shader");
         shader.Use();
         shader.SetInt("u_Texture", 0);
 
@@ -61,7 +61,7 @@ int main()
         {
             renderer.Clear();
             renderer.DrawBackground(0.1f, 0.2f, 0.3f, 1.f);
-            renderer.Draw(&mesh, &shader);
+            renderer.Draw(mesh, shader);
             window.SwapBuffers();
             
             glfwPollEvents();

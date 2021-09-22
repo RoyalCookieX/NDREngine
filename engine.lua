@@ -1,5 +1,4 @@
-project "Engine"
-    kind "WindowedApp"
+project "engine"
     targetname "NDREngine"
     language "C++"
     cppdialect "C++17"
@@ -7,7 +6,6 @@ project "Engine"
     staticruntime "On"
     targetdir (TARGET_DIR)
     objdir (OBJECT_DIR)
-    location (PROJECT_LOC)
     files
     {
         "source/**.h", "source/**.cpp"
@@ -18,11 +16,13 @@ project "Engine"
         "%{INCLUDE_DIR.glad}",
         "%{INCLUDE_DIR.glfw}",
         "%{INCLUDE_DIR.glm}",
+        "%{INCLUDE_DIR.stb_image}"
     }
     links
     {
         "glad",
         "glfw",
+        "stb_image",
         "opengl32"
     }
     filter "system:windows"
@@ -30,11 +30,13 @@ project "Engine"
     filter "platforms:x64"
         architecture "x64"
     filter "configurations:Debug"
+        kind "ConsoleApp"
         defines "NDR_DEBUG"
         runtime "Debug"
         symbols "On"
         targetsuffix "_d"
     filter "configurations:Release"
+        kind "WindowedApp"
         defines "NDR_RELEASE"
         runtime "Release"
         optimize "On"

@@ -1,7 +1,6 @@
 # Get Latest .gitignore at https://github.com/RoyalCookieX/NDREngine/.gitignore
 
 # NDREngine
-/projfiles/
 /binaries/
 /intermediates/
 

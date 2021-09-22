@@ -1,6 +1,5 @@
 TARGET_DIR = "%{wks.location}/binaries/%{cfg.buildcfg}/%{cfg.platform}"
-OBJECT_DIR = "!$(SolutionDir)/intermediates/$(Configuration)/$(Platform)"
-PROJECT_LOC = "%{wks.location}/projfiles/"
+OBJECT_DIR = "!$(SolutionDir)/intermediates/$(Configuration)/$(Platform)/$(ProjectName)"
 
 INCLUDE_DIR = {}
 
@@ -12,5 +11,6 @@ workspace "NDREngine"
         include "external/glad/glad.lua"
         include "external/glfw/glfw.lua"
         include "external/glm/glm.lua"
+        include "external/stb_image/stb_image.lua"
     group ""
     include "engine.lua"

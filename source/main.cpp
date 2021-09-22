@@ -11,6 +11,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "runtime/objects/Camera.h"
+
 #if (NDR_RELEASE && NDR_PLATFORM_WINDOWS)
 int WinMain()
 #else
@@ -52,15 +54,20 @@ int main()
     shader.SetInt("u_Texture", 0);
 
     float t = 0;
-    const glm::mat4x4 pMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -1.0f, 1.0f);
+    const glm::mat4x4 orthoProj = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -1.0f, 1.0f);
+    NDR::Camera cam(orthoProj);
     
     while (window.Active())
     {
-        const float g = (sinf(t) + 1.0f) * 0.5f;
+        const float sine = sinf(t);
+        const float g = (sine + 1.0f) * 0.5f;
+        //cam.SetPosition(sine * 0.2f, 0.0f, 0.0f);
+        cam.Rotate(0.02f, glm::vec3(0.0f, 1.0f, 0.0f));
+        
         t += 0.05f;
         shader.SetVec4("u_Color", 1.f, g, 1.f, 1.f);
 
-        shader.SetMat4("u_MVP", pMatrix);
+        shader.SetMat4("u_MVP", cam.GetViewProjMatrix());
         
         renderer.Clear();
         renderer.DrawBackground(0.1f, 0.2f, 0.3f, 1.f);

@@ -1,4 +1,4 @@
-project "Engine"
+project "engine"
     targetname "NDREngine"
     language "C++"
     cppdialect "C++17"

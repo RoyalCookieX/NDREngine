@@ -1,7 +1,8 @@
 #include "AssetManager.h"
+
 #include <sstream>
 #include <fstream>
-#include <iostream>
+#include <stb_image.h>
 
 namespace NDR
 {
@@ -45,5 +46,13 @@ namespace NDR
             
         }
         return Mesh({ }, { });
+    }
+
+    Texture AssetManager::LoadTexture(const std::string& assetPath)
+    {
+        int width, height, bpp;
+        stbi_set_flip_vertically_on_load(1);
+        unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
+        return Texture(width, height, bpp, buffer);
     }
 }

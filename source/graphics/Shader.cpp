@@ -23,11 +23,17 @@ namespace NDR
     {
         glUseProgram(_program);
     }
-    
-    void Shader::SetFloat(const std::string& uniformName, GLfloat const x) const
+
+    void Shader::SetInt(const std::string& uniformName, GLint value) const
     {
         const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
-        glUniform1f(id, x);
+        glUniform1i(id, value);
+    }
+
+    void Shader::SetFloat(const std::string& uniformName, GLfloat const value) const
+    {
+        const GLuint id = glGetUniformLocation(_program, uniformName.c_str());
+        glUniform1f(id, value);
     }
 
     void Shader::SetVec2(const std::string& uniformName, GLfloat const x, GLfloat const y) const

@@ -11,8 +11,9 @@ namespace NDR
         Shader(const char* vertexSource, const char* fragmentSource);
 
         void Use() const;
-        
-        void SetFloat(const std::string& uniformName, GLfloat x) const;
+
+        void SetInt(const std::string& uniformName, GLint value) const;
+        void SetFloat(const std::string& uniformName, GLfloat value) const;
         void SetVec2(const std::string& uniformName, GLfloat x, GLfloat y) const;
         void SetVec3(const std::string& uniformName, GLfloat x, GLfloat y, GLfloat z) const;
         void SetVec4(const std::string& uniformName, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;

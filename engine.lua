@@ -16,13 +16,15 @@ project "engine"
         "%{INCLUDE_DIR.glad}",
         "%{INCLUDE_DIR.glfw}",
         "%{INCLUDE_DIR.glm}",
-        "%{INCLUDE_DIR.stb_image}"
+        "%{INCLUDE_DIR.stb_image}",
+        "%{INCLUDE_DIR.tiny_obj_loader}",
     }
     links
     {
         "glad",
         "glfw",
         "stb_image",
+        "tiny_obj_loader",
         "opengl32"
     }
     filter "system:windows"

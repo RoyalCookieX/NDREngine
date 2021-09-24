@@ -1,11 +1,5 @@
+#include "ndrpch.h"
 #include "AssetManager.h"
-
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <stb_image.h>
-#include <tiny_obj_loader.h>
-#include <unordered_set>
 
 namespace NDR
 {

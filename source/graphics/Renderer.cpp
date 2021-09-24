@@ -1,7 +1,5 @@
+#include "ndrpch.h"
 #include "Renderer.h"
-
-#include <glad/glad.h>
-#include "core/Error.h"
 
 namespace NDR
 {

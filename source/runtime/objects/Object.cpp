@@ -1,3 +1,4 @@
+#include "ndrpch.h"
 #include "Object.h"
 
 namespace NDR

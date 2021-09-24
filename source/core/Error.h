@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdio>
-#include <glad/glad.h>
 
 #if (NDR_DEBUG || NDR_FORCE_LOG)
 #define GLCall(x) NDR::ClearGLErrors();\

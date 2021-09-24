@@ -1,3 +1,4 @@
+#include "ndrpch.h"
 #include "Camera.h"
 
 namespace NDR

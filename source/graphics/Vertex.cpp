@@ -1,6 +1,5 @@
+#include "ndrpch.h"
 #include "Vertex.h"
-
-#include "core/Error.h"
 
 namespace NDR
 {

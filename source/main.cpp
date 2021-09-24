@@ -39,12 +39,14 @@ int main()
             -200.0f,  200.0f, 0.0f, 0.0f, 1.0f,
         }
     );
-    vertexData
-    .AddAttribute({3, GL_FALSE})  // position
-    .AddAttribute({2, GL_FALSE}); // texcoords
-
     const NDR::IndexData indexData({ 0, 1, 2, 2, 3, 0 });
-    const NDR::Mesh mesh(vertexData, indexData);
+    const NDR::VertexLayout layout(
+{
+            {3, GL_FALSE}, // position
+            {2, GL_FALSE}  // texcoords
+        }
+    );
+    const NDR::Mesh mesh(vertexData, indexData, layout);
    
     // const NDR::Mesh mesh = NDR::AssetManager::LoadMesh("assets/meshes/Cube.obj");
     const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/UVTest.png");

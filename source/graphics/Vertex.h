@@ -20,26 +20,36 @@ namespace NDR
         bool _normalized;
     };
 
+    struct VertexLayout
+    {
+    public:
+        VertexLayout() = default;
+        VertexLayout(const std::vector<VertexAttribute>& attributes);
+        ~VertexLayout() = default;
+
+        VertexAttribute& operator[](int32_t index);
+
+        uint32_t GetStride() const;
+        VertexAttribute& GetAttribute(int32_t index);
+        
+        VertexLayout& AddAttribute(const VertexAttribute& attribute);
+        uint32_t GetAttributeCount() const;
+    private:
+        std::vector<VertexAttribute> _attributes;
+        uint32_t _stride;
+    };
+
     struct VertexData
     {
     public:
         VertexData() = default;
         VertexData(const std::vector<float>& vertices);
         ~VertexData() = default;
-
-        VertexAttribute& operator[](int32_t index);
         
         float* GetBuffer();
         uint32_t GetBufferSize() const;
-        uint32_t GetStride() const;
-        VertexAttribute& GetAttribute(int32_t index);
-        
-        VertexData& AddAttribute(const VertexAttribute& attribute);
-        uint32_t GetAttributeCount() const;
     private:
         std::vector<float> _vertexData;
-        std::vector<VertexAttribute> _attributes;
-        uint32_t _stride;
     };
 
     struct IndexData

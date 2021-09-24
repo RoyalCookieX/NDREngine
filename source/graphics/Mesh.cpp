@@ -7,16 +7,18 @@ namespace NDR
     Mesh::Mesh():
         _vao(0),
         _vbo(0),
-        _ibo(0)
+        _ibo(0),
+        _layout()
     {
     }
 
-    Mesh::Mesh(const VertexData& vertexData, const IndexData& indexData):
-        _vertexData(vertexData),
-        _indexData(indexData),
+    Mesh::Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout):
         _vao(0),
         _vbo(0),
-        _ibo(0)
+        _ibo(0),
+        _vertexData(vertexData),
+        _indexData(indexData),
+        _layout(layout)
     {
         // create vertex array object
         GLCall(glCreateVertexArrays(1, &_vao));
@@ -29,16 +31,16 @@ namespace NDR
 
         // setup vertex attributes
         auto offset = 0;
-        for(uint32_t attributeIndex = 0; attributeIndex < _vertexData.GetAttributeCount(); attributeIndex++)
+        for(uint32_t attributeIndex = 0; attributeIndex < _layout.GetAttributeCount(); attributeIndex++)
         {
-            VertexAttribute attribute = _vertexData[attributeIndex];
+            VertexAttribute attribute = _layout[attributeIndex];
             GLCall(glEnableVertexAttribArray(attributeIndex));
             GLCall(glVertexAttribPointer(
                 attributeIndex,
                 attribute.GetCount(),
                 GL_FLOAT,
                 attribute.IsNormalized(),
-                _vertexData.GetStride(),
+                _layout.GetStride(),
                 (const void*)offset));
             offset += attribute.GetStride();
         }

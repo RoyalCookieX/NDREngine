@@ -7,7 +7,7 @@ namespace NDR
     {
     public:
         Mesh();
-        Mesh(const VertexData& vertexData, const IndexData& indexData);
+        Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout);
         ~Mesh();
 
         uint32_t GetIndexCount() const;
@@ -18,5 +18,6 @@ namespace NDR
         
         VertexData _vertexData;
         IndexData _indexData;
+        VertexLayout _layout;
     };
 }

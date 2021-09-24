@@ -15,25 +15,37 @@ namespace NDR
     bool VertexAttribute::IsNormalized() const { return _normalized; }
     uint32_t VertexAttribute::GetStride() const { return _count * sizeof(float); }
 
-    // VertexData
-    VertexData::VertexData(const std::vector<float>& vertices):
-        _vertexData(vertices),
+    // VertexLayout
+    VertexLayout::VertexLayout(const std::vector<VertexAttribute>& attributes):
+        _attributes(attributes),
         _stride(0)
     {
+        for(auto attribute : _attributes)
+            _stride += attribute.GetStride();
     }
 
-    VertexAttribute& VertexData::operator[](int32_t index) { return GetAttribute(index); }
-    float* VertexData::GetBuffer() { return _vertexData.data(); }
-    uint32_t VertexData::GetBufferSize() const { return (uint32_t)_vertexData.size() * sizeof(float); }
-    uint32_t VertexData::GetStride() const { return _stride; }
-    VertexAttribute& VertexData::GetAttribute(int32_t index) { return _attributes[index]; }
-    VertexData& VertexData::AddAttribute(const VertexAttribute& attribute)
+    VertexAttribute& VertexLayout::operator[](int32_t index) { return GetAttribute(index); }
+    uint32_t VertexLayout::GetStride() const { return _stride; }
+    VertexAttribute& VertexLayout::GetAttribute(int32_t index) { return _attributes[index]; }
+    
+    VertexLayout& VertexLayout::AddAttribute(const VertexAttribute& attribute)
     {
         _attributes.emplace_back(attribute);
         _stride += attribute.GetStride();
         return *this;
-    }  
-    uint32_t VertexData::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
+    }
+    
+    uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
+
+    // VertexData
+    VertexData::VertexData(const std::vector<float>& vertices):
+        _vertexData(vertices)
+    {
+
+    }
+
+    float* VertexData::GetBuffer() { return _vertexData.data(); }
+    uint32_t VertexData::GetBufferSize() const { return (uint32_t)_vertexData.size() * sizeof(float); }
 
     // IndexData
     IndexData::IndexData(const std::vector<uint32_t>& indices):

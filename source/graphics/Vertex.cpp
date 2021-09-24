@@ -1,82 +1,80 @@
+#include "ndrpch.h"
 #include "Vertex.h"
-
-#include "core/Error.h"
 
 namespace NDR
 {
-    GLuint VertexAttribute::GetCount() const { return _count; }
-    GLenum VertexAttribute::GetType() const { return _type; }
+    VertexAttribute::VertexAttribute():
+        _count(1),
+        _normalized(false)
+    {
+    }
+
+    // VertexAttribute
+    VertexAttribute::VertexAttribute(GLuint count, bool normalized):
+        _count(count),
+        _normalized(normalized)
+    {
+    }
+
+    uint32_t VertexAttribute::GetCount() const { return _count; }
     bool VertexAttribute::IsNormalized() const { return _normalized; }
-    GLsizei VertexAttribute::GetStride() const { return GetTypeSize() * _count; }
+    uint32_t VertexAttribute::GetStride() const { return _count * sizeof(float); }
 
-    GLuint VertexAttribute::GetTypeSize() const
+    VertexLayout::VertexLayout():
+        _stride(0)
     {
-        switch (_type)
-        {
-            case GL_FLOAT:          return sizeof(GLfloat);
-            case GL_INT:            return sizeof(GLint); 
-            case GL_UNSIGNED_INT:   return sizeof(GLuint);
-            case GL_BYTE:           return sizeof(GLbyte);
-            default:                return 0;
-        }
     }
 
-    IndexBuffer::IndexBuffer(const std::vector<GLuint>& indices)
+    // VertexLayout
+    VertexLayout::VertexLayout(const std::vector<VertexAttribute>& attributes):
+        _attributes(attributes),
+        _stride(0)
     {
-        _count = (GLuint)indices.size();
-        
-        GLCall(glGenBuffers(1, &_ibo));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo));
-        GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW));
+        for(auto attribute : _attributes)
+            _stride += attribute.GetStride();
     }
 
-    IndexBuffer::~IndexBuffer() { GLCall(glDeleteBuffers(1, &_ibo)); }
-    GLsizei IndexBuffer::Count() const { return _count; }
-    void IndexBuffer::Bind() const { GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo)); }
-
-    VertexLayout::VertexLayout() { }
-    VertexLayout::~VertexLayout() { }
-    GLsizei VertexLayout::Size() const { return _size; }
-    GLuint VertexLayout::AttributeCount() const { return _attributeCount; }
-    VertexAttribute& VertexLayout::operator[](GLuint index) { return _attributes[index]; }
-    VertexAttribute VertexLayout::operator[](GLsizei index) const { return _attributes[index]; }
-    void VertexLayout::AddAttribute(const VertexAttribute& attribute)
+    VertexAttribute& VertexLayout::operator[](int32_t index) { return GetAttribute(index); }
+    uint32_t VertexLayout::GetStride() const { return _stride; }
+    VertexAttribute& VertexLayout::GetAttribute(int32_t index) { return _attributes[index]; }
+    
+    VertexLayout& VertexLayout::AddAttribute(const VertexAttribute& attribute)
     {
-        _attributes.push_back(attribute);
-        _size += attribute.GetStride();
-        _attributeCount++;
+        _attributes.emplace_back(attribute);
+        _stride += attribute.GetStride();
+        return *this;
+    }
+    
+    uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
+
+    VertexData::VertexData():
+        _vertexData(0)
+    {
     }
 
-    VertexArray::VertexArray(const std::vector<GLfloat>& verts, const VertexLayout& layout)
+    // VertexData
+    VertexData::VertexData(const std::vector<float>& vertices):
+        _vertexData(vertices)
     {
-        // generate vertex array object
-        GLCall(glGenVertexArrays(1, &_vao));
-        GLCall(glBindVertexArray(_vao));
-
-        // generate vertex buffer object
-        GLCall(glGenBuffers(1, &_vbo));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
-        GLCall(glBufferData(GL_ARRAY_BUFFER, verts.size() * layout.Size(), verts.data(), GL_STATIC_DRAW));
-
-        // setup vertex array attributes
-        GLuint offset = 0;
-        for(GLuint i = 0; i < layout.AttributeCount(); i++)
-        {
-            const VertexAttribute attribute = layout[i];
-            GLCall(glEnableVertexAttribArray(i));
-            GLCall(glVertexAttribPointer(i, attribute.GetCount(), attribute.GetType(), attribute.IsNormalized(), layout.Size(), (const void*)(offset)));
-            offset += attribute.GetStride();
-        }
     }
 
-    VertexArray::~VertexArray()
+    float* VertexData::GetBuffer() { return _vertexData.data(); }
+    uint32_t VertexData::GetBufferSize() const { return (uint32_t)_vertexData.size() * sizeof(float); }
+    uint32_t VertexData::GetCount() const { return _vertexData.size(); }
+
+
+    IndexData::IndexData():
+        _indexData(0)
     {
-        GLCall(glDeleteBuffers(1, &_vbo));
-        GLCall(glDeleteVertexArrays(1, &_vao));
     }
 
-    void VertexArray::Bind() const
+    // IndexData
+    IndexData::IndexData(const std::vector<uint32_t>& indices):
+        _indexData(indices)
     {
-        GLCall(glBindVertexArray(_vao));
     }
+
+    uint32_t* IndexData::GetBuffer() { return _indexData.data(); }
+    uint32_t IndexData::GetBufferSize() const { return (uint32_t)_indexData.size() * sizeof(uint32_t); }
+    uint32_t IndexData::GetCount() const { return (uint32_t)_indexData.size(); }
 }

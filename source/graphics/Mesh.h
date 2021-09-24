@@ -6,14 +6,19 @@ namespace NDR
     class Mesh
     {
     public:
-        Mesh(const VertexArray& vertices, const IndexBuffer& indices) noexcept;
+        Mesh();
+        Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout);
         ~Mesh();
-        
-        const VertexArray& GetVertexData() const;
-        const IndexBuffer& GetIndexData() const;
+
+        uint32_t GetVertexCount() const;
+        uint32_t GetIndexCount() const;
         void Bind() const;
+
     private:
-        VertexArray _vertexArray;
-        IndexBuffer _indexBuffer;
+        GLuint _vao, _vbo, _ibo;
+        
+        VertexData _vertexData;
+        IndexData _indexData;
+        VertexLayout _layout;
     };
 }

@@ -1,10 +1,4 @@
 #pragma once
-#include <string>
-
-#ifndef GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_NONE
-#endif
-#include "GLFW/glfw3.h"
 
 namespace NDR
 {
@@ -43,9 +37,9 @@ namespace NDR
         uint32_t GetHeight() const;
     
     private:
-        GLFWwindow* _window = nullptr;
+        GLFWwindow* _window;
         WindowProps _properties;
-        bool _active = true;
+        bool _active;
         
         inline static uint32_t _windowCount = 0;
     };

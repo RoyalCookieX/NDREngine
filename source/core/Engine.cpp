@@ -1,45 +1,30 @@
+#include "ndrpch.h"
 #include "Engine.h"
 
 namespace NDR
 {
-    void Engine::Run()
+    Engine::Engine()
     {
-        if(!glfwInit())
-        {
-            printf("GLFW did not initalize!");
-            glfwTerminate();
-        }
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        _window = glfwCreateWindow(800, 600, "Rendering Test", nullptr, nullptr);
-        if(_window == nullptr)
-        {
-            printf("GLFW Window did not initalize!");
-            glfwTerminate();
-        }
-        glfwMakeContextCurrent(_window);
-
-        while (!glfwWindowShouldClose(_window))
-        {
-            PollEvents(); 
-            glfwSwapBuffers(_window);
-        }
-
-        glfwDestroyWindow(_window);
-        glfwTerminate();
+        _window = std::make_unique<Window>(WindowProps(800, 600, "NDREngine", true));
+        _renderer = std::make_unique<Renderer>();
+        _renderer->SetBlendMode(BlendMode::TRANSPARENT);
     }
 
-    void Engine::Render(Mesh mesh, Shader shader)
+    Engine::~Engine()
     {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        _renderer.release();
+        _window.release();
     }
 
-    void Engine::PollEvents() const
+    void Engine::Run() const
     {
-        if (glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(_window, true);
-        glfwPollEvents();
+        while (_window->Active())
+        {
+            _renderer->Clear();
+            _renderer->DrawBackground(0.1f, 0.3f, 0.6f, 1.0f);
+            _window->SwapBuffers();
+            
+            _window->PollEvents();
+        }
     }
 }

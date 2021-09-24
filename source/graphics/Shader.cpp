@@ -1,9 +1,5 @@
+#include "ndrpch.h"
 #include "Shader.h"
-
-#include <iostream>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "core/Error.h"
 
 namespace NDR
 {

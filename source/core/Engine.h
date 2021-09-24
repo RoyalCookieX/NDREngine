@@ -1,20 +1,19 @@
 #pragma once
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 
-#include "graphics/Mesh.h"
-#include "graphics/Shader.h"
+#include "Window.h"
+#include "graphics/Renderer.h"
 
 namespace NDR 
 {
     class Engine
     {
     public:
-        void Run();
-        void Render(Mesh mesh, Shader shader);
-        void PollEvents() const;
+        Engine();
+        ~Engine();
+        
+        void Run() const;
     private:
-        GLFWwindow* _window = nullptr;
+        std::unique_ptr<Window> _window;
+        std::unique_ptr<Renderer> _renderer;
     };
 }

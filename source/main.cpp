@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/Engine.h"
 #include "core/Error.h"
@@ -8,9 +9,6 @@
 #include "graphics/Shader.h"
 #include "graphics/Vertex.h"
 #include "utility/AssetManager.h"
-
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "runtime/objects/Camera.h"
 
 #if (NDR_RELEASE && NDR_PLATFORM_WINDOWS)
@@ -33,20 +31,22 @@ int main()
     const NDR::Renderer renderer;
     renderer.SetBlendMode(NDR::BlendMode::TRANSPARENT);
     
-    NDR::VertexLayout layout;
-    layout.AddAttribute({ 3, GL_FLOAT, GL_FALSE }); // position
-    layout.AddAttribute({ 2, GL_FLOAT, GL_FALSE }); // texcoords
-    const NDR::VertexArray vertexArray(
+    NDR::VertexData vertexData(
         {
             -200.0f, -200.0f, 0.0f, 0.0f, 0.0f,
              200.0f, -200.0f, 0.0f, 1.0f, 0.0f,
              200.0f,  200.0f, 0.0f, 1.0f, 1.0f,
             -200.0f,  200.0f, 0.0f, 0.0f, 1.0f,
-        },
-        layout
-        );
-    const NDR::IndexBuffer indexBuffer({ 0, 1, 2, 2, 3, 0 });
-    const NDR::Mesh mesh(vertexArray, indexBuffer);
+        }
+    );
+    vertexData
+    .AddAttribute({3, GL_FALSE})  // position
+    .AddAttribute({2, GL_FALSE}); // texcoords
+
+    const NDR::IndexData indexData({ 0, 1, 2, 2, 3, 0 });
+    const NDR::Mesh mesh(vertexData, indexData);
+   
+    // const NDR::Mesh mesh = NDR::AssetManager::LoadMesh("assets/meshes/Cube.obj");
     const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/UVTest.png");
     texture.Bind();
     const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/MVP.shader");

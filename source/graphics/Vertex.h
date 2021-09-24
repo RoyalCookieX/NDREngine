@@ -9,65 +9,50 @@ namespace NDR
     {
     public:
         VertexAttribute() = default;
-        VertexAttribute(GLuint count, GLenum type, bool normalized)
-            : _count(count),
-              _type(type),
-              _normalized(normalized)
-        {
-        }
+        VertexAttribute(GLuint count, bool normalized);
+        ~VertexAttribute() = default;
 
-        GLuint GetCount() const;
-        GLenum GetType() const;
+        uint32_t GetCount() const;
         bool IsNormalized() const;
-        GLuint GetTypeSize() const;
-        GLsizei GetStride() const;
+        uint32_t GetStride() const;
     private:
-        GLuint _count;
-        GLenum _type;
+        uint32_t _count;
         bool _normalized;
-
     };
 
-    struct VertexLayout
+    struct VertexData
     {
     public:
-        VertexLayout();
-        ~VertexLayout();
+        VertexData() = default;
+        VertexData(const std::vector<float>& vertices);
+        ~VertexData() = default;
+
+        VertexAttribute& operator[](int32_t index);
         
-        GLsizei Size() const;
-        GLuint AttributeCount() const;
-        VertexAttribute& operator[](GLuint index);
-        VertexAttribute operator[](GLsizei index) const;
-        void AddAttribute(const VertexAttribute& attribute);
-
+        float* GetBuffer();
+        uint32_t GetBufferSize() const;
+        uint32_t GetStride() const;
+        VertexAttribute& GetAttribute(int32_t index);
+        
+        VertexData& AddAttribute(const VertexAttribute& attribute);
+        uint32_t GetAttributeCount() const;
     private:
+        std::vector<float> _vertexData;
         std::vector<VertexAttribute> _attributes;
-        GLsizei _size = 0;
-        GLuint _attributeCount = 0;
+        uint32_t _stride;
     };
 
-    class VertexArray
+    struct IndexData
     {
     public:
-        VertexArray(const std::vector<GLfloat>& verts, const VertexLayout& layout);
-        ~VertexArray();
+        IndexData() = default;
+        IndexData(const std::vector<uint32_t>& indices);
+        ~IndexData() = default;
 
-        void Bind() const;
+        uint32_t* GetBuffer();
+        uint32_t GetBufferSize() const;
+        uint32_t GetCount() const;
     private:
-        GLuint _vao = 0;
-        GLuint _vbo = 0;
-    };
-
-    class IndexBuffer
-    {
-    public:
-        IndexBuffer(const std::vector<GLuint>& indices);
-        ~IndexBuffer();
-
-        GLsizei Count() const;
-        void Bind() const;
-    private:
-        GLuint _ibo = 0;
-        GLuint _count = 0;
+        std::vector<uint32_t> _indexData;
     };
 }

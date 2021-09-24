@@ -2,7 +2,9 @@
 
 #include <sstream>
 #include <fstream>
+#include <iostream>
 #include <stb_image.h>
+#include <tiny_obj_loader.h>
 
 namespace NDR
 {
@@ -35,6 +37,19 @@ namespace NDR
             }
         }
         return Shader(sources[0].str().c_str(), sources[1].str().c_str());
+    }
+
+    Mesh AssetManager::LoadMesh(const std::string& assetPath)
+    {
+        tinyobj::attrib_t attributes;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string errorMsg;
+
+        if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath().append(assetPath).c_str()))
+            std::cout << errorMsg << std::endl;
+
+        return Mesh({ });
     }
 
     Texture AssetManager::LoadTexture(const std::string& assetPath)

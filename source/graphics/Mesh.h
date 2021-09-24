@@ -10,6 +10,7 @@ namespace NDR
         Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout);
         ~Mesh();
 
+        uint32_t GetVertexCount() const;
         uint32_t GetIndexCount() const;
         void Bind() const;
 

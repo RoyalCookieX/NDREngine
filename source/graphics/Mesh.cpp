@@ -58,6 +58,7 @@ namespace NDR
         GLCall(glDeleteVertexArrays(1, &_vao));
     }
 
+    uint32_t Mesh::GetVertexCount() const { return _vertexData.GetCount(); }
     uint32_t Mesh::GetIndexCount() const { return _indexData.GetCount(); }
     void Mesh::Bind() const
     {

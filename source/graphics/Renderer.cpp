@@ -21,7 +21,14 @@ namespace NDR
     void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
     {
         mesh.Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+        if(mesh.GetIndexCount() > 0)
+        {
+            GLCall(glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+        }
+        else
+        {
+            GLCall(glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount()));
+        }
     }
 
     void Renderer::DrawBackground(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const

@@ -4,6 +4,12 @@
 
 namespace NDR
 {
+    VertexAttribute::VertexAttribute():
+        _count(1),
+        _normalized(false)
+    {
+    }
+
     // VertexAttribute
     VertexAttribute::VertexAttribute(GLuint count, bool normalized):
         _count(count),
@@ -14,6 +20,11 @@ namespace NDR
     uint32_t VertexAttribute::GetCount() const { return _count; }
     bool VertexAttribute::IsNormalized() const { return _normalized; }
     uint32_t VertexAttribute::GetStride() const { return _count * sizeof(float); }
+
+    VertexLayout::VertexLayout():
+        _stride(0)
+    {
+    }
 
     // VertexLayout
     VertexLayout::VertexLayout(const std::vector<VertexAttribute>& attributes):
@@ -37,15 +48,26 @@ namespace NDR
     
     uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
 
+    VertexData::VertexData():
+        _vertexData(0)
+    {
+    }
+
     // VertexData
     VertexData::VertexData(const std::vector<float>& vertices):
         _vertexData(vertices)
     {
-
     }
 
     float* VertexData::GetBuffer() { return _vertexData.data(); }
     uint32_t VertexData::GetBufferSize() const { return (uint32_t)_vertexData.size() * sizeof(float); }
+    uint32_t VertexData::GetCount() const { return _vertexData.size(); }
+
+
+    IndexData::IndexData():
+        _indexData(0)
+    {
+    }
 
     // IndexData
     IndexData::IndexData(const std::vector<uint32_t>& indices):

@@ -30,16 +30,33 @@ int main()
     const NDR::Window window({ windowWidth, windowHeight, "NDREngine", true });
     const NDR::Renderer renderer;
     renderer.SetBlendMode(NDR::BlendMode::TRANSPARENT);
-    
+
+#define TEST 0
+#if TEST
+#define DRAW_ARRAYS 0
+#if DRAW_ARRAYS
+    NDR::VertexData vertexData(
+    {
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+         0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+    }
+);
+    const NDR::IndexData indexData;
+#else
     NDR::VertexData vertexData(
         {
-            -200.0f, -200.0f, 0.0f, 0.0f, 0.0f,
-             200.0f, -200.0f, 0.0f, 1.0f, 0.0f,
-             200.0f,  200.0f, 0.0f, 1.0f, 1.0f,
-            -200.0f,  200.0f, 0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
         }
     );
-    const NDR::IndexData indexData({ 0, 1, 2, 2, 3, 0 });
+    const NDR::IndexData indexData({0, 1, 2, 2, 3, 0 });
+#endif
     const NDR::VertexLayout layout(
 {
             {3, GL_FALSE}, // position
@@ -47,8 +64,9 @@ int main()
         }
     );
     const NDR::Mesh mesh(vertexData, indexData, layout);
-   
-    // const NDR::Mesh mesh = NDR::AssetManager::LoadMesh("assets/meshes/Cube.obj");
+#else 
+    const NDR::Mesh mesh = NDR::AssetManager::LoadMesh("assets/meshes/Cube.obj");
+#endif
     const NDR::Texture texture = NDR::AssetManager::LoadTexture("assets/textures/UVTest.png");
     texture.Bind();
     const NDR::Shader shader = NDR::AssetManager::LoadShader("assets/shaders/MVP.shader");
@@ -56,15 +74,16 @@ int main()
     shader.SetInt("u_Texture", 0);
 
     float t = 0;
-    const glm::mat4x4 orthoProj = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -1.0f, 1.0f);
+    const glm::mat4x4 orthoProj = glm::ortho(-2.0f, 2.0f, -1.125f, 1.125f, -1.0f, 1.0f);
     NDR::Camera cam(orthoProj);
+    cam.SetPosition(0.0f, 0.0f, -1.0f);
     
     while (window.Active())
     {
         const float sine = sinf(t);
         const float g = (sine + 1.0f) * 0.5f;
         //cam.SetPosition(sine * 0.2f, 0.0f, 0.0f);
-        cam.Rotate(0.02f, glm::vec3(0.0f, 1.0f, 0.0f));
+        cam.Rotate(0.02f, glm::vec3(1.0f, 0.0f, 1.0f));
         
         t += 0.05f;
         shader.SetVec4("u_Color", 1.f, g, 1.f, 1.f);

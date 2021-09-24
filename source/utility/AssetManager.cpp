@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stb_image.h>
 #include <tiny_obj_loader.h>
+#include <unordered_set>
 
 namespace NDR
 {
@@ -47,9 +48,41 @@ namespace NDR
         std::string errorMsg;
 
         if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath().append(assetPath).c_str()))
-            std::cout << errorMsg << std::endl;
+        {
+            std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
+            return Mesh({});
+        }
+        
+        tinyobj::mesh_t mesh = shapes[0].mesh;
+        std::unordered_set<uint32_t> indexCache;
+        VertexLayout layout;
+        layout
+        .AddAttribute({3, false})  // position
+        .AddAttribute({2, false})  // tex coords
+        .AddAttribute({3, false}); // normals
+        std::vector<float> verts;
+        std::vector<uint32_t> indices;
 
-        return Mesh({ });
+        for(int i = 0; i < mesh.indices.size(); i++)
+        {
+            tinyobj::index_t index = mesh.indices[i];
+            const int posIndex = index.vertex_index;
+            const int texIndex = index.texcoord_index;
+            const int nmlIndex = index.normal_index;
+
+            verts.push_back(attributes.vertices[posIndex * 3 + 0]);
+            verts.push_back(attributes.vertices[posIndex * 3 + 1]);
+            verts.push_back(attributes.vertices[posIndex * 3 + 2]);
+
+            verts.push_back(attributes.texcoords[texIndex * 2 + 0]);
+            verts.push_back(attributes.texcoords[texIndex * 2 + 1]);
+
+            verts.push_back(attributes.normals[nmlIndex * 3 + 0]);
+            verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
+            verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
+        }
+        
+        return Mesh(VertexData(verts), IndexData(indices), layout);
     }
 
     Texture AssetManager::LoadTexture(const std::string& assetPath)

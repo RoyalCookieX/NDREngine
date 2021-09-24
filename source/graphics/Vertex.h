@@ -8,7 +8,7 @@ namespace NDR
     struct VertexAttribute
     {
     public:
-        VertexAttribute() = default;
+        VertexAttribute();
         VertexAttribute(GLuint count, bool normalized);
         ~VertexAttribute() = default;
 
@@ -23,7 +23,7 @@ namespace NDR
     struct VertexLayout
     {
     public:
-        VertexLayout() = default;
+        VertexLayout();
         VertexLayout(const std::vector<VertexAttribute>& attributes);
         ~VertexLayout() = default;
 
@@ -42,12 +42,13 @@ namespace NDR
     struct VertexData
     {
     public:
-        VertexData() = default;
+        VertexData();
         VertexData(const std::vector<float>& vertices);
         ~VertexData() = default;
         
         float* GetBuffer();
         uint32_t GetBufferSize() const;
+        uint32_t GetCount() const;
     private:
         std::vector<float> _vertexData;
     };
@@ -55,7 +56,7 @@ namespace NDR
     struct IndexData
     {
     public:
-        IndexData() = default;
+        IndexData();
         IndexData(const std::vector<uint32_t>& indices);
         ~IndexData() = default;
 

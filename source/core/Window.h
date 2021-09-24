@@ -43,9 +43,9 @@ namespace NDR
         uint32_t GetHeight() const;
     
     private:
-        GLFWwindow* _window = nullptr;
+        GLFWwindow* _window;
         WindowProps _properties;
-        bool _active = true;
+        bool _active;
         
         inline static uint32_t _windowCount = 0;
     };

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <queue>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

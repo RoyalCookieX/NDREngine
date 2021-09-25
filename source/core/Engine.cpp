@@ -1,6 +1,8 @@
 #include "ndrpch.h"
 #include "Engine.h"
 
+#include "input/Input.h"
+
 namespace NDR
 {
     Engine::Engine()
@@ -25,6 +27,11 @@ namespace NDR
             _window->SwapBuffers();
             
             _window->PollEvents();
+
+            if(Input::GetKey(NDR_KEY_W)) printf("Up\n");
+            if(Input::GetKey(NDR_KEY_A)) printf("Left\n");
+            if(Input::GetKey(NDR_KEY_S)) printf("Down\n");
+            if(Input::GetKey(NDR_KEY_D)) printf("Right\n");
         }
     }
 }

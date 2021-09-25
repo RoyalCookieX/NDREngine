@@ -1,8 +1,6 @@
 #include "ndrpch.h"
 #include "Window.h"
 
-#include <glad/glad.h>
-
 namespace NDR
 {
     Window::Window(const WindowProps& properties)
@@ -23,6 +21,9 @@ namespace NDR
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#if NDR_DEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
         _window = glfwCreateWindow(properties.width, properties.height, properties.name.c_str(), nullptr, nullptr);
         if(_window == nullptr)
         {
@@ -43,11 +44,6 @@ namespace NDR
         {
             ((Window*)glfwGetWindowUserPointer(w))->Close();
         });
-
-        glfwSetKeyCallback(_window, [](GLFWwindow* w, int key, int scancode, int action, int mods)
-        {
-            if(key == GLFW_KEY_ESCAPE) ((Window*)glfwGetWindowUserPointer(w))->Close();
-        });
     }
 
     Window::~Window()
@@ -60,6 +56,9 @@ namespace NDR
         }
     }
 
+    Window::operator struct GLFWwindow*() const { return _window; }
+
+    void Window::AddCallback(EventFunc callback) { _callbacks.push_back(callback); }
     void Window::SetContextCurrent() const { glfwMakeContextCurrent(_window); }
     void Window::SetVSync(bool vSync) { glfwSwapInterval(vSync); }
     bool Window::Active() const { return _active; }
@@ -70,4 +69,6 @@ namespace NDR
 
     uint32_t Window::GetWidth() const { return _properties.width; }
     uint32_t Window::GetHeight() const { return _properties.height; }
+
+    void Window::Dispatch(Event* event) const { for (auto callback : _callbacks) callback(event); }
 }

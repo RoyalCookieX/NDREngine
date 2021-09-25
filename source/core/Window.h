@@ -1,4 +1,5 @@
 #pragma once
+#include "input/Event.h"
 
 namespace NDR
 {
@@ -19,12 +20,17 @@ namespace NDR
         }
     };
     
+    typedef void (*EventFunc)(Event*);
+    
     class Window
     {
     public:
         Window(const WindowProps& properties);
         ~Window();
 
+        explicit operator GLFWwindow*() const;
+
+        void AddCallback(EventFunc callback);
         void SetContextCurrent() const;
         void SetVSync(bool vSync);
         bool Active() const;
@@ -35,11 +41,13 @@ namespace NDR
 
         uint32_t GetWidth() const;
         uint32_t GetHeight() const;
-    
     private:
+        void Dispatch(Event* event) const;
+        
         GLFWwindow* _window;
         WindowProps _properties;
         bool _active;
+        std::vector<EventFunc> _callbacks;
         
         inline static uint32_t _windowCount = 0;
     };

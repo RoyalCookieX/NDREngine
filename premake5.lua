@@ -1,5 +1,5 @@
 TARGET_DIR = "%{wks.location}/binaries/%{cfg.buildcfg}/%{cfg.platform}"
-OBJECT_DIR = "!$(SolutionDir)/intermediates/$(Configuration)/$(Platform)/$(ProjectName)"
+OBJECT_DIR = "!$(SolutionDir)intermediates/$(Configuration)/$(Platform)/$(ProjectName)"
 
 INCLUDE_DIR = {}
 

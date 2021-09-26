@@ -1,5 +1,7 @@
 #pragma once
 
+#define NDR_DISABLE_GLCALL
+#ifndef NDR_DISABLE_GLCALL
 #if (NDR_DEBUG || NDR_FORCE_LOG)
 #define GLCall(x) NDR::ClearGLErrors();\
     x;\
@@ -35,3 +37,4 @@ namespace NDR
         }
     }
 }
+#endif

@@ -3,13 +3,13 @@
 
 namespace NDR
 {
+    // VertexAttribute
     VertexAttribute::VertexAttribute():
         _count(1),
         _normalized(false)
     {
     }
 
-    // VertexAttribute
     VertexAttribute::VertexAttribute(GLuint count, bool normalized):
         _count(count),
         _normalized(normalized)

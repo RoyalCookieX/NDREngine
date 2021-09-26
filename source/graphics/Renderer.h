@@ -14,12 +14,13 @@ namespace NDR
     class Renderer
     {
     public:
-        Renderer();
-        ~Renderer();
+        virtual ~Renderer() { }
         
-        void Clear() const;
-        void Draw(const Mesh& mesh, const Shader& shader) const;
-        void DrawBackground(GLfloat r, GLfloat g, GLfloat b, GLfloat a) const;
-        void SetBlendMode(const BlendMode& blendMode) const;
+        virtual void Clear() const = 0;
+        virtual void Draw(const Mesh& mesh, const Shader& shader) const = 0;
+        virtual void DrawBackground(float r, float g, float b, float a) const = 0;
+        virtual void SetBlendMode(const BlendMode& blendMode) const = 0;
+
+        static Renderer* Create();
     };
 }

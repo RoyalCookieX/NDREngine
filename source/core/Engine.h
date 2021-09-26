@@ -13,7 +13,7 @@ namespace NDR
         
         void Run() const;
     private:
-        std::unique_ptr<Window> _window;
-        std::unique_ptr<Renderer> _renderer;
+        Window* _window;
+        Renderer* _renderer;
     };
 }

@@ -7,15 +7,14 @@ namespace NDR
 {
     Engine::Engine()
     {
-        _window = std::make_unique<Window>(WindowProps(800, 600, "NDREngine", true));
-        _renderer = std::make_unique<Renderer>();
+        _window = Window::Create(WindowProps(800, 600, "NDREngine", true));
+        _renderer = Renderer::Create();
         _renderer->SetBlendMode(BlendMode::TRANSPARENT);
     }
 
     Engine::~Engine()
     {
-        _renderer.release();
-        _window.release();
+        delete _renderer;
     }
 
     void Engine::Run() const
@@ -27,7 +26,7 @@ namespace NDR
             _window->SwapBuffers();
             
             _window->PollEvents();
-
+            if(Input::GetKey(NDR_KEY_ESCAPE)) _window->Close();
             if(Input::GetKey(NDR_KEY_W)) printf("Up\n");
             if(Input::GetKey(NDR_KEY_A)) printf("Left\n");
             if(Input::GetKey(NDR_KEY_S)) printf("Down\n");

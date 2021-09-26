@@ -6,7 +6,7 @@ namespace NDR
     {
     public:
         VertexAttribute();
-        VertexAttribute(GLuint count, bool normalized);
+        VertexAttribute(uint32_t count, bool normalized);
         ~VertexAttribute() = default;
 
         uint32_t GetCount() const;

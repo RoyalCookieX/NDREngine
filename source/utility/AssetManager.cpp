@@ -8,7 +8,7 @@ namespace NDR
         return "";
     }
 
-    Shader AssetManager::LoadShader(const std::string& assetPath)
+    Shader* AssetManager::LoadShader(const std::string& assetPath)
     {
         enum SHADERTYPE { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
         SHADERTYPE type = NONE;
@@ -31,10 +31,10 @@ namespace NDR
                 sources[type] << line << std::endl;
             }
         }
-        return Shader(sources[0].str().c_str(), sources[1].str().c_str());
+        return Shader::Create(sources[0].str(), sources[1].str());
     }
 
-    Mesh AssetManager::LoadMesh(const std::string& assetPath)
+    Mesh* AssetManager::LoadMesh(const std::string& assetPath)
     {
         tinyobj::attrib_t attributes;
         std::vector<tinyobj::shape_t> shapes;
@@ -44,7 +44,7 @@ namespace NDR
         if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath().append(assetPath).c_str()))
         {
             std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
-            return Mesh({});
+            return nullptr;
         }
         
         tinyobj::mesh_t mesh = shapes[0].mesh;
@@ -57,7 +57,7 @@ namespace NDR
         std::vector<float> verts;
         std::vector<uint32_t> indices;
 
-        for(int i = 0; i < mesh.indices.size(); i++)
+        for(uint32_t i = 0; i < mesh.indices.size(); i++)
         {
             tinyobj::index_t index = mesh.indices[i];
             const int posIndex = index.vertex_index;
@@ -76,14 +76,14 @@ namespace NDR
             verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
         }
         
-        return Mesh(VertexData(verts), IndexData(indices), layout);
+        return Mesh::Create(VertexData(verts), IndexData(indices), layout);
     }
 
-    Texture AssetManager::LoadTexture(const std::string& assetPath)
+    Texture* AssetManager::LoadTexture(const std::string& assetPath)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
-        return Texture(width, height, bpp, buffer);
+        return Texture::Create(width, height, bpp, buffer);
     }
 }

@@ -5,16 +5,10 @@ namespace NDR
     class Texture
     {
     public:
-        Texture(int width, int height, int bitsPerPixel, unsigned char* buffer);
-        ~Texture();
+        virtual ~Texture() { }
 
-        void Bind(GLuint slot = 0) const;
+        virtual void Bind(uint32_t slot = 0) const = 0;
 
-    private:
-        GLuint _id;
-        int _width = 0;
-        int _height = 0;
-        int _bitsPerPixel = 0;
-        unsigned char* _buffer = nullptr;
+        static Texture* Create(int32_t width, int32_t height, int32_t bitsPerPixel, unsigned char* buffer);
     };
 }

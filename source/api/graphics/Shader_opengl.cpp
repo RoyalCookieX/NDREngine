@@ -5,8 +5,9 @@ namespace NDR
 {
     int32_t Shader::CompileSource(uint32_t shaderType, const std::string& source)
     {
+        const char* src = source.c_str();
         const GLuint id = glCreateShader(shaderType);
-        glShaderSource(id, 1, (const char* const*)source.c_str(), nullptr);
+        glShaderSource(id, 1, &src, nullptr);
         glCompileShader(id);
 
         int32_t result;

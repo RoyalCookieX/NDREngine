@@ -1,17 +1,18 @@
 #pragma once
 
-#define NDR_DISABLE_GLCALL
-#ifndef NDR_DISABLE_GLCALL
 #if (NDR_DEBUG || NDR_FORCE_LOG)
-#define GLCall(x) NDR::ClearGLErrors();\
-    x;\
-    NDR::PrintGLErrors(__FILE__, #x, __LINE__)
-#else
-#define GLCall(x) x
+    #ifdef NDR_GRAPHICSAPI_OPENGL
+        #define GRAPHICSAPICALL(x) NDR::ClearGLErrors();\
+        x;\
+        NDR::PrintGLErrors(__FILE__, #x, __LINE__)
+    #else
+        #define GRAPHICSAPICALL(x) x
+    #endif
 #endif
 
 namespace NDR
 {
+#ifdef NDR_GRAPHICSAPI_OPENGL
     static void ClearGLErrors()
     {
         while(glGetError() != GL_NO_ERROR) { }
@@ -36,5 +37,5 @@ namespace NDR
             printf("%s @ LINE %d -> [OpenGL Error (%s)]: %s\n", file, line, errorMsg, glCall);
         }
     }
-}
 #endif
+}

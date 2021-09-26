@@ -18,16 +18,16 @@ namespace GraphicsAPI
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
-        void Renderer_opengl::Draw(const Mesh& mesh, const Shader& shader) const
+        void Renderer_opengl::Draw(Mesh* mesh, Shader* shader) const
         {
-            mesh.Bind();
-            if(mesh.GetIndexCount() > 0)
+            mesh->Bind();
+            if(mesh->GetIndexCount() > 0)
             {
-                glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+                glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
             }
             else
             {
-                glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount());
+                glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
             }
         }
 

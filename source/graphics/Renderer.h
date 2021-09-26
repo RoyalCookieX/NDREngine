@@ -17,7 +17,7 @@ namespace NDR
         virtual ~Renderer() { }
         
         virtual void Clear() const = 0;
-        virtual void Draw(const Mesh& mesh, const Shader& shader) const = 0;
+        virtual void Draw(Mesh* mesh, Shader* shader) const = 0;
         virtual void DrawBackground(float r, float g, float b, float a) const = 0;
         virtual void SetBlendMode(const BlendMode& blendMode) const = 0;
 

@@ -5,9 +5,9 @@
         #define GRAPHICSAPICALL(x) NDR::ClearGLErrors();\
         x;\
         NDR::PrintGLErrors(__FILE__, #x, __LINE__)
-    #else
-        #define GRAPHICSAPICALL(x) x
     #endif
+#elif NDR_RELEASE
+    #define GRAPHICSAPICALL(x) x
 #endif
 
 namespace NDR

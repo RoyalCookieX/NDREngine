@@ -17,15 +17,15 @@ namespace GraphicsAPI
           _bitsPerPixel(bitsPerPixel),
           _buffer(buffer)
     {
-        GRAPHICSAPICALL(glCreateTextures(GL_TEXTURE_2D, 1, &_id));
-        GRAPHICSAPICALL(glBindTexture(GL_TEXTURE_2D, _id));
+        glCreateTextures(GL_TEXTURE_2D, 1, &_id);
+        glBindTexture(GL_TEXTURE_2D, _id);
 
-        GRAPHICSAPICALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-        GRAPHICSAPICALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-        GRAPHICSAPICALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        GRAPHICSAPICALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        GRAPHICSAPICALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer));
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer);
     }
 
     Texture_opengl::~Texture_opengl()
@@ -33,7 +33,7 @@ namespace GraphicsAPI
         glDeleteTextures(1, &_id);
     }
 
-    void Texture_opengl::Bind(uint32_t slot) const
+    void Texture_opengl::Bind(const uint32_t slot) const
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, _id);

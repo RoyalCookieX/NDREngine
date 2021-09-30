@@ -1,4 +1,5 @@
 #pragma once
+#include "Buffer.h"
 
 namespace NDR
 {
@@ -36,31 +37,31 @@ namespace NDR
         uint32_t _stride;
     };
 
-    struct VertexData
+    class VertexArray
     {
     public:
-        VertexData();
-        VertexData(const std::vector<float>& vertices);
-        ~VertexData() = default;
+        VertexArray();
+        VertexArray(VertexBuffer&& vertexBuffer, const VertexLayout& layout);
+        ~VertexArray();
+
+        VertexArray(const VertexArray&) = delete;
+        VertexArray& operator=(const VertexArray&) = delete;
+
+        VertexArray(VertexArray&& other) noexcept;
+        VertexArray& operator=(VertexArray&& other) noexcept;
+
+        const VertexBuffer& GetVertexBuffer() const;
+        size_t GetVertexCount() const;
+        void Bind() const;
+
+        friend bool operator==(const VertexArray& left, const VertexArray& right);
+    private:
+        uint32_t _id;
         
-        float* GetBuffer();
-        uint32_t GetBufferSize() const;
-        uint32_t GetCount() const;
-    private:
-        std::vector<float> _vertexData;
+        VertexBuffer _vertexBuffer;
+        VertexLayout _layout;
     };
 
-    struct IndexData
-    {
-    public:
-        IndexData();
-        IndexData(const std::vector<uint32_t>& indices);
-        ~IndexData() = default;
-
-        uint32_t* GetBuffer();
-        uint32_t GetBufferSize() const;
-        uint32_t GetCount() const;
-    private:
-        std::vector<uint32_t> _indexData;
-    };
+    extern bool operator==(const VertexArray& left, const VertexArray& right);
+    extern bool operator!=(const VertexArray& left, const VertexArray& right);
 }

@@ -1,4 +1,6 @@
 #pragma once
+#include "Buffer.h"
+#include "Shader.h"
 #include "Vertex.h"
 
 namespace NDR
@@ -6,12 +8,26 @@ namespace NDR
     class Mesh
     {
     public:
-        virtual ~Mesh() { }
+        Mesh();
+        Mesh(VertexArray&& vertexArray, IndexBuffer&& indexBuffer, Shader&& shader);
+        ~Mesh();
 
-        virtual uint32_t GetVertexCount() const = 0;
-        virtual uint32_t GetIndexCount() const = 0;
-        virtual void Bind() const = 0;
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(const Mesh&) = delete;
 
-        static Mesh* Create(const VertexData& vertices, const IndexData& indices, const VertexLayout& layout);
+        Mesh(Mesh&& other) noexcept;
+        Mesh& operator=(Mesh&& other) noexcept;
+
+        const VertexArray& GetVertexArray() const;
+        const IndexBuffer& GetIndexBuffer() const;
+        const Shader& GetShader() const;
+
+    private:
+        VertexArray _vertexArray;
+        IndexBuffer _indexBuffer;
+        Shader _shader;
     };
+
+    extern bool operator==(const Mesh& left, const Mesh& right);
+    extern bool operator!=(const Mesh& left, const Mesh& right);
 }

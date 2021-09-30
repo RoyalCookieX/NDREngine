@@ -47,34 +47,66 @@ namespace NDR
     
     uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
 
-    VertexData::VertexData():
-        _vertexData(0)
+    VertexArray::VertexArray():
+        _id(0)
     {
     }
 
-    // VertexData
-    VertexData::VertexData(const std::vector<float>& vertices):
-        _vertexData(vertices)
+    VertexArray::VertexArray(VertexBuffer&& vertexBuffer, const VertexLayout& layout):
+        _id(0),
+        _vertexBuffer(std::move(vertexBuffer)),
+        _layout(layout)
     {
+        // create vertex array object
+        glCreateVertexArrays(1, &_id);
+        glBindVertexArray(_id);
+
+        _vertexBuffer.Bind();
+
+        // setup vertex attributes
+        auto offset = 0;
+        for(uint32_t attributeIndex = 0; attributeIndex < _layout.GetAttributeCount(); attributeIndex++)
+        {
+            VertexAttribute attribute = _layout[attributeIndex];
+            glEnableVertexAttribArray(attributeIndex);
+            glVertexAttribPointer(
+                attributeIndex,
+                attribute.GetCount(),
+                GL_FLOAT,
+                attribute.IsNormalized(),
+                _layout.GetStride(),
+                (const void*)offset);
+            offset += attribute.GetStride();
+        }
     }
 
-    float* VertexData::GetBuffer() { return _vertexData.data(); }
-    uint32_t VertexData::GetBufferSize() const { return (uint32_t)_vertexData.size() * sizeof(float); }
-    uint32_t VertexData::GetCount() const { return _vertexData.size(); }
+    VertexArray::~VertexArray() { glDeleteVertexArrays(1, &_id); }
 
-
-    IndexData::IndexData():
-        _indexData(0)
+    VertexArray::VertexArray(VertexArray&& other) noexcept:
+        _id(other._id),
+        _vertexBuffer(std::move(other._vertexBuffer)),
+        _layout(other._layout)
     {
+        other._id = 0;
     }
 
-    // IndexData
-    IndexData::IndexData(const std::vector<uint32_t>& indices):
-        _indexData(indices)
+    VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
     {
+        if(*this != other)
+        {
+            _id = other._id;
+            _vertexBuffer = std::move(other._vertexBuffer);
+            _layout = other._layout;
+
+            other._id = 0;
+        }
+        return *this;
     }
 
-    uint32_t* IndexData::GetBuffer() { return _indexData.data(); }
-    uint32_t IndexData::GetBufferSize() const { return (uint32_t)_indexData.size() * sizeof(uint32_t); }
-    uint32_t IndexData::GetCount() const { return (uint32_t)_indexData.size(); }
+    const VertexBuffer& VertexArray::GetVertexBuffer() const { return _vertexBuffer; }
+    size_t VertexArray::GetVertexCount() const { return _vertexBuffer.GetCount(); }
+    void VertexArray::Bind() const { glBindVertexArray(_id); }
+
+    bool operator==(const VertexArray& left, const VertexArray& right) { return left._id == right._id; }
+    bool operator!=(const VertexArray& left, const VertexArray& right) { return !(left == right); }
 }

@@ -17,10 +17,10 @@ namespace NDR
     private:
         Window* _window;
         Renderer* _renderer;
-
-        Mesh* _quadMesh;
-        Shader* _shader;
-        Texture* _renderTexture;
-        Framebuffer* _framebuffer;
+        
+        Mesh _quadMesh;
+        Texture _quadTexture;
+        Shader _quadShader;
+        Framebuffer _framebuffer;
     };
 }

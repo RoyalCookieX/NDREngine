@@ -4,12 +4,21 @@
 
 namespace NDR
 {
-    VertexBuffer::VertexBuffer(float* vertices)
+    VertexBuffer::VertexBuffer():
+        _id(0),
+        _count(0),
+        _size(0)
     {
-        _size = sizeof(vertices) * sizeof(float);
-        _count = sizeof(vertices) / sizeof(float);
+    }
+
+    VertexBuffer::VertexBuffer(std::vector<float> vertices):
+        VertexBuffer()
+    {
+        _size = vertices.size() * sizeof(float);
+        _count = vertices.size();
         glCreateBuffers(1, &_id);
-        glBufferData(GL_ARRAY_BUFFER, _size, vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, _id);
+        glBufferData(GL_ARRAY_BUFFER, _size, vertices.data(), GL_STATIC_DRAW);
     }
 
     VertexBuffer::~VertexBuffer() { Release(); }
@@ -54,12 +63,21 @@ namespace NDR
     bool operator==(const VertexBuffer& left, const VertexBuffer& right) { return left._id == right._id; }
     bool operator!=(const VertexBuffer& left, const VertexBuffer& right) { return !(left == right); }
 
-    IndexBuffer::IndexBuffer(uint32_t* indices)
+    IndexBuffer::IndexBuffer():
+        _id(0),
+        _count(0),
+        _size(0)
     {
-        _size = sizeof(indices) * sizeof(float);
-        _count = sizeof(indices) / sizeof(float);
+    }
+
+    IndexBuffer::IndexBuffer(std::vector<uint32_t> indices):
+        IndexBuffer()
+    {
+        _size = indices.size() * sizeof(uint32_t);
+        _count = indices.size();
         glCreateBuffers(1, &_id);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _size, indices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _id);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _size, indices.data(), GL_STATIC_DRAW);
     }
 
     IndexBuffer::~IndexBuffer() { Release(); }

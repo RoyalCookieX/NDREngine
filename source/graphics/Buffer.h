@@ -5,7 +5,8 @@ namespace NDR
     class VertexBuffer
     {
     public:
-        VertexBuffer(float* vertices);
+        VertexBuffer();
+        VertexBuffer(std::vector<float> vertices);
         ~VertexBuffer();
 
         VertexBuffer(const VertexBuffer&) = delete;
@@ -26,13 +27,14 @@ namespace NDR
         size_t _count, _size;
     };
 
-    static bool operator==(const VertexBuffer& left, const VertexBuffer& right);
-    static bool operator!=(const VertexBuffer& left, const VertexBuffer& right);
+    extern bool operator==(const VertexBuffer& left, const VertexBuffer& right);
+    extern bool operator!=(const VertexBuffer& left, const VertexBuffer& right);
 
     class IndexBuffer
     {
     public:
-        IndexBuffer(uint32_t* indices);
+        IndexBuffer();
+        IndexBuffer(std::vector<uint32_t> indices);
         ~IndexBuffer();
 
         IndexBuffer(const IndexBuffer&) = delete;
@@ -53,6 +55,6 @@ namespace NDR
         size_t _count, _size;
     };
 
-    static bool operator==(const IndexBuffer& left, const IndexBuffer& right);
-    static bool operator!=(const IndexBuffer& left, const IndexBuffer& right);
+    extern bool operator==(const IndexBuffer& left, const IndexBuffer& right);
+    extern bool operator!=(const IndexBuffer& left, const IndexBuffer& right);
 }

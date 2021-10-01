@@ -74,7 +74,7 @@ namespace NDR
         .AddAttribute({3, false}); // normals
         VertexArray vertexArray(std::move(vertexBuffer), layout);        
         
-        return Mesh(std::move(vertexArray), std::move(indexBuffer), Shader());
+        return Mesh(std::move(vertexArray), std::move(indexBuffer), LoadShader("assets/shaders/Cube.shader"));
     }
 
     Texture AssetManager::LoadTexture(const std::string& assetPath)

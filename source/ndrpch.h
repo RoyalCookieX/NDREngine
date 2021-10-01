@@ -25,3 +25,4 @@
 #include <tiny_obj_loader.h>
 
 #include "core/APICall.h"
+#include "core/Log.h"

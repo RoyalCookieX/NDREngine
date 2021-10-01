@@ -25,6 +25,8 @@ namespace NDR
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(MessageCallback, nullptr);
+
+        glEnable(GL_DEPTH_TEST);
 #endif
     }
     Renderer::~Renderer() { }

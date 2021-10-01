@@ -20,8 +20,8 @@ namespace NDR
         Renderer* _renderer;
 
         Camera _cam;
-        Texture _quadTexture;
-        Mesh _quadMesh;
+        Texture _cubeTexture;
+        Mesh _cubeMesh;
         Framebuffer _framebuffer;
     };
 }

@@ -35,12 +35,13 @@ namespace NDR
         
         _quadTexture = AssetManager::LoadTexture("assets/textures/UVTest.png");
         _quadTexture.Bind(0);
-        _quadShader = AssetManager::LoadShader("assets/shaders/Texture.shader");
-        _quadShader.Use();
-        _quadShader.SetInt("u_Texture", 0);
-        _quadMesh = Mesh(std::move(vertexArray), std::move(indexBuffer), std::move(_quadShader));
+        Shader quadShader = AssetManager::LoadShader("assets/shaders/Texture.shader");
+        quadShader.Use();
+        quadShader.SetInt("u_Texture", 0);
+        _quadMesh = Mesh(std::move(vertexArray), std::move(indexBuffer), std::move(quadShader));
 
-        //_framebuffer = Framebuffer(FramebufferMode::SCREENSIZE, 800, 600);
+        _cam = Camera(glm::perspective(glm::radians(45.0f), 1.33f, 0.1f, 100.0f));
+        _cam.GetTransform().SetPosition(0.0f, 0.0f, -2.0f);
     }
 
     Engine::~Engine()
@@ -48,9 +49,10 @@ namespace NDR
         delete _renderer;
     }
 
-    void Engine::Run() const
+    void Engine::Run()
     {
         float t = 0;
+        
         while (_window->Active())
         {
             const float r = ((glm::sin(t + 0.0f) + 1.0f) * 0.5f) * 0.5f;
@@ -58,19 +60,30 @@ namespace NDR
             const float b = ((glm::sin(t + 4.2f) + 1.0f) * 0.5f) * 0.5f;
             t += 0.02f;
 
+            const glm::mat4 model = glm::mat4(1.0f);
+            const glm::mat4 viewProj = _cam.GetViewProjMatrix();
+            const glm::mat4 mvp = model * viewProj;
+            
+            _quadMesh.GetShader().SetMat4("u_MVP", model);
+
             _renderer->Clear();
             _renderer->DrawBackground(r, g, b, 1.0f);
-            //_framebuffer.Bind();
             _renderer->Draw(_quadMesh);
-            //_framebuffer.Unbind();
             _window->SwapBuffers();
 
             _window->PollEvents();
             if(Input::GetKey(NDR_KEY_ESCAPE)) _window->Close();
-            if(Input::GetKey(NDR_KEY_W)) printf("Up\n");
-            if(Input::GetKey(NDR_KEY_A)) printf("Left\n");
-            if(Input::GetKey(NDR_KEY_S)) printf("Down\n");
-            if(Input::GetKey(NDR_KEY_D)) printf("Right\n");
+            if(Input::GetKey(NDR_KEY_W))
+                _cam.GetTransform().Translate( 0.0f,  0.1f, 0.0f);
+            if(Input::GetKey(NDR_KEY_A))
+                _cam.GetTransform().Translate(-0.1f,  0.0f, 0.0f);
+            if(Input::GetKey(NDR_KEY_S))
+                _cam.GetTransform().Translate( 0.0f, -0.1f, 0.0f);
+            if(Input::GetKey(NDR_KEY_D))
+                _cam.GetTransform().Translate( 0.1f,  0.0f, 0.0f);
+
+            const glm::vec3 pos = _cam.GetTransform().GetPosition();
+            printf("[%f, %f, %f]\n", pos.x, pos.y, pos.z);
         }
     }
 }

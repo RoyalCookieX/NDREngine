@@ -43,11 +43,6 @@ namespace NDR
         
         tinyobj::mesh_t mesh = shapes[0].mesh;
         std::unordered_set<uint32_t> indexCache;
-        VertexLayout layout;
-        layout
-        .AddAttribute({3, false})  // position
-        .AddAttribute({2, false})  // tex coords
-        .AddAttribute({3, false}); // normals
         std::vector<float> verts;
         std::vector<uint32_t> indices;
 
@@ -69,8 +64,17 @@ namespace NDR
             verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
             verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
         }
+
+        VertexBuffer vertexBuffer(verts);
+        IndexBuffer indexBuffer(indices);
+        VertexLayout layout;
+        layout
+        .AddAttribute({3, false})  // position
+        .AddAttribute({2, false})  // tex coords
+        .AddAttribute({3, false}); // normals
+        VertexArray vertexArray(std::move(vertexBuffer), layout);        
         
-        return Mesh();
+        return Mesh(std::move(vertexArray), std::move(indexBuffer), Shader());
     }
 
     Texture AssetManager::LoadTexture(const std::string& assetPath)

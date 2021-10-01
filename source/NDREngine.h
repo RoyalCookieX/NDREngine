@@ -13,6 +13,7 @@
 #include <queue>
 
 #include <glm/glm.hpp>
+#include <glm/ext/quaternion_float.hpp>
 
 #include "core/APICall.h"
 #include "core/Engine.h"

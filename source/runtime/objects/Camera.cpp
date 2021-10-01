@@ -3,6 +3,11 @@
 
 namespace NDR
 {
+    Camera::Camera():
+        _projMatrix(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f))
+    {
+    }
+
     Camera::Camera(const glm::mat4& projMatrix):
         Object(),
         _projMatrix(projMatrix)

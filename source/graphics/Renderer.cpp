@@ -36,7 +36,21 @@ namespace NDR
         mesh.GetVertexArray().Bind();
         mesh.GetIndexBuffer().Bind();
         mesh.GetShader().Use();
-        glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+        if(mesh.GetIndexBuffer().GetCount() == 0)
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)mesh.GetVertexArray().GetVertexCount());
+        else
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
+    {
+        mesh.GetVertexArray().Bind();
+        mesh.GetIndexBuffer().Bind();
+        shader.Use();
+        if(mesh.GetIndexBuffer().GetCount() == 0)
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+        else
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)mesh.GetVertexArray().GetVertexCount());
     }
 
     void Renderer::DrawBackground(const float r, const float g, const float b, const float a) const { glClearColor(r, g, b, a); }

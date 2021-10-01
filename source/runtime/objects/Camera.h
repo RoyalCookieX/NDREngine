@@ -6,6 +6,7 @@ namespace NDR
     class Camera : public Object
     {
     public:
+        Camera();
         Camera(const glm::mat4& projMatrix);
         Camera(const Transform& transform, const glm::mat4& projMatrix);
         Camera(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale, const glm::mat4& projMatrix);

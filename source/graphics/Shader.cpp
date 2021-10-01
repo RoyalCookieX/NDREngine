@@ -7,8 +7,8 @@ namespace NDR
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
         _program = glCreateProgram();
-        const GLuint vs = CompileSource(GL_VERTEX_SHADER, vertexSource.c_str());
-        const GLuint fs = CompileSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
+        const uint32_t vs = CompileSource(GL_VERTEX_SHADER, vertexSource.c_str());
+        const uint32_t fs = CompileSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
 
         glAttachShader(_program, vs);
         glAttachShader(_program, fs);
@@ -19,16 +19,14 @@ namespace NDR
         glDeleteShader(fs);
     }
 
-    Shader::~Shader()
-    {
-        glDeleteProgram(_program);
-        _program = 0;
-    }
+    Shader::~Shader() { glDeleteProgram(_program); }
 
     Shader::Shader(Shader&& other) noexcept:
-        _program(other._program)
+        _program(other._program),
+        _uniformLocationCache(other._uniformLocationCache)
     {
         other._program = 0;
+        other._uniformLocationCache.clear();
     }
 
     Shader& Shader::operator=(Shader&& other) noexcept
@@ -48,54 +46,49 @@ namespace NDR
 
         void Shader::SetInt(const std::string& uniformName, int32_t value) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
+        const uint32_t id = GetUniformLocation(uniformName);
         glUniform1i(id, value);
     }
 
     void Shader::SetFloat(const std::string& uniformName, float const value) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
+        const uint32_t id = GetUniformLocation(uniformName);
         glUniform1f(id, value);
     }
 
     void Shader::SetVec2(const std::string& uniformName, glm::vec2 vec2) const { return SetVec2(uniformName, vec2.x, vec2.y); }
     void Shader::SetVec2(const std::string& uniformName, float const x, float const y) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
+        const uint32_t id = GetUniformLocation(uniformName);
         glUniform2f(id, x, y);
     }
 
     void Shader::SetVec3(const std::string& uniformName, glm::vec3 vec3) const { return SetVec3(uniformName, vec3.x, vec3.y, vec3.z); }
     void Shader::SetVec3(const std::string& uniformName, float const x, float const y, float const z) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
+        const uint32_t id = GetUniformLocation(uniformName);
         glUniform3f(id, x, y, z);
     }
     
     void Shader::SetVec4(const std::string& uniformName, glm::vec4 vec4) const { return SetVec4(uniformName, vec4.x, vec4.y, vec4.z, vec4.w); }
+
     void Shader::SetVec4(const std::string& uniformName, float const x, float const y, float const z, const float w) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
+        const uint32_t id = GetUniformLocation(uniformName);
         glUniform4f(id, x, y, z, w);
     }
 
     void Shader::SetMat4(const std::string& uniformName, glm::mat4 mat4) const
     {
-        const GLuint id = GetUniformLocation(uniformName);
-
-        float matrix[16] = { 0.0 };
-        const float* pSource = value_ptr(mat4);
-        for (int i = 0; i < 16; ++i)
-            matrix[i] = pSource[i];
-        
-        glUniformMatrix4fv(id, 1, false, matrix);
+        const uint32_t id = GetUniformLocation(uniformName);
+        glUniformMatrix4fv(id, 1, false, glm::value_ptr(mat4));
     }
 
     int32_t Shader::GetUniformLocation(const std::string& uniformName) const
     {
         if(_uniformLocationCache.find(uniformName) == _uniformLocationCache.end())
         {
-            int32_t id = glGetUniformLocation(_program, uniformName.c_str());
+            uint32_t id = glGetUniformLocation(_program, uniformName.c_str());
             _uniformLocationCache.emplace(uniformName, id);
             return id;
         }
@@ -105,7 +98,7 @@ namespace NDR
     int32_t Shader::CompileSource(uint32_t shaderType, const std::string& source)
     {
         const char* src = source.c_str();
-        const GLuint id = glCreateShader(shaderType);
+        const uint32_t id = glCreateShader(shaderType);
         glShaderSource(id, 1, &src, nullptr);
         glCompileShader(id);
 

@@ -4,6 +4,7 @@
 #include "graphics/Framebuffer.h"
 #include "graphics/Renderer.h"
 #include "graphics/Texture.h"
+#include "runtime/objects/Camera.h"
 
 namespace NDR 
 {
@@ -13,14 +14,14 @@ namespace NDR
         Engine();
         ~Engine();
         
-        void Run() const;
+        void Run();
     private:
         Window* _window;
         Renderer* _renderer;
-        
-        Mesh _quadMesh;
+
+        Camera _cam;
         Texture _quadTexture;
-        Shader _quadShader;
+        Mesh _quadMesh;
         Framebuffer _framebuffer;
     };
 }

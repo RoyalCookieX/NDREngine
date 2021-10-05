@@ -21,7 +21,7 @@ namespace NDR
 
         Camera _cam;
         Texture _cubeTexture;
-        Mesh _cubeMesh;
+        Mesh _mesh;
         Framebuffer _framebuffer;
     };
 }

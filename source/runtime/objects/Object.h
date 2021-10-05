@@ -17,7 +17,10 @@ namespace NDR
         Object(Object&& other) noexcept;
         Object& operator=(Object&& other) noexcept;
 
+        virtual void Tick() { }
+
         Transform& GetTransform();
+        const Transform& Object::GetTransform() const;
         glm::mat4 GetTransformMatrix() const;
 
         bool operator==(const Object& right);

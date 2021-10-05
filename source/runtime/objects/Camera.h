@@ -15,6 +15,8 @@ namespace NDR
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetViewProjMatrix() const;
 
+        virtual void Tick() override;
+
         void SetProjection(const glm::mat4& projMatrix);
     private:
         glm::mat4 _projMatrix;

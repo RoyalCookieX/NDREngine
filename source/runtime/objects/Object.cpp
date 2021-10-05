@@ -24,6 +24,7 @@ namespace NDR
     }
 
     Transform& Object::GetTransform() { return _transform; }
+    const Transform& Object::GetTransform() const { return _transform; }
     glm::mat4 Object::GetTransformMatrix() const { return _transform.GetMatrix(); }
 
     bool Object::operator==(const Object& right) { return this == &right; }

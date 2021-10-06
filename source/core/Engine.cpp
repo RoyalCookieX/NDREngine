@@ -16,12 +16,18 @@ namespace NDR
         _renderer = new Renderer;
         _renderer->SetBlendMode(BlendMode::TRANSPARENT);
         
-        _cubeTexture = AssetManager::LoadTexture("assets/textures/UVTest.png");
-        _cubeTexture.Bind(0);
-        const Shader shader = AssetManager::LoadShader("assets/shaders/Cube.shader");
-        shader.Use();
-        shader.SetInt("u_Texture", 0);
-        _mesh = AssetManager::LoadMesh("assets/meshes/Monkey.obj");
+        _texture = AssetManager::LoadTexture("assets/textures/obama.png");
+        _texture.Bind(0);
+        _shader = AssetManager::LoadShader("assets/shaders/Quad.shader");
+        _shader.Use();
+        _shader.SetInt("u_Texture", 0);
+        
+        VertexBuffer vb(4 * 4);
+        _indexBuffer = IndexBuffer({0, 1, 2, 0, 2, 3});
+        VertexLayout layout;
+        layout.AddAttribute({2, false});
+        layout.AddAttribute({2, false});
+        _vertexArray = VertexArray(std::move(vb), layout);
     }
 
     Engine::~Engine()
@@ -42,11 +48,19 @@ namespace NDR
             const float b = ((glm::sin(t + 4.2f) + 1.0f) * 0.5f) * 0.5f;
             t += 0.02f;
             
-            _mesh.GetShader().SetMat4("u_MVP", camera.GetViewProjMatrix());
+            _shader.SetMat4("u_MVP", camera.GetViewProjMatrix());
+
+            _vertexArray.GetVertexBuffer().SetData(
+                {
+                    -0.5f + r - 0.25f, -0.5f, 0.0f, 0.0f,
+                     0.5f + r - 0.25f, -0.5f, 1.0f, 0.0f,
+                     0.5f + r - 0.25f,  0.5f, 1.0f, 1.0f,
+                    -0.5f + r - 0.25f,  0.5f, 0.0f, 1.0f,
+                });
 
             _renderer->Clear();
             _renderer->DrawBackground(r, g, b, 1.0f);
-            _renderer->Draw(_mesh);
+            _renderer->Draw(_vertexArray, _indexBuffer, _shader);
             _window->SwapBuffers();
 
             _window->PollEvents();

@@ -20,8 +20,9 @@ namespace NDR
         Renderer* _renderer;
 
         Camera _cam;
-        Texture _cubeTexture;
-        Mesh _mesh;
-        Framebuffer _framebuffer;
+        Texture _texture;
+        VertexArray _vertexArray;
+        IndexBuffer _indexBuffer;
+        Shader _shader;
     };
 }

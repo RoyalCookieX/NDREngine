@@ -33,26 +33,32 @@ namespace NDR
 
     void Renderer::Clear() const {  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    void Renderer::Draw(const Mesh& mesh) const
+    void Renderer::Draw(const VertexArray& vertices)
     {
-        mesh.GetVertexArray().Bind();
-        mesh.GetIndexBuffer().Bind();
-        mesh.GetShader().Use();
-        if(mesh.GetIndexBuffer().GetCount() == 0)
-            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)mesh.GetVertexArray().GetVertexCount());
-        else
-            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+        vertices.Bind();
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.GetVertexCount());
     }
 
-    void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
+    void Renderer::Draw(const VertexArray& vertices, const Shader& shader)
     {
-        mesh.GetVertexArray().Bind();
-        mesh.GetIndexBuffer().Bind();
+        vertices.Bind();
         shader.Use();
-        if(mesh.GetIndexBuffer().GetCount() == 0)
-            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
-        else
-            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)mesh.GetVertexArray().GetVertexCount());
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.GetVertexCount());
+    }
+
+    void Renderer::Draw(const VertexArray& vertices, const IndexBuffer& indices)
+    {
+        vertices.Bind();
+        indices.Bind();
+        glDrawElements(GL_TRIANGLES, indices.GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::Draw(const VertexArray& vertices, const IndexBuffer& indices, Shader& shader)
+    {
+        vertices.Bind();
+        indices.Bind();
+        shader.Use();
+        glDrawElements(GL_TRIANGLES, indices.GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::DrawBackground(const float r, const float g, const float b, const float a) const { glClearColor(r, g, b, a); }

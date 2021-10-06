@@ -6,6 +6,7 @@ namespace NDR
     {
     public:
         VertexBuffer();
+        VertexBuffer(size_t count);
         VertexBuffer(std::vector<float> vertices);
         ~VertexBuffer();
 
@@ -19,6 +20,7 @@ namespace NDR
         size_t GetSize() const;
 
         void Bind() const;
+        void SetData(std::vector<float> vertices);
         void Release();
 
         friend bool operator==(const VertexBuffer& left, const VertexBuffer& right);

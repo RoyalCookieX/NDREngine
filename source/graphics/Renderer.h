@@ -18,8 +18,10 @@ namespace NDR
         ~Renderer();
         
         void Clear() const;
-        void Draw(const Mesh& mesh) const;
-        void Draw(const Mesh& mesh, const Shader& shader) const;
+        void Draw(const VertexArray& vertices);
+        void Draw(const VertexArray& vertices, const Shader& shader);
+        void Draw(const VertexArray& vertices, const IndexBuffer& indices);
+        void Draw(const VertexArray& vertices, const IndexBuffer& indices, Shader& shader);
         void DrawBackground(float r, float g, float b, float a) const;
         void SetBlendMode(const BlendMode& blendMode) const;
     };

@@ -11,6 +11,16 @@ namespace NDR
     {
     }
 
+    VertexBuffer::VertexBuffer(size_t count):
+        VertexBuffer()
+    {
+        _size = count * sizeof(float);
+        _count = count;
+        glCreateBuffers(1, &_id);
+        glBindBuffer(GL_ARRAY_BUFFER, _id);
+        glBufferData(GL_ARRAY_BUFFER, _size, nullptr, GL_DYNAMIC_DRAW);
+    }
+
     VertexBuffer::VertexBuffer(std::vector<float> vertices):
         VertexBuffer()
     {
@@ -52,6 +62,12 @@ namespace NDR
     size_t VertexBuffer::GetSize() const { return _size; }
 
     void VertexBuffer::Bind() const { glBindBuffer(GL_ARRAY_BUFFER, _id); }
+
+    void VertexBuffer::SetData(std::vector<float> vertices)
+    {
+        glBufferSubData(GL_ARRAY_BUFFER, 0, _size, vertices.data());
+    }
+
     void VertexBuffer::Release()
     {
         glDeleteBuffers(1, &_id);

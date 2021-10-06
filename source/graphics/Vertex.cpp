@@ -103,6 +103,7 @@ namespace NDR
         return *this;
     }
 
+    VertexBuffer& VertexArray::GetVertexBuffer() { return _vertexBuffer; }
     const VertexBuffer& VertexArray::GetVertexBuffer() const { return _vertexBuffer; }
     size_t VertexArray::GetVertexCount() const { return _vertexBuffer.GetCount(); }
     void VertexArray::Bind() const { glBindVertexArray(_id); }

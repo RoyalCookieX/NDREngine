@@ -1,28 +1,30 @@
 #pragma once
 
-#include "Window.h"
-#include "graphics/Framebuffer.h"
+#include "core/Window.h"
 #include "graphics/Renderer.h"
-#include "graphics/Texture.h"
-#include "runtime/objects/Camera.h"
 
 namespace NDR 
 {
     class Engine
     {
     public:
-        Engine();
-        ~Engine();
-        
-        void Run();
-    private:
-        Window* _window;
-        Renderer* _renderer;
+        virtual ~Engine() = default;
 
-        Camera _cam;
-        Texture _texture;
-        VertexArray _vertexArray;
-        IndexBuffer _indexBuffer;
-        Shader _shader;
+        void Run();
+
+        virtual void Initialize() = 0;
+        virtual void Tick() = 0;
+        virtual void OnDraw() = 0;
+        virtual void Shutdown() = 0;
+
+        Window* GetWindow() const { return _window; }
+        Renderer* GetRenderer() const { return _renderer; }
+    
+    private:
+        void PreInitialize();
+        void PostShutdown();
+    
+        Window* _window = nullptr;
+        Renderer* _renderer = nullptr;
     };
 }

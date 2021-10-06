@@ -21,13 +21,18 @@ namespace NDR
 #endif    
     Renderer::Renderer()
     {
+        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            printf("GLAD did not initalize!\n");
+            glfwTerminate();
+            return;
+        }
 #ifdef NDR_DEBUG
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(MessageCallback, nullptr);
-
-        glEnable(GL_DEPTH_TEST);
 #endif
+        glEnable(GL_DEPTH_TEST);
     }
     Renderer::~Renderer() { }
 

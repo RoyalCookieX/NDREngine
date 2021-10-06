@@ -40,12 +40,18 @@ namespace NDR
 
     void Camera::Tick()
     {
-        if(Input::GetKey(NDR_KEY_W)) GetTransform().Translate(glm::vec3( 0.00f, 0.00f, 0.05f) * GetTransform().GetRotation());
-        if(Input::GetKey(NDR_KEY_A)) GetTransform().Translate(glm::vec3( 0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
-        if(Input::GetKey(NDR_KEY_S)) GetTransform().Translate(glm::vec3( 0.00f, 0.00f,-0.05f) * GetTransform().GetRotation());
-        if(Input::GetKey(NDR_KEY_D)) GetTransform().Translate(glm::vec3(-0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
-        if(Input::GetKey(NDR_KEY_Q)) GetTransform().Translate(glm::vec3( 0.00f,-0.05f, 0.00f) * GetTransform().GetRotation());
-        if(Input::GetKey(NDR_KEY_E)) GetTransform().Translate(glm::vec3( 0.00f, 0.05f, 0.00f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_W))
+            GetTransform().Translate(glm::vec3( 0.00f, 0.00f, 0.05f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_A))
+            GetTransform().Translate(glm::vec3( 0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_S))
+            GetTransform().Translate(glm::vec3( 0.00f, 0.00f,-0.05f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_D))
+            GetTransform().Translate(glm::vec3(-0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_Q))
+            GetTransform().Translate(glm::vec3( 0.00f,-0.05f, 0.00f) * GetTransform().GetRotation());
+        if(Input::GetKey(NDR_KEY_E))
+            GetTransform().Translate(glm::vec3( 0.00f, 0.05f, 0.00f) * GetTransform().GetRotation());
 
         //TODO: Make camera rotation work
         // if(Input::GetKey(NDR_KEY_I))

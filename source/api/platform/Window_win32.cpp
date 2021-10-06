@@ -24,11 +24,15 @@ namespace PlatformAPI
             }
         }
         _windowCount++;
-
+        
+#ifdef NDR_GRAPHICSAPI_OPENGL
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef NDR_DEBUG
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+#endif
         _window = glfwCreateWindow(properties.width, properties.height, properties.name.c_str(), nullptr, nullptr);
         if(_window == nullptr)
         {
@@ -36,12 +40,6 @@ namespace PlatformAPI
             glfwTerminate();
         }
         Window_win32::SetContextCurrent();
-        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            printf("GLAD did not initalize!\n");
-            glfwTerminate();
-            return;
-        }
         Window_win32::SetVSync(properties.isVsync);
 
         glfwSetWindowUserPointer(_window, this);

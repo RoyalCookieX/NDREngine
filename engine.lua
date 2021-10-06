@@ -45,8 +45,6 @@ project "engine"
         }
     filter "platforms:x64"
         architecture "x64"
-    filter "platforms:x86"
-        architecture "x86"
     filter "configurations:debug"
         defines "NDR_DEBUG"
         runtime "Debug"

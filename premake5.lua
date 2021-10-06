@@ -7,7 +7,7 @@ ENGINE_INCLUDE_DIR = {}
 workspace "NDREngine"
     startproject "Engine"
     configurations { "debug", "release" }
-    platforms { "x64", "x86" }
+    platforms { "x64" }
     group "external"
         include "external/glad/glad.lua"
         include "external/glfw/glfw.lua"

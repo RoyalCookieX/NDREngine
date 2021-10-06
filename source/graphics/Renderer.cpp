@@ -36,6 +36,9 @@ namespace NDR
     }
     Renderer::~Renderer() { }
 
+    void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
+    glm::mat4 Renderer::GetViewProj() const { return _viewProj; }
+
     void Renderer::Clear() const {  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
     void Renderer::Draw(const VertexArray& vertices)
@@ -44,26 +47,13 @@ namespace NDR
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.GetVertexCount());
     }
 
-    void Renderer::Draw(const VertexArray& vertices, const Shader& shader)
+    void Renderer::Draw(const VertexArray& vertices, const Shader& shader, const Transform& transform)
     {
         vertices.Bind();
         shader.Use();
+        shader.SetMat4("u_MVP", _viewProj * transform.GetMatrix());
+        
         glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.GetVertexCount());
-    }
-
-    void Renderer::Draw(const VertexArray& vertices, const IndexBuffer& indices)
-    {
-        vertices.Bind();
-        indices.Bind();
-        glDrawElements(GL_TRIANGLES, indices.GetCount(), GL_UNSIGNED_INT, nullptr);
-    }
-
-    void Renderer::Draw(const VertexArray& vertices, const IndexBuffer& indices, Shader& shader)
-    {
-        vertices.Bind();
-        indices.Bind();
-        shader.Use();
-        glDrawElements(GL_TRIANGLES, indices.GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::DrawBackground(const float r, const float g, const float b, const float a) const { glClearColor(r, g, b, a); }

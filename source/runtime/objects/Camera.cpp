@@ -41,27 +41,26 @@ namespace NDR
     void Camera::Tick()
     {
         if(Input::GetKey(NDR_KEY_W))
-            GetTransform().Translate(glm::vec3( 0.00f, 0.00f, 0.05f) * GetTransform().GetRotation());
+            GetTransform().Translate(GetTransform().GetForward() * moveSpeed);
         if(Input::GetKey(NDR_KEY_A))
-            GetTransform().Translate(glm::vec3( 0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
+            GetTransform().Translate(-GetTransform().GetRight() * moveSpeed);
         if(Input::GetKey(NDR_KEY_S))
-            GetTransform().Translate(glm::vec3( 0.00f, 0.00f,-0.05f) * GetTransform().GetRotation());
+            GetTransform().Translate(-GetTransform().GetForward() * moveSpeed);
         if(Input::GetKey(NDR_KEY_D))
-            GetTransform().Translate(glm::vec3(-0.05f, 0.00f, 0.00f) * GetTransform().GetRotation());
+            GetTransform().Translate(GetTransform().GetRight() * moveSpeed);
         if(Input::GetKey(NDR_KEY_Q))
-            GetTransform().Translate(glm::vec3( 0.00f,-0.05f, 0.00f) * GetTransform().GetRotation());
+            GetTransform().Translate(glm::vec3( 0.0f, -1.0f, 0.0f) * moveSpeed);
         if(Input::GetKey(NDR_KEY_E))
-            GetTransform().Translate(glm::vec3( 0.00f, 0.05f, 0.00f) * GetTransform().GetRotation());
+            GetTransform().Translate(glm::vec3( 0.0f,  1.0f, 0.0f) * moveSpeed);
 
-        //TODO: Make camera rotation work
-        // if(Input::GetKey(NDR_KEY_I))
-        //     GetTransform().Rotate({ 0.05f, 0.00f, 0.00f});
-        // if(Input::GetKey(NDR_KEY_J))
-        //     GetTransform().Rotate({ 0.00f,-0.05f, 0.00f});
-        // if(Input::GetKey(NDR_KEY_K))
-        //     GetTransform().Rotate({-0.05f, 0.00f, 0.00f});
-        // if(Input::GetKey(NDR_KEY_L))
-        //     GetTransform().Rotate({ 0.00f, 0.05f, 0.00f});
+        if(Input::GetKey(NDR_KEY_I))
+            GetTransform().Rotate(rotationSpeed, glm::vec3( 1.0f,  0.0f, 0.0f));
+        if(Input::GetKey(NDR_KEY_J))
+            GetTransform().Rotate(rotationSpeed, glm::vec3( 0.0f, -1.0f, 0.0f));
+        if(Input::GetKey(NDR_KEY_K))
+            GetTransform().Rotate(rotationSpeed, glm::vec3(-1.0f,  0.0f, 0.0f));
+        if(Input::GetKey(NDR_KEY_L))
+            GetTransform().Rotate(rotationSpeed, glm::vec3( 0.0f,  1.0f, 0.0f));
     }
 
     void Camera::SetProjection(const glm::mat4& projMatrix) { _projMatrix = projMatrix; }

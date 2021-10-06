@@ -6,6 +6,8 @@ namespace NDR
     class Camera : public Object
     {
     public:
+        float moveSpeed = 0.05f, rotationSpeed = 0.05f;
+        
         Camera();
         Camera(const glm::mat4& projMatrix);
         Camera(const Transform& transform, const glm::mat4& projMatrix);

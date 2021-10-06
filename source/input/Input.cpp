@@ -5,15 +5,13 @@
 
 namespace NDR
 {
-    Input* Input::_instance = new Input();
-
-    NDRButtonAction Input::GetKey_Impl(NDRKey keycode) const
+    NDRButtonAction Input::GetKey(NDRKey keycode)
     {
         GLFWwindow* window = glfwGetCurrentContext();
         return glfwGetKey(window, keycode);
     }
 
-    NDRButtonAction Input::GetMouseButton_Impl(NDRMouseButton button) const
+    NDRButtonAction Input::GetMouseButton(NDRMouseButton button)
     {
         GLFWwindow* window = glfwGetCurrentContext();
         return glfwGetMouseButton(window, button);

@@ -6,11 +6,13 @@ namespace NDR
     {
     public:
         Transform();
+        Transform(const glm::mat4& matrix);
         Transform(const glm::vec3& position);
         Transform(const glm::vec3& position, const glm::quat& rotation);
         Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
         
-        glm::mat4 GetMatrix() const;
+        glm::mat4& GetMatrix();
+        const glm::mat4& GetMatrix() const;
         glm::vec3 GetPosition() const;
         glm::quat GetRotation() const;
         glm::vec3 GetScale() const;

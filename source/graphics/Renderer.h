@@ -3,7 +3,6 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "runtime/components/Transform.h"
-#include "runtime/objects/Camera.h"
 
 namespace NDR
 {
@@ -13,21 +12,41 @@ namespace NDR
         TRANSPARENT = 1
     };
 
+    struct RenderBatch
+    {
+    public:
+        RenderBatch();
+        RenderBatch(uint32_t maxQuads);
+        
+        VertexArray va;
+        VertexLayout layout;
+        IndexBuffer ib;
+        Shader shader;
+
+        void AddQuad(std::vector<float> vertices);
+        bool IsBatchFull() const;
+
+        uint32_t quadCount, indicesCount;
+        uint32_t maxQuads, maxVertices, maxIndices;
+        int32_t maxTextureSlots;
+    };
+
     class Renderer
     {
     public:
-        Renderer();
+        Renderer(uint32_t maxQuads = 1024);
         ~Renderer();
-
-        void SetViewProj(const glm::mat4& camera);
-        glm::mat4 GetViewProj() const;
         
         void Clear() const;
-        void Draw(const VertexArray& vertices);
-        void Draw(const VertexArray& vertices, const Shader& shader, const Transform& transform);
+
+        void DrawQuad(const Transform& transform);
+        void Flush();
+        
         void DrawBackground(float r, float g, float b, float a) const;
         void SetBlendMode(const BlendMode& blendMode) const;
     private:
         glm::mat4 _viewProj;
+        RenderBatch _batch;
+        bool _isActive;
     };
 }

@@ -24,6 +24,7 @@ namespace NDR
 
             _renderer->Clear();
             OnDraw();
+            _renderer->Flush();
             _window->SwapBuffers();
         }
         

@@ -12,7 +12,8 @@ project "engine"
     defines "NDR_GRAPHICSAPI_OPENGL"
     files
     {
-        "source/**.h", "source/**.cpp"
+        "source/**.h", "source/**.cpp",
+        "assets/**";
     }
     removefiles
     {

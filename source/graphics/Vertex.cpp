@@ -30,11 +30,12 @@ namespace NDR
         _attributes(attributes),
         _stride(0)
     {
-        for(auto attribute : _attributes)
+        for (auto attribute : _attributes)
             _stride += attribute.GetStride();
     }
 
     VertexAttribute& VertexLayout::operator[](int32_t index) { return GetAttribute(index); }
+
     uint32_t VertexLayout::GetStride() const { return _stride; }
     VertexAttribute& VertexLayout::GetAttribute(int32_t index) { return _attributes[index]; }
     

@@ -1,7 +1,8 @@
 TARGET_DIR = "%{wks.location}/binaries/%{cfg.buildcfg}/%{cfg.platform}"
-OBJECT_DIR = "!$(SolutionDir)/intermediates/$(Configuration)/$(Platform)/$(ProjectName)"
+OBJECT_DIR = "!$(SolutionDir)intermediates/$(Configuration)/$(Platform)/$(ProjectName)"
 
-INCLUDE_DIR = {}
+APP_INCLUDE_DIR = {}
+ENGINE_INCLUDE_DIR = {}
 
 workspace "NDREngine"
     startproject "Engine"

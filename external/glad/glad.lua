@@ -1,4 +1,5 @@
-INCLUDE_DIR["glad"] = "%{wks.location}/external/glad/include"
+APP_INCLUDE_DIR["glad"] = "external/glad/include"
+ENGINE_INCLUDE_DIR["glad"] = "%{wks.location}/%{APP_INCLUDE_DIR.glad}"
 
 project "glad"
     kind "StaticLib"
@@ -17,9 +18,9 @@ project "glad"
     }
     filter "platforms:x64"
         architecture "x64"
-    filter "configurations:Debug"
+    filter "configurations:debug"
         runtime "Debug"
         symbols "On"
-    filter "configurations:Release"
+    filter "configurations:release"
         runtime "Release"
         optimize "On"

@@ -5,16 +5,27 @@ namespace NDR
     class Texture
     {
     public:
-        Texture(int width, int height, int bitsPerPixel, unsigned char* buffer);
+        Texture();
+        Texture(int32_t width, int32_t height, int32_t bitsPerPixel, unsigned char* buffer);
         ~Texture();
 
-        void Bind(GLuint slot = 0) const;
+        Texture(const Texture&) = delete;
+        Texture& operator=(const Texture&) = delete;
 
+        Texture(Texture&& other) noexcept;
+        Texture& operator=(Texture&& other) noexcept;
+
+        void Bind(uint32_t slot = 0) const;
+
+        uint32_t GetTextureID() const;
+
+        friend bool operator==(const Texture& left, const Texture& right);
     private:
-        GLuint _id;
-        int _width = 0;
-        int _height = 0;
-        int _bitsPerPixel = 0;
-        unsigned char* _buffer = nullptr;
+        uint32_t _id;
+        unsigned char* _buffer;
+        int32_t _width, _height, _bitsPerPixel;
     };
+
+    extern bool operator==(const Texture& left, const Texture& right);
+    extern bool operator!=(const Texture& left, const Texture& right);
 }

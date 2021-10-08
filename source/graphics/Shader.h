@@ -5,25 +5,38 @@ namespace NDR
     class Shader
     {
     public:
-        Shader(const char* vertexSource, const char* fragmentSource);
+        Shader();
+        Shader(const std::string& vertexSource, const std::string& fragmentSource); 
+        ~Shader();
 
+        Shader(const Shader&) = delete;
+        Shader& operator=(const Shader&) = delete;
+
+        Shader(Shader&& other) noexcept;
+        Shader& operator=(Shader&& other) noexcept;
+        
         void Use() const;
 
-        void SetInt(const std::string& uniformName, GLint value) const;
-        void SetFloat(const std::string& uniformName, GLfloat value) const;
+        void SetInt(const std::string& uniformName, int32_t value) const;
+        void SetFloat(const std::string& uniformName, float value) const;
+        void SetVec2(const std::string& uniformName, float x, float y) const;
         void SetVec2(const std::string& uniformName, glm::vec2 vec2) const;
-        void SetVec3(const std::string& uniformName, GLfloat x, GLfloat y, GLfloat z) const;
+        void SetVec3(const std::string& uniformName, float x, float y, float z) const;
         void SetVec3(const std::string& uniformName, glm::vec3 vec3) const;
-        void SetVec4(const std::string& uniformName, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
+        void SetVec4(const std::string& uniformName, float x, float y, float z, float w) const;
         void SetVec4(const std::string& uniformName, glm::vec4 vec4) const;
-        void SetVec2(const std::string& uniformName, GLfloat x, GLfloat y) const;
         void SetMat4(const std::string& uniformName, glm::mat4 mat4) const;
         
-        static GLuint CompileSource(GLenum shaderType, const char* source);
+        static int32_t CompileSource(uint32_t shaderType, const std::string& source);
+
+        friend bool operator==(const Shader& left, const Shader& right);
     private:
-        GLint GetUniformLocation(const std::string& uniformName) const;
-        
-        GLuint _program;
-        mutable std::unordered_map<std::string, GLint> _uniformLocationCache;
+        int32_t GetUniformLocation(const std::string& uniformName) const;
+
+        uint32_t _program;
+        mutable std::unordered_map<std::string, uint32_t> _uniformLocationCache;
     };
+
+    extern bool operator==(const Shader& left, const Shader& right);
+    extern bool operator!=(const Shader& left, const Shader& right);
 }

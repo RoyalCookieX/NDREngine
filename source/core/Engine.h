@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Window.h"
+#include "core/Window.h"
 #include "graphics/Renderer.h"
 
 namespace NDR 
@@ -8,12 +8,23 @@ namespace NDR
     class Engine
     {
     public:
-        Engine();
-        ~Engine();
-        
-        void Run() const;
+        virtual ~Engine() = default;
+
+        void Run();
+
+        virtual void Initialize() = 0;
+        virtual void Tick() = 0;
+        virtual void OnDraw() = 0;
+        virtual void Shutdown() = 0;
+
+        Window* GetWindow() const { return _window; }
+        Renderer* GetRenderer() const { return _renderer; }
+    
     private:
-        std::unique_ptr<Window> _window;
-        std::unique_ptr<Renderer> _renderer;
+        void PreInitialize();
+        void PostShutdown();
+    
+        Window* _window = nullptr;
+        Renderer* _renderer = nullptr;
     };
 }

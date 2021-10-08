@@ -3,65 +3,51 @@
 
 namespace NDR
 {
-    Mesh::Mesh():
-        _vao(0),
-        _vbo(0),
-        _ibo(0),
-        _layout()
+    Mesh::Mesh()
     {
     }
-
-    Mesh::Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout):
-        _vao(0),
-        _vbo(0),
-        _ibo(0),
-        _vertexData(vertexData),
-        _indexData(indexData),
-        _layout(layout)
+    
+    Mesh::Mesh(VertexArray&& vertexArray, IndexBuffer&& indexBuffer, Shader&& shader):
+        _vertexArray(std::move(vertexArray)),
+        _indexBuffer(std::move(indexBuffer)),
+        _shader(std::move(shader))
     {
-        // create vertex array object
-        GLCall(glCreateVertexArrays(1, &_vao));
-        GLCall(glBindVertexArray(_vao));
-
-        // create vertex buffer object
-        GLCall(glCreateBuffers(1, &_vbo));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
-        GLCall(glBufferData(GL_ARRAY_BUFFER, _vertexData.GetBufferSize(), _vertexData.GetBuffer(), GL_STATIC_DRAW));
-
-        // setup vertex attributes
-        auto offset = 0;
-        for(uint32_t attributeIndex = 0; attributeIndex < _layout.GetAttributeCount(); attributeIndex++)
-        {
-            VertexAttribute attribute = _layout[attributeIndex];
-            GLCall(glEnableVertexAttribArray(attributeIndex));
-            GLCall(glVertexAttribPointer(
-                attributeIndex,
-                attribute.GetCount(),
-                GL_FLOAT,
-                attribute.IsNormalized(),
-                _layout.GetStride(),
-                (const void*)offset));
-            offset += attribute.GetStride();
-        }
-
-        // create index buffer object
-        GLCall(glCreateBuffers(1, &_ibo));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo));
-        GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexData.GetBufferSize(), _indexData.GetBuffer(), GL_STATIC_DRAW));
+        _vertexArray.Bind();
+        _indexBuffer.Bind();
     }
 
     Mesh::~Mesh()
     {
-        GLCall(glDeleteBuffers(1, &_ibo));
-        GLCall(glDeleteBuffers(1, &_vbo));
-        GLCall(glDeleteVertexArrays(1, &_vao));
     }
 
-    uint32_t Mesh::GetVertexCount() const { return _vertexData.GetCount(); }
-    uint32_t Mesh::GetIndexCount() const { return _indexData.GetCount(); }
-    void Mesh::Bind() const
+    Mesh::Mesh(Mesh&& other) noexcept:
+        _vertexArray(std::move(other._vertexArray)),
+        _indexBuffer(std::move(other._indexBuffer)),
+        _shader(std::move(other._shader))
     {
-        GLCall(glBindVertexArray(_vao));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo));
     }
+
+    Mesh& Mesh::operator=(Mesh&& other) noexcept
+    {
+        if(*this != other)
+        {
+            _vertexArray = std::move(other._vertexArray);
+            _indexBuffer = std::move(other._indexBuffer);
+            _shader = std::move(other._shader);
+        }
+        return *this;
+    }
+
+    const VertexArray& Mesh::GetVertexArray() const { return _vertexArray; }
+    const IndexBuffer& Mesh::GetIndexBuffer() const { return _indexBuffer; }
+    const Shader& Mesh::GetShader() const { return _shader; }
+
+    bool operator==(const Mesh& left, const Mesh& right)
+    {
+        return
+            left.GetVertexArray() == right.GetVertexArray() &&
+            left.GetIndexBuffer() == right.GetIndexBuffer() &&
+            left.GetShader() == right.GetShader();
+    }
+    bool operator!=(const Mesh& left, const Mesh& right) { return !(left == right); }
 }

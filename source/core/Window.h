@@ -1,46 +1,46 @@
 #pragma once
+#include "input/Event.h"
 
 namespace NDR
 {
     struct WindowProps
     {
     public:
-        int width;
-        int height;
+        uint32_t width;
+        uint32_t height;
         std::string name;
         bool isVsync;
 
-        WindowProps(int width, int height, const std::string& name, bool isVsync)
-            : width(width),
-              height(height),
-              name(name),
-              isVsync(isVsync)
+        WindowProps(int width, int height, const std::string& name, bool isVsync):
+            width(width),
+            height(height),
+            name(name),
+            isVsync(isVsync)
         {
         }
     };
     
+    typedef void (*EventFunc)(Event*);
+    
     class Window
     {
     public:
-        Window(const WindowProps& properties);
-        ~Window();
+        virtual ~Window() { }
 
-        void SetContextCurrent() const;
-        void SetVSync(bool vSync);
-        bool Active() const;
-        void Close();
+        virtual void AddCallback(EventFunc callback) = 0;
+        virtual void SetContextCurrent() const = 0;
+        virtual void SetVSync(bool vSync) = 0;
+        virtual bool Active() const = 0;
+        virtual void Close() = 0;
 
-        void SwapBuffers() const;
-        void PollEvents() const;
+        virtual void SwapBuffers() const = 0;
+        virtual void PollEvents() const = 0;
 
-        uint32_t GetWidth() const;
-        uint32_t GetHeight() const;
-    
-    private:
-        GLFWwindow* _window;
-        WindowProps _properties;
-        bool _active;
-        
-        inline static uint32_t _windowCount = 0;
+        virtual uint32_t GetWidth() const = 0;
+        virtual uint32_t GetHeight() const = 0;
+
+        static Window* Create(const WindowProps& props);
+    protected:
+        virtual void Dispatch(Event* event) const = 0;
     };
 }

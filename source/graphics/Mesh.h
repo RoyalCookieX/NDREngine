@@ -1,4 +1,6 @@
 #pragma once
+#include "Buffer.h"
+#include "Shader.h"
 #include "Vertex.h"
 
 namespace NDR
@@ -7,18 +9,25 @@ namespace NDR
     {
     public:
         Mesh();
-        Mesh(const VertexData& vertexData, const IndexData& indexData, const VertexLayout& layout);
+        Mesh(VertexArray&& vertexArray, IndexBuffer&& indexBuffer, Shader&& shader);
         ~Mesh();
 
-        uint32_t GetVertexCount() const;
-        uint32_t GetIndexCount() const;
-        void Bind() const;
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(const Mesh&) = delete;
+
+        Mesh(Mesh&& other) noexcept;
+        Mesh& operator=(Mesh&& other) noexcept;
+
+        const VertexArray& GetVertexArray() const;
+        const IndexBuffer& GetIndexBuffer() const;
+        const Shader& GetShader() const;
 
     private:
-        GLuint _vao, _vbo, _ibo;
-        
-        VertexData _vertexData;
-        IndexData _indexData;
-        VertexLayout _layout;
+        VertexArray _vertexArray;
+        IndexBuffer _indexBuffer;
+        Shader _shader;
     };
+
+    extern bool operator==(const Mesh& left, const Mesh& right);
+    extern bool operator!=(const Mesh& left, const Mesh& right);
 }

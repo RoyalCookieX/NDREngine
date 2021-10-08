@@ -1,4 +1,5 @@
-INCLUDE_DIR["glfw"] = "%{wks.location}/external/glfw/include"
+APP_INCLUDE_DIR["glfw"] = "external/glfw/include"
+ENGINE_INCLUDE_DIR["glfw"] = "%{wks.location}/%{APP_INCLUDE_DIR.glfw}"
 
 project "glfw"
     kind "StaticLib"
@@ -20,6 +21,8 @@ project "glfw"
     {
         "include"
     }
+    filter "platforms:x64"
+        architecture "x64"
     filter "system:windows"
         systemversion "latest"
         staticruntime "On"
@@ -35,11 +38,9 @@ project "glfw"
             "_GLFW_WIN32",
             "_CRT_SECURE_NO_WARNINGS"
         }
-    filter "platforms:x64"
-        architecture "x64"
-    filter "configurations:Debug"
+    filter "configurations:debug"
         runtime "Debug"
         symbols "On"
-    filter "configurations:Release"
+    filter "configurations:release"
         runtime "Release"
         optimize "On"

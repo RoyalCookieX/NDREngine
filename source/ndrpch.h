@@ -9,7 +9,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <iostream>
 #include <queue>
 
 #include <glad/glad.h>
@@ -23,6 +22,3 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <stb_image.h>
 #include <tiny_obj_loader.h>
-
-#include "core/APICall.h"
-#include "core/Log.h"

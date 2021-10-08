@@ -37,40 +37,36 @@ namespace NDR
         return s;
     }
 
-    void Transform::SetPosition(const glm::vec3& position, const bool isLocal)
+    void Transform::SetPosition(const glm::vec3& newPosition, const bool isLocal)
     {
-        _matrix = glm::translate(glm::mat4(1.0f), position) * _matrix;
+        auto[pos, rot, scale] = Decompose();
+        ConstructMatrix(newPosition, rot, scale);
     }
     Transform& Transform::Translate(const glm::vec3& translation, const bool isLocal)
     {
-        _matrix = _matrix * glm::translate(glm::mat4(1.0f), translation);
+        auto[pos, rot, scale] = Decompose();
+        ConstructMatrix(pos + translation, rot, scale);
         return *this;
-
-    }
-    Transform Transform::Translate(const glm::vec3& translation, bool isLocal) const
-    {
-        Transform t(_matrix);
-        return Transform(t.Translate(translation, isLocal));
     }
 
-    void Transform::SetRotation(const glm::quat& rotation, const bool isLocal)
+    void Transform::SetRotation(const glm::quat& newRotation, const bool isLocal)
     {
-        _matrix = glm::rotate(glm::mat4(1.0f), glm::angle(rotation), glm::axis(rotation)) * _matrix;
+        ConstructMatrix(GetPosition(), newRotation, GetScale());
     }
-    void Transform::SetRotation(const glm::vec3& euler, const bool isLocal)
+    void Transform::SetRotation(const glm::vec3& newEuler, const bool isLocal)
     {
-        SetRotation(glm::quat(glm::radians(euler)), isLocal);
+        SetRotation(glm::quat(glm::radians(newEuler)), isLocal);
     }
-    void Transform::SetRotation(const float angle, const glm::vec3& axis, const bool isLocal)
+    void Transform::SetRotation(const float degrees, const glm::vec3& axis, const bool isLocal)
     {
-        SetRotation(glm::angleAxis(glm::radians(angle), axis));
+        SetRotation(glm::angleAxis(glm::radians(degrees), axis));
     }
     Transform& Transform::Rotate(const glm::quat& rotation, const bool isLocal)
     {
         if(isLocal)
         {
-            const glm::mat4 rot = glm::toMat4(rotation);
-            _matrix = _matrix * rot;
+            auto[pos, rot, scale] = Decompose();
+            ConstructMatrix(pos, rot * rotation, scale);           
         }
         else
         {
@@ -88,13 +84,15 @@ namespace NDR
         return Rotate(glm::angleAxis(glm::radians(degrees), axis), isLocal);
     }
 
-    void Transform::SetScale(const glm::vec3& scale)
+    void Transform::SetScale(const glm::vec3& newScale)
     {
-        _matrix = glm::scale(_matrix, scale);
+        auto[pos, rot, size] = Decompose();
+        ConstructMatrix(pos, rot, newScale);
     }
     Transform& Transform::Scale(const glm::vec3& scalar)
     {
-        _matrix *= glm::scale(glm::mat4(1.0f), scalar);
+        auto[pos, rot, size] = Decompose();
+        ConstructMatrix(pos, rot, size + scalar);
         return *this;
     }
 
@@ -111,5 +109,12 @@ namespace NDR
         glm::vec4 perspective;
         glm::decompose(_matrix, scale, rotation, translation, skew, perspective);
         return std::make_tuple(translation, rotation, scale);
+    }
+
+    void Transform::ConstructMatrix(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale)
+    {
+        _matrix = glm::translate(glm::mat4(1.0f), pos)
+                * glm::toMat4(rot)
+                * glm::scale(glm::mat4(1.0f), scale);
     }
 }

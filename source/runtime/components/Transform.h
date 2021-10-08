@@ -16,18 +16,17 @@ namespace NDR
         glm::quat GetRotation(bool isLocal = false) const;
         glm::vec3 GetScale() const;
 
-        void SetPosition(const glm::vec3& position, bool isLocal = false);
+        void SetPosition(const glm::vec3& newPosition, bool isLocal = false);
         Transform& Translate(const glm::vec3& translation, bool isLocal = false);
-        Transform Translate(const glm::vec3& translation, bool isLocal = false) const;
         
-        void SetRotation(const glm::quat& rotation, bool isLocal = false);
-        void SetRotation(const glm::vec3& euler, bool isLocal = false);
-        void SetRotation(float angle, const glm::vec3& axis, bool isLocal = false);
+        void SetRotation(const glm::quat& newRotation, bool isLocal = false);
+        void SetRotation(const glm::vec3& newEuler, bool isLocal = false);
+        void SetRotation(float degrees, const glm::vec3& axis, bool isLocal = false);
         Transform& Rotate(const glm::quat& rotation, bool isLocal = false);
         Transform& Rotate(const glm::vec3& euler, bool isLocal = false);
         Transform& Rotate(float degrees, const glm::vec3& axis, bool isLocal = false);
         
-        void SetScale(const glm::vec3& scale);
+        void SetScale(const glm::vec3& newScale);
         Transform& Scale(const glm::vec3& scalar);
 
         glm::vec3 GetRight() const;
@@ -36,6 +35,7 @@ namespace NDR
         
     private:
         std::tuple<glm::vec3, glm::quat, glm::vec3> Decompose() const;
+        void ConstructMatrix(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale);
         
         glm::mat4 _matrix;
     };

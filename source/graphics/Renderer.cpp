@@ -104,52 +104,24 @@ namespace NDR
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    // void Renderer::DrawQuad(const Transform& transform)
-    // {
-    //     if(_batch.IsBatchFull())
-    //     {
-    //         //printf("batch full\n");
-    //         Flush();
-    //     }
-    //
-    //     const glm::vec3 v0(0.0f);
-    //     const glm::vec3 v1(0.0f);
-    //     const glm::vec3 v2(0.0f);
-    //     const glm::vec3 v3(0.0f);
-    //     
-    //     const std::vector vertices
-    //     {
-    //         v0.x, v0.y, v0.z, 0.0f, 0.0f,
-    //         v1.x, v1.y, v1.z, 1.0f, 0.0f,
-    //         v2.x, v2.y, v2.z, 1.0f, 1.0f,
-    //         v3.x, v3.y, v3.z, 0.0f, 1.0f,
-    //     };
-    //     _batch.AddQuad(vertices);
-    // }
+    void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
-    void Renderer::DrawQuad(const glm::vec3& position, const glm::vec3& euler, const glm::vec3& scale)
+    void Renderer::DrawQuad(const Transform& t)
     {
         if(_batch.IsBatchFull())
             Flush();
 
-        const glm::mat4 proj(glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, 0.01f, 10.0f));
-        const glm::quat rotation(glm::radians(euler));
-        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::toMat4(rotation)
-            * glm::scale(glm::mat4(1.0f), scale);
-
-
-        const glm::vec4 v0 = proj * transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v1 = proj * transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v2 = proj * transform * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
-        const glm::vec4 v3 = proj * transform * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
+        const glm::vec4 v0 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v1 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v2 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
+        const glm::vec4 v3 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
 
         const std::vector<float> vertices
         {
-            v0.x, v0.y, 0.0f, 0.0f, 0.0f,
-            v1.x, v1.y, 0.0f, 1.0f, 0.0f,
-            v2.x, v2.y, 0.0f, 1.0f, 1.0f,
-            v3.x, v3.y, 0.0f, 0.0f, 1.0f,
+            v0.x, v0.y, v0.z, 0.0f, 0.0f,
+            v1.x, v1.y, v1.z, 1.0f, 0.0f,
+            v2.x, v2.y, v2.z, 1.0f, 1.0f,
+            v3.x, v3.y, v3.z, 0.0f, 1.0f,
         };
 
         _batch.AddQuad(vertices);

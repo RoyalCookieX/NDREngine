@@ -39,7 +39,8 @@ namespace NDR
         
         void Clear() const;
 
-        void DrawQuad(const glm::vec3& position, const glm::vec3& euler, const glm::vec3& scale);
+        void SetViewProj(const glm::mat4& viewProj);
+        void DrawQuad(const Transform& t);
         void Flush();
         
         void DrawBackground(float r, float g, float b, float a) const;

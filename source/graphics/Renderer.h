@@ -39,7 +39,7 @@ namespace NDR
         
         void Clear() const;
 
-        void DrawQuad(const Transform& transform);
+        void DrawQuad(const glm::vec3& position, const glm::vec3& euler, const glm::vec3& scale);
         void Flush();
         
         void DrawBackground(float r, float g, float b, float a) const;

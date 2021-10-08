@@ -11,24 +11,24 @@ namespace NDR
         Transform(const glm::vec3& position, const glm::quat& rotation);
         Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
         
-        glm::mat4& GetMatrix();
         const glm::mat4& GetMatrix() const;
-        glm::vec3 GetPosition() const;
-        glm::quat GetRotation() const;
+        glm::vec3 GetPosition(bool isLocal = false) const;
+        glm::quat GetRotation(bool isLocal = false) const;
         glm::vec3 GetScale() const;
 
-        void SetPosition(const glm::vec3& position);
-        void Translate(const glm::vec3& translation);
+        void SetPosition(const glm::vec3& position, bool isLocal = false);
+        Transform& Translate(const glm::vec3& translation, bool isLocal = false);
+        Transform Translate(const glm::vec3& translation, bool isLocal = false) const;
         
-        void SetRotation(const glm::quat& rotation);
-        void SetRotation(const glm::vec3& euler);
-        void SetRotation(float angle, const glm::vec3& axis);
-        void Rotate(const glm::quat& rotation);
-        void Rotate(const glm::vec3& euler);
-        void Rotate(float angle, const glm::vec3& axis);
+        void SetRotation(const glm::quat& rotation, bool isLocal = false);
+        void SetRotation(const glm::vec3& euler, bool isLocal = false);
+        void SetRotation(float angle, const glm::vec3& axis, bool isLocal = false);
+        Transform& Rotate(const glm::quat& rotation, bool isLocal = false);
+        Transform& Rotate(const glm::vec3& euler, bool isLocal = false);
+        Transform& Rotate(float degrees, const glm::vec3& axis, bool isLocal = false);
         
         void SetScale(const glm::vec3& scale);
-        void Scale(const glm::vec3& scalar);
+        Transform& Scale(const glm::vec3& scalar);
 
         glm::vec3 GetRight() const;
         glm::vec3 GetUp() const;

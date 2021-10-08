@@ -24,7 +24,7 @@ namespace NDR
         //TODO: make maxTextureSlots dynamic
         maxTextureSlots(32)
     {
-        layout.AddAttribute({2, false});
+        layout.AddAttribute({3, false});
         layout.AddAttribute({2, false});
 
         VertexBuffer vb(maxVertices * layout.GetStride());
@@ -94,6 +94,8 @@ namespace NDR
         glDebugMessageCallback(MessageCallback, nullptr);
 #endif
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         _batch = RenderBatch(maxQuads);
     }
@@ -102,29 +104,54 @@ namespace NDR
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    void Renderer::DrawQuad(const Transform& transform)
+    // void Renderer::DrawQuad(const Transform& transform)
+    // {
+    //     if(_batch.IsBatchFull())
+    //     {
+    //         //printf("batch full\n");
+    //         Flush();
+    //     }
+    //
+    //     const glm::vec3 v0(0.0f);
+    //     const glm::vec3 v1(0.0f);
+    //     const glm::vec3 v2(0.0f);
+    //     const glm::vec3 v3(0.0f);
+    //     
+    //     const std::vector vertices
+    //     {
+    //         v0.x, v0.y, v0.z, 0.0f, 0.0f,
+    //         v1.x, v1.y, v1.z, 1.0f, 0.0f,
+    //         v2.x, v2.y, v2.z, 1.0f, 1.0f,
+    //         v3.x, v3.y, v3.z, 0.0f, 1.0f,
+    //     };
+    //     _batch.AddQuad(vertices);
+    // }
+
+    void Renderer::DrawQuad(const glm::vec3& position, const glm::vec3& euler, const glm::vec3& scale)
     {
         if(_batch.IsBatchFull())
-        {
-            printf("batch full\n");
             Flush();
-        }
-        
-        const glm::vec3 pos = transform.GetPosition();
-        const float xPos = pos.x;
-        const float yPos = pos.y;
 
-        const glm::vec3 scale = transform.GetScale();
-        const float xHalfScale = glm::abs(scale.x / 2.0f);
-        const float yHalfScale = glm::abs(scale.y / 2.0f);
-        
-        const std::vector vertices
+        const glm::mat4 proj(glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, 0.01f, 10.0f));
+        const glm::quat rotation(glm::radians(euler));
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::toMat4(rotation)
+            * glm::scale(glm::mat4(1.0f), scale);
+
+
+        const glm::vec4 v0 = proj * transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v1 = proj * transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v2 = proj * transform * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
+        const glm::vec4 v3 = proj * transform * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
+
+        const std::vector<float> vertices
         {
-            xPos - xHalfScale, yPos - yHalfScale, 0.0f, 0.0f,
-            xPos + xHalfScale, yPos - yHalfScale, 1.0f, 0.0f,
-            xPos + xHalfScale, yPos + yHalfScale, 1.0f, 1.0f,
-            xPos - xHalfScale, yPos + yHalfScale, 0.0f, 1.0f,
+            v0.x, v0.y, 0.0f, 0.0f, 0.0f,
+            v1.x, v1.y, 0.0f, 1.0f, 0.0f,
+            v2.x, v2.y, 0.0f, 1.0f, 1.0f,
+            v3.x, v3.y, 0.0f, 0.0f, 1.0f,
         };
+
         _batch.AddQuad(vertices);
     }
 
@@ -138,7 +165,7 @@ namespace NDR
         _batch.shader.Use();
 
         glDrawElements(GL_TRIANGLES, _batch.indicesCount, GL_UNSIGNED_INT, nullptr);
-        printf("batch count: %d\n", _batch.quadCount);
+        //printf("batch count: %d\n", _batch.quadCount);
         _batch.quadCount = 0;
         _batch.indicesCount = 0;
     }

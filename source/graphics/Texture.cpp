@@ -6,18 +6,14 @@ namespace NDR
     Texture::Texture():
         _id(0),
         _buffer(nullptr),
-        _width(0),
-        _height(0),
-        _bitsPerPixel(0)
+        _properties()
     {
     }
 
-    Texture::Texture(const int32_t width, const int32_t height, const int32_t bitsPerPixel, unsigned char* buffer):
+    Texture::Texture(const TextureProperties& properties, unsigned char* buffer):
         _id(0),
         _buffer(buffer),
-        _width(width),
-        _height(height),
-        _bitsPerPixel(bitsPerPixel)
+        _properties(properties)
     {
         glCreateTextures(GL_TEXTURE_2D, 1, &_id);
         glBindTexture(GL_TEXTURE_2D, _id);
@@ -27,7 +23,7 @@ namespace NDR
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _properties.width, _properties.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _buffer);
     }
 
     Texture::~Texture() { glDeleteTextures(1, &_id); }
@@ -35,15 +31,10 @@ namespace NDR
     Texture::Texture(Texture&& other) noexcept:
         _id(other._id),
         _buffer(other._buffer),
-        _width(other._width),
-        _height(other._height),
-        _bitsPerPixel(other._bitsPerPixel)
+        _properties(other._properties)
     {
         other._id = 0;
         other._buffer = nullptr;
-        other._width = 0;
-        other._height = 0;
-        other._bitsPerPixel = 0;
     }
 
     Texture& Texture::operator=(Texture&& other) noexcept
@@ -52,15 +43,10 @@ namespace NDR
         {
             _id = other._id;
             _buffer = other._buffer;
-            _width = other._width;
-            _height = other._height;
-            _bitsPerPixel = other._bitsPerPixel;
+            _properties = other._properties;
 
             other._id = 0;
             other._buffer = nullptr;
-            other._width = 0;
-            other._height = 0;
-            other._bitsPerPixel = 0;
         }
         return *this;
     }

@@ -73,7 +73,8 @@ namespace NDR
         .AddAttribute({2, false})  // tex coords
         .AddAttribute({3, false}); // normals
         VertexArray vertexArray(std::move(vertexBuffer), layout);        
-        
+
+        //TODO: Set shader by parameter
         return Mesh(std::move(vertexArray), std::move(indexBuffer), LoadShader("assets/shaders/Cube.shader"));
     }
 
@@ -82,6 +83,6 @@ namespace NDR
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
-        return Texture(width, height, bpp, buffer);
+        return Texture({width, height, bpp}, buffer);
     }
 }

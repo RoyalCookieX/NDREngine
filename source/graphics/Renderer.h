@@ -40,7 +40,7 @@ namespace NDR
         void Clear() const;
 
         void SetViewProj(const glm::mat4& viewProj);
-        void DrawQuad(const Transform& t);
+        void DrawQuad(const Transform& t, const glm::vec4& color = glm::vec4(1.0f));
         void Flush();
         
         void DrawBackground(float r, float g, float b, float a) const;

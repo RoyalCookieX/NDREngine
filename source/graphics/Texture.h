@@ -1,12 +1,18 @@
 #pragma once
 
 namespace NDR
-{
+{    
+    struct TextureProperties
+    {
+    public:
+        int32_t width, height, bitsPerPixel;
+    };
+    
     class Texture
     {
     public:
         Texture();
-        Texture(int32_t width, int32_t height, int32_t bitsPerPixel, unsigned char* buffer);
+        Texture(const TextureProperties& properties, unsigned char* buffer);
         ~Texture();
 
         Texture(const Texture&) = delete;
@@ -23,7 +29,7 @@ namespace NDR
     private:
         uint32_t _id;
         unsigned char* _buffer;
-        int32_t _width, _height, _bitsPerPixel;
+        TextureProperties _properties;
     };
 
     extern bool operator==(const Texture& left, const Texture& right);

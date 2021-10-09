@@ -24,8 +24,9 @@ namespace NDR
         //TODO: make maxTextureSlots dynamic
         maxTextureSlots(32)
     {
-        layout.AddAttribute({3, false});
-        layout.AddAttribute({2, false});
+        layout.AddAttribute({3, false}); // position
+        layout.AddAttribute({4, false}); // color
+        layout.AddAttribute({2, false}); // texCoords
 
         VertexBuffer vb(maxVertices * layout.GetStride());
 
@@ -106,7 +107,7 @@ namespace NDR
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
-    void Renderer::DrawQuad(const Transform& t)
+    void Renderer::DrawQuad(const Transform& t, const glm::vec4& color)
     {
         if(_batch.IsBatchFull())
             Flush();
@@ -118,10 +119,10 @@ namespace NDR
 
         const std::vector<float> vertices
         {
-            v0.x, v0.y, v0.z, 0.0f, 0.0f,
-            v1.x, v1.y, v1.z, 1.0f, 0.0f,
-            v2.x, v2.y, v2.z, 1.0f, 1.0f,
-            v3.x, v3.y, v3.z, 0.0f, 1.0f,
+            v0.x, v0.y, v0.z, color.r, color.g, color.b, color.a, 0.0f, 0.0f,
+            v1.x, v1.y, v1.z, color.r, color.g, color.b, color.a, 1.0f, 0.0f,
+            v2.x, v2.y, v2.z, color.r, color.g, color.b, color.a, 1.0f, 1.0f,
+            v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, 0.0f, 1.0f,
         };
 
         _batch.AddQuad(vertices);

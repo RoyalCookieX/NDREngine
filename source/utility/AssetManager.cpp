@@ -3,12 +3,12 @@
 
 namespace NDR
 {
-    std::string AssetManager::GetAssetRootPath()
+    std::string GetAssetRootPath()
     {
         return "";
     }
 
-    Shader AssetManager::LoadShader(const std::string& assetPath)
+    Shader LoadShader(const std::string& assetPath)
     {
         enum SHADERTYPE { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
         SHADERTYPE type = NONE;
@@ -28,7 +28,7 @@ namespace NDR
         return Shader(sources[0].str(), sources[1].str());
     }
 
-    Mesh AssetManager::LoadMesh(const std::string& assetPath)
+    Mesh LoadMesh(const std::string& assetPath)
     {
         tinyobj::attrib_t attributes;
         std::vector<tinyobj::shape_t> shapes;
@@ -78,11 +78,19 @@ namespace NDR
         return Mesh(std::move(vertexArray), std::move(indexBuffer), LoadShader("assets/shaders/Cube.shader"));
     }
 
-    Texture2D AssetManager::LoadTexture2D(const std::string& assetPath)
+    Texture2D LoadTexture2D(const std::string& assetPath)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
         return Texture2D({width, height, bpp}, buffer);
+    }
+
+    Texture2DAtlas LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight)
+    {
+        int width, height, bpp;
+        stbi_set_flip_vertically_on_load(1);
+        unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
+        return Texture2DAtlas({width, height, cellWidth, cellHeight, bpp}, buffer);
     }
 }

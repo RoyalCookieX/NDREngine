@@ -48,7 +48,8 @@ namespace NDR
 
         void SetViewProj(const glm::mat4& viewProj);
         void DrawQuad(const Transform& t, const glm::vec4& color = glm::vec4(1.0f));
-        void DrawQuad(const Transform& t, Texture& texture, const glm::vec4& color = glm::vec4(1.0f));
+        void DrawQuad(const Transform& t, Texture2D& texture, const glm::vec4& color = glm::vec4(1.0f));
+        void DrawQuad(const Transform& t, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color = glm::vec4(1.0f));
         void Flush();
         
         void DrawBackground(const glm::vec4& color) const;

@@ -5,14 +5,11 @@
 
 namespace NDR
 {
-    class AssetManager
-    {
-    public:
-        //TODO: make GetAssetRootPath() dynamic
-        static std::string GetAssetRootPath();
+    //TODO: make GetAssetRootPath() dynamic
+    extern std::string GetAssetRootPath();
         
-        static Shader LoadShader(const std::string& assetPath);
-        static Mesh LoadMesh(const std::string& assetPath);
-        static Texture2D LoadTexture2D(const std::string& assetPath);
-    };
+    extern Shader LoadShader(const std::string& assetPath);
+    extern Mesh LoadMesh(const std::string& assetPath);
+    extern Texture2D LoadTexture2D(const std::string& assetPath);
+    extern Texture2DAtlas LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight);
 }

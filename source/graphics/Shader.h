@@ -18,6 +18,7 @@ namespace NDR
         void Use() const;
 
         void SetInt(const std::string& uniformName, int32_t value) const;
+        void SetIntArray(const std::string& uniformName, int32_t* value, uint32_t count) const;
         void SetFloat(const std::string& uniformName, float value) const;
         void SetVec2(const std::string& uniformName, float x, float y) const;
         void SetVec2(const std::string& uniformName, glm::vec2 vec2) const;

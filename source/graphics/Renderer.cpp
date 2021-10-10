@@ -21,12 +21,13 @@ namespace NDR
         maxQuads(maxQuads),
         maxVertices(maxQuads * 4),
         maxIndices(maxQuads * 6),
-        //TODO: make maxTextureSlots dynamic
+        //TODO: Make maxTextureSlots dynamic
         maxTextureSlots(32)
     {
         layout.AddAttribute({3, false}); // position
         layout.AddAttribute({4, false}); // color
         layout.AddAttribute({2, false}); // texCoords
+        layout.AddAttribute({1, false}); // texIndex
 
         VertexBuffer vb(maxVertices * layout.GetStride());
 
@@ -47,9 +48,9 @@ namespace NDR
         }
         ib = IndexBuffer(indices);
 
+        whiteTexture = Texture({64, 64, 4});
+
         shader = AssetManager::LoadShader("assets/shaders/Quad.shader");
-        shader.Use();
-        shader.SetInt("u_Texture", 0);
     }
 
     void RenderBatch::AddQuad(std::vector<float> vertices)
@@ -59,8 +60,19 @@ namespace NDR
         indicesCount += 6;
     }
 
-    bool RenderBatch::IsBatchFull() const { return quadCount >= maxQuads; }
-    
+    bool RenderBatch::IsBatchFull() const
+    {
+        return quadCount >= maxQuads || boundTextures.size() >= maxTextureSlots;
+    }
+
+    void RenderBatch::Reset()
+    {
+        quadCount = 0;
+        indicesCount = 0;
+        boundTextures.clear();
+        boundSlots.clear();
+    }
+
 #ifdef NDR_DEBUG
     // from https://www.khronos.org/opengl/wiki/OpenGL_Error
     inline void
@@ -73,19 +85,18 @@ namespace NDR
                      const void* userParam )
     {
         if(type == GL_DEBUG_TYPE_OTHER) return;
-        fprintf( stderr, "GL CALLBACK: %s message = %s\n",
-                 ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-                  message );
+        fprintf( stderr, "[OpenGL%s]: %s\n",
+            type == GL_DEBUG_TYPE_ERROR ? " Error" : "",
+            message );
     }
 #endif
 
     Renderer::Renderer(const uint32_t maxQuads):
-        _viewProj(glm::mat4(1.0f)),
-        _isActive(false)
+        _viewProj(glm::mat4(1.0f))
     {
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
-            printf("GLAD did not initalize!\n");
+            printf("GLAD did not initialize!\n");
             glfwTerminate();
             return;
         }
@@ -107,22 +118,40 @@ namespace NDR
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
-    void Renderer::DrawQuad(const Transform& t, const glm::vec4& color)
+    void Renderer::DrawQuad(const Transform& t, const glm::vec4& color) { DrawQuad(t, _batch.whiteTexture, color); }
+    void Renderer::DrawQuad(const Transform& t, Texture& texture, const glm::vec4& color)
     {
         if(_batch.IsBatchFull())
+        {
             Flush();
+        }
 
         const glm::vec4 v0 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
         const glm::vec4 v1 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
         const glm::vec4 v2 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
         const glm::vec4 v3 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
 
+        float texIndex;
+        auto it = _batch.boundTextures.find(&texture);
+        if(it != _batch.boundTextures.end())
+        {
+            _batch.boundSlots.push_back(it->second);
+            texIndex = (float)it->second;
+        }
+        else
+        {
+            int32_t newIndex = (int32_t)_batch.boundTextures.size();
+            _batch.boundTextures.insert(std::make_pair(&texture, newIndex));
+            _batch.boundSlots.push_back(newIndex);
+            texIndex = (float)newIndex;
+        }
+        
         const std::vector<float> vertices
         {
-            v0.x, v0.y, v0.z, color.r, color.g, color.b, color.a, 0.0f, 0.0f,
-            v1.x, v1.y, v1.z, color.r, color.g, color.b, color.a, 1.0f, 0.0f,
-            v2.x, v2.y, v2.z, color.r, color.g, color.b, color.a, 1.0f, 1.0f,
-            v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, 0.0f, 1.0f,
+            v0.x, v0.y, v0.z, color.r, color.g, color.b, color.a, 0.0f, 0.0f, texIndex,
+            v1.x, v1.y, v1.z, color.r, color.g, color.b, color.a, 1.0f, 0.0f, texIndex,
+            v2.x, v2.y, v2.z, color.r, color.g, color.b, color.a, 1.0f, 1.0f, texIndex,
+            v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, 0.0f, 1.0f, texIndex,
         };
 
         _batch.AddQuad(vertices);
@@ -137,13 +166,20 @@ namespace NDR
         _batch.ib.Bind();
         _batch.shader.Use();
 
+        std::memset(_batch.boundSlots.data(), 0, _batch.boundTextures.size());
+        
+        for(auto it = _batch.boundTextures.begin(); it != _batch.boundTextures.end(); ++it)
+        {
+            it->first->Bind(it->second);
+            _batch.boundSlots.push_back(it->second);
+        }
+        _batch.shader.SetIntArray("u_Textures", _batch.boundSlots.data(), (uint32_t)_batch.boundSlots.size());
+
         glDrawElements(GL_TRIANGLES, _batch.indicesCount, GL_UNSIGNED_INT, nullptr);
-        //printf("batch count: %d\n", _batch.quadCount);
-        _batch.quadCount = 0;
-        _batch.indicesCount = 0;
+        _batch.Reset();
     }
 
-    void Renderer::DrawBackground(const float r, const float g, const float b, const float a) const { glClearColor(r, g, b, a); }
+    void Renderer::DrawBackground(const glm::vec4& color) const { glClearColor(color.r, color.g, color.b, color.a); }
     void Renderer::SetBlendMode(const BlendMode& blendMode) const
     {
         switch (blendMode)
@@ -159,6 +195,7 @@ namespace NDR
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 break;
             }
+        default: break;
         }
     }
 }

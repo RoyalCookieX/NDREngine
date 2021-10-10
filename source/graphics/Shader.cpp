@@ -44,10 +44,16 @@ namespace NDR
 
     void Shader::Use() const { glUseProgram(_program); }
 
-        void Shader::SetInt(const std::string& uniformName, int32_t value) const
+    void Shader::SetInt(const std::string& uniformName, int32_t value) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform1i(id, value);
+    }
+
+    void Shader::SetIntArray(const std::string& uniformName, int32_t* values, uint32_t count) const
+    {
+        const uint32_t id = GetUniformLocation(uniformName);
+        glUniform1iv(id, count, values);
     }
 
     void Shader::SetFloat(const std::string& uniformName, float const value) const

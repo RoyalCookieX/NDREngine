@@ -5,6 +5,13 @@ namespace NDR
     struct TextureProperties
     {
     public:
+        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel):
+            width(width),
+            height(height),
+            bitsPerPixel(bitsPerPixel)
+        {
+        }
+        
         int32_t width, height, bitsPerPixel;
     };
     
@@ -12,6 +19,7 @@ namespace NDR
     {
     public:
         Texture();
+        Texture(const TextureProperties& properties);
         Texture(const TextureProperties& properties, unsigned char* buffer);
         ~Texture();
 
@@ -28,7 +36,6 @@ namespace NDR
         friend bool operator==(const Texture& left, const Texture& right);
     private:
         uint32_t _id;
-        unsigned char* _buffer;
         TextureProperties _properties;
     };
 

@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "utility/AssetManager.h"
+#include "Primitives.h"
 
 namespace NDR
 {   
@@ -65,6 +66,25 @@ namespace NDR
         return quadCount >= maxQuads || boundTextures.size() >= maxTextureSlots;
     }
 
+    float RenderBatch::GetTextureIndex(const Texture& texture)
+    {
+        float texIndex;
+        auto it = boundTextures.find(&texture);
+        if(it != boundTextures.end())
+        {
+            boundSlots.push_back(it->second);
+            texIndex = (float)it->second;
+        }
+        else
+        {
+            int32_t newIndex = (int32_t)boundTextures.size();
+            boundTextures.insert(std::make_pair(&texture, newIndex));
+            boundSlots.push_back(newIndex);
+            texIndex = (float)newIndex;
+        }
+        return texIndex;
+    }
+
     void RenderBatch::Reset()
     {
         quadCount = 0;
@@ -118,86 +138,39 @@ namespace NDR
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
-    void Renderer::DrawQuad(const Transform& t, const glm::vec4& color) { DrawQuad(t, _batch.whiteTexture, color); }
-    void Renderer::DrawQuad(const Transform& t, Texture2D& texture, const glm::vec4& color)
+    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.whiteTexture, color); }
+    void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
         if(_batch.IsBatchFull())
         {
             Flush();
         }
 
-        // get position of vertices
-        const glm::vec4 v0 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v1 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v2 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
-        const glm::vec4 v3 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
-
-        // get texture for vertices
-        float texIndex;
-        auto it = _batch.boundTextures.find(&texture);
-        if(it != _batch.boundTextures.end())
+        const glm::mat4 mvp = _viewProj * transform.GetMatrix();
+        const std::array<float, 8> uvs
         {
-            _batch.boundSlots.push_back(it->second);
-            texIndex = (float)it->second;
-        }
-        else
-        {
-            int32_t newIndex = (int32_t)_batch.boundTextures.size();
-            _batch.boundTextures.insert(std::make_pair(&texture, newIndex));
-            _batch.boundSlots.push_back(newIndex);
-            texIndex = (float)newIndex;
-        }
-
-        const std::vector<float> vertices
-        {
-            v0.x, v0.y, v0.z, color.r, color.g, color.b, color.a, 0.0f, 0.0f, texIndex,
-            v1.x, v1.y, v1.z, color.r, color.g, color.b, color.a, 0.0f, 1.0f, texIndex,
-            v2.x, v2.y, v2.z, color.r, color.g, color.b, color.a, 1.0f, 1.0f, texIndex,
-            v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, 1.0f, 0.0f, texIndex,
+           0.0f, 0.0f,
+           1.0f, 0.0f,
+           1.0f, 1.0f,
+           0.0f, 1.0f,
         };
+        const float texIndex = _batch.GetTextureIndex(texture);
+        const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
         _batch.AddQuad(vertices);
     }
 
-    void Renderer::DrawQuad(const Transform& t, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color)
+    void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color)
     {
         if(_batch.IsBatchFull())
         {
             Flush();
         }
 
-        // get position of vertices
-        const glm::vec4 v0 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v1 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v2 = _viewProj * t.GetMatrix() * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
-        const glm::vec4 v3 = _viewProj * t.GetMatrix() * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
-
-        // get texture for vertices
-        float texIndex;
-        auto it = _batch.boundTextures.find(&textureAtlas);
-        if(it != _batch.boundTextures.end())
-        {
-            _batch.boundSlots.push_back(it->second);
-            texIndex = (float)it->second;
-        }
-        else
-        {
-            int32_t newIndex = (int32_t)_batch.boundTextures.size();
-            _batch.boundTextures.insert(std::make_pair(&textureAtlas, newIndex));
-            _batch.boundSlots.push_back(newIndex);
-            texIndex = (float)newIndex;
-        }
-
-        // get uvs for vertices
-        const auto uvs = textureAtlas.GetUVs(x, y);
-        
-        const std::vector<float> vertices
-        {
-            v0.x, v0.y, v0.z, color.r, color.g, color.b, color.a, uvs[0], uvs[1], texIndex,
-            v1.x, v1.y, v1.z, color.r, color.g, color.b, color.a, uvs[2], uvs[3], texIndex,
-            v2.x, v2.y, v2.z, color.r, color.g, color.b, color.a, uvs[4], uvs[5], texIndex,
-            v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, uvs[6], uvs[7], texIndex,
-        };
+        const glm::mat4 mvp = _viewProj * transform.GetMatrix();
+        const std::array<float, 8> uvs = textureAtlas.GetUVs(x, y);
+        const float texIndex = _batch.GetTextureIndex(textureAtlas);
+        const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
         _batch.AddQuad(vertices);
     }

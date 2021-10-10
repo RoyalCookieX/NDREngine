@@ -26,13 +26,14 @@ namespace NDR
 
         void AddQuad(std::vector<float> vertices);
         bool IsBatchFull() const;
+        float GetTextureIndex(const Texture& texture);
         void Reset();
 
         uint32_t quadCount, indicesCount;
         uint32_t maxQuads, maxVertices, maxIndices;
 
         uint32_t maxTextureSlots;
-        std::map<Texture*, int32_t> boundTextures;
+        std::map<const Texture*, int32_t> boundTextures;
         std::vector<int32_t> boundSlots;
 
         Texture2D whiteTexture;
@@ -47,9 +48,9 @@ namespace NDR
         void Clear() const;
 
         void SetViewProj(const glm::mat4& viewProj);
-        void DrawQuad(const Transform& t, const glm::vec4& color = glm::vec4(1.0f));
-        void DrawQuad(const Transform& t, Texture2D& texture, const glm::vec4& color = glm::vec4(1.0f));
-        void DrawQuad(const Transform& t, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color = glm::vec4(1.0f));
+        void DrawQuad(const Transform& transform, const glm::vec4& color = glm::vec4(1.0f));
+        void DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color = glm::vec4(1.0f));
+        void DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color = glm::vec4(1.0f));
         void Flush();
         
         void DrawBackground(const glm::vec4& color) const;

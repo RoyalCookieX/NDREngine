@@ -48,7 +48,7 @@ namespace NDR
         }
         ib = IndexBuffer(indices);
 
-        whiteTexture = Texture({64, 64, 4});
+        whiteTexture = Texture2D({64, 64, 4});
 
         shader = AssetManager::LoadShader("assets/shaders/Quad.shader");
     }

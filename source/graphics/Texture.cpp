@@ -3,13 +3,13 @@
 
 namespace NDR
 {
-    Texture::Texture():
+    Texture2D::Texture2D():
         _id(0),
         _properties(0, 0, 0)
     {
     }
 
-    Texture::Texture(const TextureProperties& properties):
+    Texture2D::Texture2D(const TextureProperties& properties):
         _id(0),
         _properties(properties)
     {
@@ -32,7 +32,7 @@ namespace NDR
         delete buffer;
     }
 
-    Texture::Texture(const TextureProperties& properties, unsigned char* buffer):   
+    Texture2D::Texture2D(const TextureProperties& properties, unsigned char* buffer):   
         _id(0),
         _properties(properties)
     {
@@ -49,19 +49,19 @@ namespace NDR
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture::~Texture()
+    Texture2D::~Texture2D()
     {
         glDeleteTextures(1, &_id);
     }
 
-    Texture::Texture(Texture&& other) noexcept:
+    Texture2D::Texture2D(Texture2D&& other) noexcept:
         _id(other._id),
         _properties(other._properties)
     {
         other._id = 0;
     }
 
-    Texture& Texture::operator=(Texture&& other) noexcept
+    Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
     {
         if(*this != other)
         {
@@ -73,14 +73,14 @@ namespace NDR
         return *this;
     }
 
-    void Texture::Bind(const uint32_t slot) const
+    void Texture2D::Bind(const uint32_t slot) const
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, _id);
     }
 
-    uint32_t Texture::GetTextureID() const { return _id; }
+    uint32_t Texture2D::GetTextureID() const { return _id; }
 
-    bool operator==(const Texture& left, const Texture& right) { return left._id == right._id; }
+    bool operator==(const Texture& left, const Texture& right) { return left.GetTextureID() == right.GetTextureID(); }
     bool operator!=(const Texture& left, const Texture& right) { return !(left == right); }
 }

@@ -18,22 +18,29 @@ namespace NDR
     class Texture
     {
     public:
-        Texture();
-        Texture(const TextureProperties& properties);
-        Texture(const TextureProperties& properties, unsigned char* buffer);
-        ~Texture();
+        virtual ~Texture() { }
 
-        Texture(const Texture&) = delete;
-        Texture& operator=(const Texture&) = delete;
+        virtual void Bind(uint32_t slot = 0) const = 0;
+        virtual uint32_t GetTextureID() const = 0;
+    };
 
-        Texture(Texture&& other) noexcept;
-        Texture& operator=(Texture&& other) noexcept;
+    class Texture2D : public Texture
+    {
+    public:
+        Texture2D();
+        Texture2D(const TextureProperties& properties);
+        Texture2D(const TextureProperties& properties, unsigned char* buffer);
+        virtual ~Texture2D() override;
 
-        void Bind(uint32_t slot = 0) const;
+        Texture2D(const Texture&) = delete;
+        Texture2D& operator=(const Texture2D&) = delete;
 
-        uint32_t GetTextureID() const;
+        Texture2D(Texture2D&& other) noexcept;
+        Texture2D& operator=(Texture2D&& other) noexcept;
 
-        friend bool operator==(const Texture& left, const Texture& right);
+        virtual void Bind(uint32_t slot) const override;
+        virtual uint32_t GetTextureID() const override;
+
     private:
         uint32_t _id;
         TextureProperties _properties;

@@ -35,7 +35,7 @@ namespace NDR
         std::map<Texture*, int32_t> boundTextures;
         std::vector<int32_t> boundSlots;
 
-        Texture whiteTexture;
+        Texture2D whiteTexture;
     };
 
     class Renderer

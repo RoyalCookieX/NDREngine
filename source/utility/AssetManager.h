@@ -13,6 +13,6 @@ namespace NDR
         
         static Shader LoadShader(const std::string& assetPath);
         static Mesh LoadMesh(const std::string& assetPath);
-        static Texture LoadTexture(const std::string& assetPath);
+        static Texture2D LoadTexture2D(const std::string& assetPath);
     };
 }

@@ -78,11 +78,11 @@ namespace NDR
         return Mesh(std::move(vertexArray), std::move(indexBuffer), LoadShader("assets/shaders/Cube.shader"));
     }
 
-    Texture AssetManager::LoadTexture(const std::string& assetPath)
+    Texture2D AssetManager::LoadTexture2D(const std::string& assetPath)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(assetPath.c_str(), &width, &height, &bpp, 4);
-        return Texture({width, height, bpp}, buffer);
+        return Texture2D({width, height, bpp}, buffer);
     }
 }

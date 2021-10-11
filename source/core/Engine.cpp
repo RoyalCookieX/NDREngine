@@ -3,7 +3,7 @@
 #include "input/Input.h"
 
 namespace NDR
-{
+{    
     void Engine::PreInitialize()
     {
         _window = Window::Create({800, 600, "NDREngine", true});
@@ -18,12 +18,11 @@ namespace NDR
         while(_window->Active())
         {
             _window->PollEvents();
-            if(Input::GetKey(NDR_KEY_ESCAPE)) _window->Close();
-
-            Tick();
+            if(Input::GetKey(NDR_KEY_ESCAPE))
+                _window->Close();
 
             _renderer->Clear();
-            OnDraw();
+            Tick();
             _renderer->Flush();
             _window->SwapBuffers();
         }

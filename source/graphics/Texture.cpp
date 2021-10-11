@@ -5,6 +5,28 @@ namespace NDR
 {
     bool Texture::operator==(const Texture& other) const { return GetTextureID() == other.GetTextureID(); }
     bool Texture::operator!=(const Texture& other) const { return !(*this == other); }
+
+    static void InitalizeTexture(uint32_t& id, const TextureProperties* properties, uint8_t* buffer)
+    {
+        glCreateTextures(GL_TEXTURE_2D, 1, &id);
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        int32_t filter = 0;
+        switch(properties->filter)
+        {
+        case TextureFilter::NEAREST: filter = GL_NEAREST; break;
+        case TextureFilter::LINEAR: filter = GL_LINEAR; break;
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, properties->width, properties->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     Texture2D::Texture2D():
         _id(0),
         _properties(0, 0, 0)
@@ -19,42 +41,19 @@ namespace NDR
         uint8_t* buffer = new uint8_t[bufferSize];
         for(size_t i = 0; i < bufferSize; i++)
             buffer[i] = 255;
-        
-        glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-        glBindTexture(GL_TEXTURE_2D, _id);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _properties.width, _properties.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        delete buffer;
+        InitalizeTexture(_id, &_properties, buffer);
+        delete[] buffer;
     }
 
     Texture2D::Texture2D(const TextureProperties& properties, uint8_t* buffer):   
         _id(0),
         _properties(properties)
     {
-        glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-        glBindTexture(GL_TEXTURE_2D, _id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _properties.width, _properties.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        InitalizeTexture(_id, &_properties, buffer);
     }
 
-    Texture2D::~Texture2D()
-    {
-        glDeleteTextures(1, &_id);
-    }
+    Texture2D::~Texture2D() { glDeleteTextures(1, &_id); }
 
     Texture2D::Texture2D(Texture2D&& other) noexcept:
         _id(other._id),
@@ -75,12 +74,6 @@ namespace NDR
         return *this;
     }
 
-    void Texture2D::Bind(const uint32_t slot) const
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, _id);
-    }
-
     uint32_t Texture2D::GetTextureID() const { return _id; }
 
     Texture2DAtlas::Texture2DAtlas():
@@ -98,35 +91,15 @@ namespace NDR
         for(size_t i = 0; i < bufferSize; i++)
             buffer[i] = 255;
         
-        glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-        glBindTexture(GL_TEXTURE_2D, _id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _properties.width, _properties.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        delete buffer;
+        InitalizeTexture(_id, &_properties, buffer);
+        delete[] buffer;
     }
 
     Texture2DAtlas::Texture2DAtlas(const TextureAtlasProperties& properties, uint8_t* buffer):
         _id(0),
         _properties(properties)
     {
-        glCreateTextures(GL_TEXTURE_2D, 1, &_id);
-        glBindTexture(GL_TEXTURE_2D, _id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _properties.width, _properties.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        InitalizeTexture(_id, &_properties, buffer);
     }
 
     Texture2DAtlas::Texture2DAtlas(Texture2DAtlas&& other) noexcept:
@@ -160,12 +133,6 @@ namespace NDR
             uOffset * x + uOffset,  vOffset * y + vOffset,
             uOffset * x + 0.0f,     vOffset * y + vOffset,
         };
-    }
-
-    void Texture2DAtlas::Bind(uint32_t slot) const
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, _id);
     }
 
     uint32_t Texture2DAtlas::GetTextureID() const { return _id; }

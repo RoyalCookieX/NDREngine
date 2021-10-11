@@ -21,10 +21,14 @@ namespace NDR
         indicesCount(0),
         maxQuads(maxQuads),
         maxVertices(maxQuads * 4),
-        maxIndices(maxQuads * 6),
-        //TODO: Make maxTextureSlots dynamic
-        maxTextureSlots(32)
+        maxIndices(maxQuads * 6)
     {
+        Reset();
+        
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
+        for(int32_t i = 0; i < maxTextureSlots; i++)
+            textureIndexes.push_back(i);
+        
         layout.AddAttribute({3, false}); // position
         layout.AddAttribute({4, false}); // color
         layout.AddAttribute({2, false}); // texCoords
@@ -49,7 +53,7 @@ namespace NDR
         }
         ib = IndexBuffer(indices);
 
-        whiteTexture = Texture2D({64, 64, 4});
+        whiteTexture = Texture2D({4, 4, 4, TextureFilter::NEAREST});
 
         shader = LoadShader("assets/shaders/Quad.shader");
     }
@@ -68,18 +72,19 @@ namespace NDR
 
     float RenderBatch::GetTextureIndex(const Texture& texture)
     {
-        float texIndex;
-        auto it = boundTextures.find(&texture);
-        if(it != boundTextures.end())
+        float texIndex = -1.0f;
+        for(size_t i = 0; i < boundTextures.size(); i++)
         {
-            boundSlots.push_back(it->second);
-            texIndex = (float)it->second;
+            if(boundTextures[i]->GetTextureID() == texture.GetTextureID())
+            {
+                texIndex = (float)i;
+                break;
+            }
         }
-        else
+        if(texIndex == -1.0f)
         {
-            int32_t newIndex = (int32_t)boundTextures.size();
-            boundTextures.insert(std::make_pair(&texture, newIndex));
-            boundSlots.push_back(newIndex);
+            const int32_t newIndex = (int32_t)boundTextures.size();
+            boundTextures.push_back(&texture);
             texIndex = (float)newIndex;
         }
         return texIndex;
@@ -90,7 +95,8 @@ namespace NDR
         quadCount = 0;
         indicesCount = 0;
         boundTextures.clear();
-        boundSlots.clear();
+
+        textureIndexes.reserve(maxTextureSlots);
     }
 
 #ifdef NDR_DEBUG
@@ -138,6 +144,12 @@ namespace NDR
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
+    void Renderer::BindTexture(const Texture& texture, uint32_t slot)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, texture.GetTextureID());
+    }
+
     void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.whiteTexture, color); }
     void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
@@ -160,7 +172,7 @@ namespace NDR
         _batch.AddQuad(vertices);
     }
 
-    void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color)
+    void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
     {
         if(_batch.IsBatchFull())
         {
@@ -183,16 +195,12 @@ namespace NDR
         _batch.va.Bind();
         _batch.ib.Bind();
         _batch.shader.Use();
-
-        std::memset(_batch.boundSlots.data(), 0, _batch.boundTextures.size());
         
-        for(auto it = _batch.boundTextures.begin(); it != _batch.boundTextures.end(); ++it)
-        {
-            it->first->Bind(it->second);
-            _batch.boundSlots.push_back(it->second);
-        }
-        _batch.shader.SetIntArray("u_Textures", _batch.boundSlots.data(), (uint32_t)_batch.boundSlots.size());
-
+        for(size_t i = 0; i < _batch.boundTextures.size(); i++)
+            BindTexture(*_batch.boundTextures[i], (uint32_t)i);
+        
+        _batch.shader.SetIntArray("u_Textures", _batch.textureIndexes.data(), (uint32_t)_batch.textureIndexes.size());
+        
         glDrawElements(GL_TRIANGLES, _batch.indicesCount, GL_UNSIGNED_INT, nullptr);
         _batch.Reset();
     }

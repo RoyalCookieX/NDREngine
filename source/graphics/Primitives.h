@@ -22,4 +22,20 @@ namespace NDR
             v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a, uvs[6], uvs[7], texIndex,
         };
     }
+   
+    static std::vector<float> CreateCube(
+        const glm::mat4& mvp,
+        const std::array<float, 8>& uvs,
+        const glm::vec4& color = glm::vec4(1.0f),
+        float texIndex = 0)
+    {
+        std::vector<float> vertices;
+        //vertices.reserve(240);
+
+        //std::vector<float> left = CreateQuad(, uvs);
+        
+        //vertices.insert(vertices.end(), left.begin(), left.end());
+        
+        return vertices;
+    }
 }

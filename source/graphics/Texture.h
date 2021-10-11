@@ -1,33 +1,34 @@
 #pragma once
 
 namespace NDR
-{    
+{
+    enum class TextureFilter { NEAREST, LINEAR };
+    
     struct TextureProperties
     {
     public:
-        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel):
+        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel, TextureFilter filter = TextureFilter::NEAREST):
             width(width),
             height(height),
-            bitsPerPixel(bitsPerPixel)
+            bitsPerPixel(bitsPerPixel),
+            filter(filter)
         {
         }
         
         int32_t width, height, bitsPerPixel;
+        TextureFilter filter;
     };
 
-    struct TextureAtlasProperties
+    struct TextureAtlasProperties : TextureProperties
     {
     public:
-        TextureAtlasProperties(int32_t width, int32_t height, uint32_t cellWidth, uint32_t cellHeight, int32_t bitsPerPixel):
-            width(width),
-            height(height),
+        TextureAtlasProperties(int32_t width, int32_t height, uint32_t cellWidth, uint32_t cellHeight, int32_t bitsPerPixel, TextureFilter filter = TextureFilter::NEAREST):
+            TextureProperties(width, height, bitsPerPixel, filter),
             cellWidth(cellWidth),
-            cellHeight(cellHeight),
-            bitsPerPixel(bitsPerPixel)
+            cellHeight(cellHeight)
         {
         }
 
-        int32_t width, height, bitsPerPixel;
         uint32_t cellWidth, cellHeight;
     };
     
@@ -36,7 +37,6 @@ namespace NDR
     public:
         virtual ~Texture() { }
 
-        virtual void Bind(uint32_t slot = 0) const = 0;
         virtual uint32_t GetTextureID() const = 0;
 
         bool operator==(const Texture& other) const;
@@ -57,7 +57,6 @@ namespace NDR
         Texture2D(Texture2D&& other) noexcept;
         Texture2D& operator=(Texture2D&& other) noexcept;
 
-        virtual void Bind(uint32_t slot) const override;
         virtual uint32_t GetTextureID() const override;
 
     private:
@@ -79,7 +78,6 @@ namespace NDR
         Texture2DAtlas& operator=(Texture2DAtlas&& other) noexcept;
 
         virtual std::array<float, 8> GetUVs(uint32_t x, uint32_t y) const;
-        virtual void Bind(uint32_t slot) const override;
         virtual uint32_t GetTextureID() const override;
 
     private:

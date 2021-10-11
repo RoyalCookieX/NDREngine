@@ -32,9 +32,9 @@ namespace NDR
         uint32_t quadCount, indicesCount;
         uint32_t maxQuads, maxVertices, maxIndices;
 
-        uint32_t maxTextureSlots;
-        std::map<const Texture*, int32_t> boundTextures;
-        std::vector<int32_t> boundSlots;
+        int32_t maxTextureSlots;
+        std::vector<const Texture*> boundTextures;
+        std::vector<int32_t> textureIndexes;
 
         Texture2D whiteTexture;
     };
@@ -45,9 +45,10 @@ namespace NDR
         Renderer(uint32_t maxQuads = 1024);
         ~Renderer();
         
-        void Clear() const;
-
         void SetViewProj(const glm::mat4& viewProj);
+        void BindTexture(const Texture& texture, uint32_t slot = 0);
+        void Clear() const;
+        
         void DrawQuad(const Transform& transform, const glm::vec4& color = glm::vec4(1.0f));
         void DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color = glm::vec4(1.0f));
         void DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, int32_t x, int32_t y, const glm::vec4& color = glm::vec4(1.0f));

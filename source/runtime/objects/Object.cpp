@@ -5,7 +5,6 @@ namespace NDR
 {
     Object::Object() { }
     Object::Object(const Transform& transform): _transform(transform) { }
-    Object::Object(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale): _transform(position, rotation, scale) { }
     Object::~Object() { }
 
     Object::Object(const Object& other): _transform(other._transform) { }

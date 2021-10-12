@@ -8,35 +8,29 @@ namespace NDR
         Transform();
         Transform(const glm::mat4& matrix);
         Transform(const glm::vec3& position);
-        Transform(const glm::vec3& position, const glm::quat& rotation);
-        Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
+        Transform(const glm::vec3& position, const glm::vec3& euler);
+        Transform(const glm::vec3& position, const glm::vec3& euler, const glm::vec3& scale);
         
-        const glm::mat4& GetMatrix() const;
-        glm::vec3 GetPosition(bool isLocal = false) const;
-        glm::quat GetRotation(bool isLocal = false) const;
-        glm::vec3 GetScale() const;
+        glm::mat4 GetMatrix() const;
+        const glm::vec3& GetPosition() const;
+        const glm::quat& GetRotation() const;
+        const glm::vec3& GetScale() const;
 
-        void SetPosition(const glm::vec3& newPosition, bool isLocal = false);
-        Transform& Translate(const glm::vec3& translation, bool isLocal = false);
-        
-        void SetRotation(const glm::quat& newRotation, bool isLocal = false);
-        void SetRotation(const glm::vec3& newEuler, bool isLocal = false);
-        void SetRotation(float degrees, const glm::vec3& axis, bool isLocal = false);
-        Transform& Rotate(const glm::quat& rotation, bool isLocal = false);
-        Transform& Rotate(const glm::vec3& euler, bool isLocal = false);
-        Transform& Rotate(float degrees, const glm::vec3& axis, bool isLocal = false);
-        
-        void SetScale(const glm::vec3& newScale);
+        Transform& SetPosition(const glm::vec3& position);
+        Transform& SetRotation(const glm::vec3& euler);
+        Transform& SetScale(const glm::vec3& scale);
+
+        Transform& Translate(const glm::vec3& translation);
+        Transform& Rotate(const glm::vec3& euler);
         Transform& Scale(const glm::vec3& scalar);
 
         glm::vec3 GetRight() const;
         glm::vec3 GetUp() const;
         glm::vec3 GetForward() const;
-        
-    private:
-        std::tuple<glm::vec3, glm::quat, glm::vec3> Decompose() const;
-        void ConstructMatrix(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale);
-        
-        glm::mat4 _matrix;
+    private:     
+        //TODO: replace _position, _rotation, and _scale with _matrix
+        glm::vec3 _position;
+        glm::quat _rotation;
+        glm::vec3 _scale;
     };
 }

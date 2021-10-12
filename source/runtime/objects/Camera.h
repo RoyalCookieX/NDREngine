@@ -3,24 +3,33 @@
 
 namespace NDR
 {
-    class Camera : public Object
+    class Camera
     {
     public:
-        float moveSpeed = 0.05f, rotationSpeed = 0.05f;
+        float moveSpeed = 0.05f, rotationSpeed = 2.5f;
         
         Camera();
         Camera(const glm::mat4& projMatrix);
-        Camera(const Transform& transform, const glm::mat4& projMatrix);
-        Camera(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale, const glm::mat4& projMatrix);
+        Camera(const glm::mat4& projMatrix, const glm::vec3& position, const glm::vec2& yawPitch);
 
+        glm::vec2 GetYawPitch() const;
+        void SetYawPitch(const glm::vec2& yawPitch);
+        glm::vec2 AddYawPitch(const glm::vec2& yawPitch);
+        
+        glm::vec3 GetRightAxis() const;
+        glm::vec3 GetUpAxis() const;
+        glm::vec3 GetForwardAxis() const;
+        
         glm::mat4 GetProjMatrix() const;
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetViewProjMatrix() const;
 
-        virtual void Tick() override;
+        void Tick();
 
         void SetProjection(const glm::mat4& projMatrix);
     private:
         glm::mat4 _projMatrix;
+        glm::vec3 _position;
+        glm::vec2 _yawPitch;
     };
 }

@@ -23,7 +23,7 @@ namespace NDR
                 _window->Close();
 
             _renderer->Clear();
-            Tick(GetDeltaTime());
+            Tick(Time::GetDeltaTime());
             _renderer->Flush();
             _window->SwapBuffers();
         }

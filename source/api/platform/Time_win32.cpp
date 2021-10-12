@@ -5,12 +5,12 @@ namespace NDR
 {
     static float lastTime = 0;
 
-    float GetTime()
+    float Time::GetTime()
     {
         return (float)glfwGetTime();
     }
     
-    float GetDeltaTime()
+    float Time::GetDeltaTime()
     {
         const float currentTime = (float)glfwGetTime();
         const float deltaTime = currentTime - lastTime;

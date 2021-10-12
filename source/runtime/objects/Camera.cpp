@@ -44,17 +44,20 @@ namespace NDR
     glm::vec3 Camera::GetUpAxis() const { return glm::vec3(0.0f, 1.0f, 0.0f); }
     glm::vec3 Camera::GetForwardAxis() const
     {
-        const glm::vec2 yawPitchRad = glm::radians(_yawPitch);
-        const float yaw = yawPitchRad.x;
-        const float pitch = yawPitchRad.y;
+        const glm::vec2 radians = glm::radians(_yawPitch);
+        const float yaw = radians.x;
+        const float pitch = radians.y;
         const glm::vec3 forward(glm::sin(yaw) * glm::cos(pitch), glm::sin(pitch), glm::cos(yaw) * glm::cos(pitch));
         return glm::normalize(forward);
     }
 
     glm::mat4 Camera::GetProjMatrix() const { return _projMatrix; }
     glm::mat4 Camera::GetViewMatrix() const
-    {        
-        return glm::lookAt(_position, _position + GetForwardAxis(), GetUpAxis());
+    {
+        const glm::vec2 radians = glm::radians(_yawPitch);
+        const float yaw = radians.x;
+        const float pitch = radians.y;
+        return glm::rotate(pitch, VEC3_RIGHT) * glm::rotate(yaw, VEC3_UP) * glm::translate(-_position);
     }
     glm::mat4 Camera::GetViewProjMatrix() const { return _projMatrix * GetViewMatrix(); }
 

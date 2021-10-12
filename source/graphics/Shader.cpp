@@ -42,7 +42,7 @@ namespace NDR
         return *this;
     }
 
-    void Shader::Use() const { glUseProgram(_program); }
+    uint32_t Shader::GetProgram() const { return _program; }
 
     void Shader::SetInt(const std::string& uniformName, int32_t value) const
     {

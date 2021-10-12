@@ -143,12 +143,22 @@ namespace NDR
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
+    void Renderer::DrawElements(const uint32_t count)
+    {
+        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+    }
+
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
 
     void Renderer::BindTexture(const Texture& texture, uint32_t slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture.GetTextureID());
+    }
+
+    void Renderer::BindShader(const Shader& shader)
+    {
+        glUseProgram(shader.GetProgram());
     }
 
     void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.whiteTexture, color); }
@@ -195,14 +205,14 @@ namespace NDR
         
         _batch.va.Bind();
         _batch.ib.Bind();
-        _batch.shader.Use();
+        BindShader(_batch.shader);
         
         for(size_t i = 0; i < _batch.boundTextures.size(); i++)
             BindTexture(*_batch.boundTextures[i], (uint32_t)i);
         
         _batch.shader.SetIntArray("u_Textures", _batch.textureIndexes.data(), (uint32_t)_batch.textureIndexes.size());
         
-        glDrawElements(GL_TRIANGLES, _batch.indicesCount, GL_UNSIGNED_INT, nullptr);
+        DrawElements(_batch.indicesCount);
         _batch.Reset();
     }
 

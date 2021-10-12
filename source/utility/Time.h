@@ -2,6 +2,10 @@
 
 namespace NDR
 {
-    extern float GetTime();
-    extern float GetDeltaTime();
+    class Time
+    {
+    public:
+        static float GetTime();
+        static float GetDeltaTime();
+    };
 }

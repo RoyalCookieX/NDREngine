@@ -17,6 +17,7 @@
 #include "graphics/Renderer.h"
 #include "runtime/objects/Camera.h"
 #include "utility/AssetManager.h"
+#include "utility/Time.h"
 
 #if (NDR_RELEASE && NDR_PLATFORM_WINDOWS)
 #define NDRMain WinMain

@@ -1,6 +1,7 @@
 #include "ndrpch.h"
 #include "Engine.h"
 #include "input/Input.h"
+#include "utility/Time.h"
 
 namespace NDR
 {    
@@ -22,7 +23,7 @@ namespace NDR
                 _window->Close();
 
             _renderer->Clear();
-            Tick();
+            Tick(GetDeltaTime());
             _renderer->Flush();
             _window->SwapBuffers();
         }

@@ -6,7 +6,7 @@ namespace NDR
     class Camera
     {
     public:
-        float moveSpeed = 0.05f, rotationSpeed = 2.5f;
+        float moveSpeed = 1.0f, rotationSpeed = 90.0f;
         
         Camera();
         Camera(const glm::mat4& projMatrix);
@@ -24,7 +24,7 @@ namespace NDR
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetViewProjMatrix() const;
 
-        void Tick();
+        void Tick(float deltaTime);
 
         void SetProjection(const glm::mat4& projMatrix);
     private:

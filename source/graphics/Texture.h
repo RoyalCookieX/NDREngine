@@ -3,27 +3,35 @@
 namespace NDR
 {
     enum class TextureFilter { NEAREST, LINEAR };
+    enum class TextureWrap { REPEAT, CLAMPTOEDGE };
     
     struct TextureProperties
     {
     public:
-        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel, TextureFilter filter = TextureFilter::NEAREST):
+        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel,
+            TextureFilter filter = TextureFilter::NEAREST, TextureWrap wrap = TextureWrap::CLAMPTOEDGE):
+
             width(width),
             height(height),
             bitsPerPixel(bitsPerPixel),
-            filter(filter)
+            filter(filter),
+            wrap(wrap)
         {
         }
         
         int32_t width, height, bitsPerPixel;
         TextureFilter filter;
+        TextureWrap wrap;
     };
 
     struct TextureAtlasProperties : TextureProperties
     {
     public:
-        TextureAtlasProperties(int32_t width, int32_t height, uint32_t cellWidth, uint32_t cellHeight, int32_t bitsPerPixel, TextureFilter filter = TextureFilter::NEAREST):
-            TextureProperties(width, height, bitsPerPixel, filter),
+        TextureAtlasProperties(int32_t width, int32_t height,
+            uint32_t cellWidth, uint32_t cellHeight, int32_t bitsPerPixel,
+            TextureFilter filter = TextureFilter::NEAREST, TextureWrap wrap = TextureWrap::CLAMPTOEDGE):
+
+            TextureProperties(width, height, bitsPerPixel, filter, wrap),
             cellWidth(cellWidth),
             cellHeight(cellHeight)
         {

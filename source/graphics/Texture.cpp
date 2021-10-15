@@ -11,16 +11,21 @@ namespace NDR
         glCreateTextures(GL_TEXTURE_2D, 1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
 
-        int32_t filter = 0;
+        int32_t filter = 0, wrap = 0;
         switch(properties->filter)
         {
-        case TextureFilter::NEAREST: filter = GL_NEAREST; break;
-        case TextureFilter::LINEAR: filter = GL_LINEAR; break;
+            case TextureFilter::NEAREST: filter = GL_NEAREST; break;
+            case TextureFilter::LINEAR: filter = GL_LINEAR; break;
+        }
+        switch(properties->wrap)
+        {
+            case TextureWrap::REPEAT: wrap = GL_REPEAT; break;
+            case TextureWrap::CLAMPTOEDGE: wrap = GL_CLAMP_TO_EDGE; break;
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, properties->width, properties->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 

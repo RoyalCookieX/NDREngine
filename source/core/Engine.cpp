@@ -7,7 +7,7 @@ namespace NDR
 {    
     void Engine::PreInitialize()
     {
-        _window = Window::Create({800, 600, "NDREngine", true});
+        _window = Window::Create({800, 600, "NDREngine", false});
         _renderer = new Renderer();
     }
 

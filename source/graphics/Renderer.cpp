@@ -23,21 +23,24 @@ namespace NDR
         maxVertices(maxQuads * 4),
         maxIndices(maxQuads * 6)
     {
+        // initialize batch stats
         Reset();
-        
+
+        // get number of texture slots
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
+        textureIndexes.reserve(maxTextureSlots);
         for(int32_t i = 0; i < maxTextureSlots; i++)
             textureIndexes.push_back(i);
-        
-        layout.AddAttribute({3, false}); // position
+
+        // setup vertex buffer and vertex array
+        layout.AddAttribute({4, false}); // position
         layout.AddAttribute({4, false}); // color
         layout.AddAttribute({2, false}); // texCoords
         layout.AddAttribute({1, false}); // texIndex
-
         VertexBuffer vb(maxVertices * layout.GetStride());
-
         va = VertexArray(std::move(vb), layout);
 
+        // setup index buffer
         std::vector<uint32_t> indices;
         indices.reserve(maxIndices);
         uint32_t index = 0;
@@ -53,19 +56,35 @@ namespace NDR
         }
         ib = IndexBuffer(indices);
 
-        whiteTexture = Texture2D({4, 4, 4, TextureFilter::NEAREST});
+        // create default white texture
+        whiteTexture = Texture2D({1, 1, 1});
 
+        // get default shader
+        //TODO: use engine assets instead of application assets
         shader = LoadShader("assets/shaders/Quad.shader");
     }
 
     void RenderBatch::AddQuad(std::vector<float> vertices)
     {
         va.GetVertexBuffer().SetData(quadCount * 4 * layout.GetStride(), vertices);
+#if 0
+        std::cout << "quad #" << quadCount << ": " << std::endl;
+        for(int i = 0; i < vertices.size(); i += layout.GetStride() / 4)
+        {
+            std::cout << std::fixed << std::setprecision(2) <<
+                "  position:  [" << vertices[i + 0] << " " << vertices[i + 1] << " " << vertices[i + 2] << " " << vertices[i + 3] << "] " << std::endl <<
+                "  color:     [" << vertices[i + 4] << " " << vertices[i + 5] << " " << vertices[i + 6] << " " << vertices[i + 7] << "] " << std::endl <<
+                "  texCoords: [" << vertices[i + 8] << " " << vertices[i + 9] << "] " << std::endl <<
+                "  texIndex:  [" << vertices[i + 10] << "]" << std::endl;
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+#endif
         quadCount++;
         indicesCount += 6;
     }
 
-    bool RenderBatch::IsBatchFull() const
+    bool RenderBatch::IsFull() const
     {
         return quadCount >= maxQuads || boundTextures.size() >= maxTextureSlots;
     }
@@ -164,7 +183,7 @@ namespace NDR
     void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.whiteTexture, color); }
     void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
-        if(_batch.IsBatchFull())
+        if(_batch.IsFull())
         {
             Flush();
         }
@@ -185,7 +204,7 @@ namespace NDR
 
     void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
     {
-        if(_batch.IsBatchFull())
+        if(_batch.IsFull())
         {
             Flush();
         }
@@ -202,6 +221,8 @@ namespace NDR
     {
         if(_batch.indicesCount <= 0)
             return;
+
+        //std::cout << "flush" << std::endl;
         
         _batch.va.Bind();
         _batch.ib.Bind();

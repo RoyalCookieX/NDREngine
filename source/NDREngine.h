@@ -10,7 +10,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include "core/Engine.h"
 #include "core/Window.h"

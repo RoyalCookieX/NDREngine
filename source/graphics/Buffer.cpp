@@ -65,6 +65,9 @@ namespace NDR
 
     void VertexBuffer::SetData(const uint64_t offset, std::vector<float> vertices)
     {
+#ifdef NDR_DEBUG
+        assert(("[VertexBuffer Error]: Data and Offset are invalid!", vertices.size() + offset <= _size));
+#endif
         glBufferSubData(GL_ARRAY_BUFFER, offset, vertices.size() * sizeof(float), vertices.data());
     }
 

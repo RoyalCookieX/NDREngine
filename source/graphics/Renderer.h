@@ -25,7 +25,7 @@ namespace NDR
         Shader shader;
 
         void AddQuad(std::vector<float> vertices);
-        bool IsBatchFull() const;
+        bool IsFull() const;
         float GetTextureIndex(const Texture& texture);
         void Reset();
 

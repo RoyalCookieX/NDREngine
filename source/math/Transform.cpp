@@ -29,7 +29,7 @@ namespace NDR
         const glm::mat4 posMatrix = glm::translate(position);
         const glm::mat4 rotMatrix = glm::toMat4(glm::quat(glm::radians(euler)));
         const glm::mat4 scaleMatrix = glm::scale(scale);
-        _matrix = posMatrix * rotMatrix;
+        _matrix = posMatrix * rotMatrix * scaleMatrix;
     }
 
     glm::mat4 Transform::GetMatrix() const { return _matrix; }

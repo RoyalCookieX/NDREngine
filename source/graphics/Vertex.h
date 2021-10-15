@@ -50,7 +50,8 @@ namespace NDR
         VertexArray(VertexArray&& other) noexcept;
         VertexArray& operator=(VertexArray&& other) noexcept;
 
-        VertexBuffer& VertexArray::GetVertexBuffer();
+        VertexBuffer& GetVertexBuffer();
+        VertexLayout& GetVertexLayout();
         const VertexBuffer& GetVertexBuffer() const;
         size_t GetVertexCount() const;
         void Bind() const;

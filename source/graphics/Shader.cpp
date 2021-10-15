@@ -44,6 +44,11 @@ namespace NDR
 
     uint32_t Shader::GetProgram() const { return _program; }
 
+    void Shader::Use() const
+    {
+        glUseProgram(_program);
+    }
+
     void Shader::SetInt(const std::string& uniformName, int32_t value) const
     {
         const uint32_t id = GetUniformLocation(uniformName);

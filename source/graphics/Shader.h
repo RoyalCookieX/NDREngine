@@ -16,6 +16,7 @@ namespace NDR
         Shader& operator=(Shader&& other) noexcept;
         
         uint32_t GetProgram() const;
+        void Use() const;
 
         void SetInt(const std::string& uniformName, int32_t value) const;
         void SetIntArray(const std::string& uniformName, int32_t* value, uint32_t count) const;

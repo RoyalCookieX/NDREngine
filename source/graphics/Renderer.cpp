@@ -1,123 +1,10 @@
 #include "ndrpch.h"
 #include "Renderer.h"
 
-#include "utility/AssetManager.h"
 #include "Primitives.h"
 
 namespace NDR
 {   
-    RenderBatch::RenderBatch():
-        quadCount(0),
-        indicesCount(0),
-        maxQuads(0),
-        maxVertices(0),
-        maxIndices(0),
-        maxTextureSlots(0)
-    {
-    }
-
-    RenderBatch::RenderBatch(uint32_t maxQuads):
-        quadCount(0),
-        indicesCount(0),
-        maxQuads(maxQuads),
-        maxVertices(maxQuads * 4),
-        maxIndices(maxQuads * 6)
-    {
-        // initialize batch stats
-        Reset();
-
-        // get number of texture slots
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
-        textureIndexes.reserve(maxTextureSlots);
-        for(int32_t i = 0; i < maxTextureSlots; i++)
-            textureIndexes.push_back(i);
-
-        // setup vertex buffer and vertex array
-        layout.AddAttribute({4, false}); // position
-        layout.AddAttribute({4, false}); // color
-        layout.AddAttribute({2, false}); // texCoords
-        layout.AddAttribute({1, false}); // texIndex
-        VertexBuffer vb(maxVertices * layout.GetStride());
-        va = VertexArray(std::move(vb), layout);
-
-        // setup index buffer
-        std::vector<uint32_t> indices;
-        indices.reserve(maxIndices);
-        uint32_t index = 0;
-        for (uint32_t i = 0; i < maxIndices; i += 6)
-        {
-            indices.push_back(index + 0);
-            indices.push_back(index + 1);
-            indices.push_back(index + 2);
-            indices.push_back(index + 0);
-            indices.push_back(index + 2);
-            indices.push_back(index + 3);
-            index += 4;
-        }
-        ib = IndexBuffer(indices);
-
-        // create default white texture
-        whiteTexture = Texture2D({1, 1, 1});
-
-        // get default shader
-        //TODO: use engine assets instead of application assets
-        shader = LoadShader("assets/shaders/Quad.shader");
-    }
-
-    void RenderBatch::AddQuad(std::vector<float> vertices)
-    {
-        va.GetVertexBuffer().SetData(quadCount * 4 * layout.GetStride(), vertices);
-#if 0
-        std::cout << "quad #" << quadCount << ": " << std::endl;
-        for(int i = 0; i < vertices.size(); i += layout.GetStride() / 4)
-        {
-            std::cout << std::fixed << std::setprecision(2) <<
-                "  position:  [" << vertices[i + 0] << " " << vertices[i + 1] << " " << vertices[i + 2] << " " << vertices[i + 3] << "] " << std::endl <<
-                "  color:     [" << vertices[i + 4] << " " << vertices[i + 5] << " " << vertices[i + 6] << " " << vertices[i + 7] << "] " << std::endl <<
-                "  texCoords: [" << vertices[i + 8] << " " << vertices[i + 9] << "] " << std::endl <<
-                "  texIndex:  [" << vertices[i + 10] << "]" << std::endl;
-            std::cout << std::endl;
-        }
-        std::cout << std::endl;
-#endif
-        quadCount++;
-        indicesCount += 6;
-    }
-
-    bool RenderBatch::IsFull() const
-    {
-        return quadCount >= maxQuads || boundTextures.size() >= maxTextureSlots;
-    }
-
-    float RenderBatch::GetTextureIndex(const Texture& texture)
-    {
-        float texIndex = -1.0f;
-        for(size_t i = 0; i < boundTextures.size(); i++)
-        {
-            if(boundTextures[i]->GetTextureID() == texture.GetTextureID())
-            {
-                texIndex = (float)i;
-                break;
-            }
-        }
-        if(texIndex == -1.0f)
-        {
-            const int32_t newIndex = (int32_t)boundTextures.size();
-            boundTextures.push_back(&texture);
-            texIndex = (float)newIndex;
-        }
-        return texIndex;
-    }
-
-    void RenderBatch::Reset()
-    {
-        quadCount = 0;
-        indicesCount = 0;
-        boundTextures.clear();
-
-        textureIndexes.reserve(maxTextureSlots);
-    }
-
 #ifdef NDR_DEBUG
     // from https://www.khronos.org/opengl/wiki/OpenGL_Error
     inline void
@@ -155,16 +42,19 @@ namespace NDR
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        _batch = RenderBatch(maxQuads);
+        _batch.Initialize(maxQuads);
     }
 
     Renderer::~Renderer() { }
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    void Renderer::DrawElements(const uint32_t count)
+    void Renderer::DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader)
     {
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+        va.Bind();
+        ib.Bind();
+        shader.Use();
+        glDrawElements(GL_TRIANGLES, ib.GetSize(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
@@ -175,12 +65,7 @@ namespace NDR
         glBindTexture(GL_TEXTURE_2D, texture.GetTextureID());
     }
 
-    void Renderer::BindShader(const Shader& shader)
-    {
-        glUseProgram(shader.GetProgram());
-    }
-
-    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.whiteTexture, color); }
+    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.GetDefaultTexture(), color); }
     void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
         if(_batch.IsFull())
@@ -199,7 +84,7 @@ namespace NDR
         const float texIndex = _batch.GetTextureIndex(texture);
         const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
-        _batch.AddQuad(vertices);
+        _batch.AddElement(vertices);
     }
 
     void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
@@ -214,26 +99,18 @@ namespace NDR
         const float texIndex = _batch.GetTextureIndex(textureAtlas);
         const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
-        _batch.AddQuad(vertices);
+        _batch.AddElement(vertices);
     }
 
     void Renderer::Flush()
     {
-        if(_batch.indicesCount <= 0)
+        if(_batch.GetIndicesCount() <= 0)
             return;
-
-        //std::cout << "flush" << std::endl;
         
-        _batch.va.Bind();
-        _batch.ib.Bind();
-        BindShader(_batch.shader);
-        
-        for(size_t i = 0; i < _batch.boundTextures.size(); i++)
-            BindTexture(*_batch.boundTextures[i], (uint32_t)i);
-        
-        _batch.shader.SetIntArray("u_Textures", _batch.textureIndexes.data(), (uint32_t)_batch.textureIndexes.size());
-        
-        DrawElements(_batch.indicesCount);
+        for(size_t i = 0; i < _batch.GetBoundTextureCount(); i++)
+            BindTexture(_batch.GetBoundTexture(i), (uint32_t)i);
+                
+        DrawElements(_batch.GetVertexArray(), _batch.GetIndexBuffer(), _batch.GetDefaultShader());
         _batch.Reset();
     }
 

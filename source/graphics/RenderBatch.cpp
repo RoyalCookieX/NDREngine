@@ -15,14 +15,14 @@ namespace NDR
     {
     }
 
-    RenderBatch::RenderBatch(const uint32_t maxElements, const uint32_t verticesPerElement, const uint32_t indicesPerElement, const VertexLayout& layout):
+    RenderBatch::RenderBatch(const uint32_t maxElements, const uint32_t verticesPerElement, const uint32_t indicesPerElement, const VertexLayout& layout, Texture&& texture, Shader&& shader):
         _maxElements(maxElements),
         _verticesPerElement(verticesPerElement),
         _indicesPerElement(indicesPerElement),
         _elementCount(0),
         _indicesCount(0),
         _maxTextureSlots(0)
-    {
+    {        
         RenderBatch::Reset();
 
         // get number of texture slots
@@ -51,9 +51,8 @@ namespace NDR
         }
         _ib = IndexBuffer(indices);
 
-        _defaultTexture = Texture2D({1, 1, 1});
-        //TODO: get assets from engine path, instead of application path
-        _defaultShader = LoadShader("assets/shaders/Quad.shader");
+        _defaultTexture = (Texture2D&&)texture;
+        _defaultShader = (Shader&&)shader;
         _defaultShader.Use();
         _defaultShader.SetIntArray("u_Textures", _textureIndexes.data(), (uint32_t)_textureIndexes.size());
     }

@@ -46,6 +46,7 @@ namespace NDR
         virtual ~Texture() { }
 
         virtual uint32_t GetTextureID() const = 0;
+        virtual void Bind(uint32_t slot = 0) const = 0;
 
         bool operator==(const Texture& other) const;
         bool operator!=(const Texture& other) const;
@@ -66,6 +67,7 @@ namespace NDR
         Texture2D& operator=(Texture2D&& other) noexcept;
 
         virtual uint32_t GetTextureID() const override;
+        virtual void Bind(uint32_t slot) const override;
 
     private:
         uint32_t _id;
@@ -87,6 +89,7 @@ namespace NDR
 
         virtual std::array<float, 8> GetUVs(uint32_t x, uint32_t y) const;
         virtual uint32_t GetTextureID() const override;
+        virtual void Bind(uint32_t slot) const override;
 
     private:
         uint32_t _id;

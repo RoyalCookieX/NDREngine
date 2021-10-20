@@ -81,6 +81,12 @@ namespace NDR
 
     uint32_t Texture2D::GetTextureID() const { return _id; }
 
+    void Texture2D::Bind(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, _id);
+    }
+
     Texture2DAtlas::Texture2DAtlas():
         _id(0),
         _properties(0, 0, 0, 0, 0)
@@ -141,4 +147,10 @@ namespace NDR
     }
 
     uint32_t Texture2DAtlas::GetTextureID() const { return _id; }
+
+    void Texture2DAtlas::Bind(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, _id);
+    }
 }

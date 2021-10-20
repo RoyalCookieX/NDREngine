@@ -9,8 +9,7 @@ namespace NDR
     {
     public:
         RenderBatch();
-        //TODO: assign defaultShader on constructor
-        RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout);
+        RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, Texture&& texture, Shader&& shader);
         virtual ~RenderBatch() { }
 
         RenderBatch(const RenderBatch&) = delete;

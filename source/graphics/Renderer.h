@@ -19,7 +19,6 @@ namespace NDR
         ~Renderer();
         
         void SetViewProj(const glm::mat4& viewProj);
-        void BindTexture(const Texture& texture, uint32_t slot = 0);
         void Clear() const;
 
         void DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);

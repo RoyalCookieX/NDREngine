@@ -48,7 +48,8 @@ namespace NDR
         quadLayout.AddAttribute({4, false}); // color
         quadLayout.AddAttribute({2, false}); // texCoords
         quadLayout.AddAttribute({1, false}); // texIndex
-        _quadBatch = RenderBatch(1024, 4, 6, quadLayout);
+        //TODO: Make Engine Assets Path
+        _quadBatch = RenderBatch(1024, 4, 6, quadLayout, Texture2D({1, 1, 1}), LoadShader("assets/shaders/Quad.shader"));
         
         VertexLayout lineLayout;
         lineLayout.AddAttribute({4, false}); // position
@@ -72,12 +73,6 @@ namespace NDR
     }
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
-
-    void Renderer::BindTexture(const Texture& texture, uint32_t slot)
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, texture.GetTextureID());
-    }
 
     void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
     {
@@ -144,7 +139,7 @@ namespace NDR
             return;
         
         for(size_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
-            BindTexture(_quadBatch.GetBoundTexture(i), (uint32_t)i);
+            _quadBatch.GetBoundTexture(i).Bind(i);
                 
         DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetIndexBuffer(), _quadBatch.GetDefaultShader());
         _quadBatch.Reset();

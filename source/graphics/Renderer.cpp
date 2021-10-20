@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "Primitives.h"
+#include "utility/AssetManager.h"
 
 namespace NDR
 {   
@@ -23,7 +24,7 @@ namespace NDR
     }
 #endif
 
-    Renderer::Renderer(const uint32_t maxQuads):
+    Renderer::Renderer():
         _viewProj(glm::mat4(1.0f))
     {
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -42,7 +43,20 @@ namespace NDR
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        _batch.Initialize(maxQuads);
+        VertexLayout quadLayout;
+        quadLayout.AddAttribute({4, false}); // position
+        quadLayout.AddAttribute({4, false}); // color
+        quadLayout.AddAttribute({2, false}); // texCoords
+        quadLayout.AddAttribute({1, false}); // texIndex
+        _quadBatch = RenderBatch(1024, 4, 6, quadLayout);
+        
+        VertexLayout lineLayout;
+        lineLayout.AddAttribute({4, false}); // position
+        lineLayout.AddAttribute({4, false}); // color
+        VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount());
+        _lineVertexArray = VertexArray(std::move(linevb), lineLayout);
+        //TODO: Make Engine Assets Path
+        _lineShader = LoadShader("assets/shaders/Line.shader");
     }
 
     Renderer::~Renderer() { }
@@ -65,10 +79,32 @@ namespace NDR
         glBindTexture(GL_TEXTURE_2D, texture.GetTextureID());
     }
 
-    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _batch.GetDefaultTexture(), color); }
+    void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
+    {
+        const glm::vec3 displacement = (end - start);
+        const glm::vec3 dir = glm::normalize(displacement);
+        const float scale = glm::length(displacement);
+        const glm::quat rot = glm::rotation(VEC3_RIGHT, dir);
+        
+        const glm::mat4 mvp = _viewProj
+            * glm::translate(start)
+            * glm::toMat4(rot)
+            * glm::scale(glm::vec3(scale))
+        ;
+        
+        const std::vector<float> vertices = CreateLine(mvp, color);
+
+        _lineVertexArray.GetVertexBuffer().SetData(0, vertices);
+        _lineVertexArray.Bind();
+        _lineShader.Use();
+        
+        glDrawArrays(GL_LINES, 0, vertices.size());
+    }
+
+    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _quadBatch.GetDefaultTexture(), color); }
     void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
-        if(_batch.IsFull())
+        if(_quadBatch.IsFull())
         {
             Flush();
         }
@@ -81,37 +117,37 @@ namespace NDR
            1.0f, 1.0f,
            0.0f, 1.0f,
         };
-        const float texIndex = _batch.GetTextureIndex(texture);
+        const float texIndex = _quadBatch.GetTextureIndex(texture);
         const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
-        _batch.AddElement(vertices);
+        _quadBatch.AddElement(vertices);
     }
 
     void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
     {
-        if(_batch.IsFull())
+        if(_quadBatch.IsFull())
         {
             Flush();
         }
 
         const glm::mat4 mvp = _viewProj * transform.GetMatrix();
         const std::array<float, 8> uvs = textureAtlas.GetUVs(x, y);
-        const float texIndex = _batch.GetTextureIndex(textureAtlas);
+        const float texIndex = _quadBatch.GetTextureIndex(textureAtlas);
         const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
 
-        _batch.AddElement(vertices);
+        _quadBatch.AddElement(vertices);
     }
 
     void Renderer::Flush()
     {
-        if(_batch.GetIndicesCount() <= 0)
+        if(_quadBatch.GetIndicesCount() <= 0)
             return;
         
-        for(size_t i = 0; i < _batch.GetBoundTextureCount(); i++)
-            BindTexture(_batch.GetBoundTexture(i), (uint32_t)i);
+        for(size_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
+            BindTexture(_quadBatch.GetBoundTexture(i), (uint32_t)i);
                 
-        DrawElements(_batch.GetVertexArray(), _batch.GetIndexBuffer(), _batch.GetDefaultShader());
-        _batch.Reset();
+        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetIndexBuffer(), _quadBatch.GetDefaultShader());
+        _quadBatch.Reset();
     }
 
     void Renderer::DrawBackground(const glm::vec4& color) const { glClearColor(color.r, color.g, color.b, color.a); }

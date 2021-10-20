@@ -8,7 +8,6 @@ namespace NDR
     public:
         VertexAttribute();
         VertexAttribute(uint32_t count, bool normalized);
-        ~VertexAttribute() = default;
 
         uint32_t GetCount() const;
         bool IsNormalized() const;
@@ -23,18 +22,18 @@ namespace NDR
     public:
         VertexLayout();
         VertexLayout(const std::vector<VertexAttribute>& attributes);
-        ~VertexLayout() = default;
 
         VertexAttribute& operator[](int32_t index);
 
-        uint32_t GetStride() const;
+        size_t GetVertexSize() const;
+        uint32_t GetAttributeComponentCount() const;
         VertexAttribute& GetAttribute(int32_t index);
         
         VertexLayout& AddAttribute(const VertexAttribute& attribute);
         uint32_t GetAttributeCount() const;
     private:
         std::vector<VertexAttribute> _attributes;
-        uint32_t _stride;
+        size_t _vertexSize;
     };
 
     class VertexArray

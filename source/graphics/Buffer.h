@@ -6,7 +6,7 @@ namespace NDR
     {
     public:
         VertexBuffer();
-        VertexBuffer(size_t size);
+        VertexBuffer(size_t count);
         VertexBuffer(std::vector<float> vertices);
         ~VertexBuffer();
 
@@ -26,7 +26,7 @@ namespace NDR
         friend bool operator==(const VertexBuffer& left, const VertexBuffer& right);
     private:
         uint32_t _id;
-        size_t _count, _size;
+        size_t _count;
     };
 
     extern bool operator==(const VertexBuffer& left, const VertexBuffer& right);
@@ -54,7 +54,7 @@ namespace NDR
         friend bool operator==(const IndexBuffer& left, const IndexBuffer& right);
     private:
         uint32_t _id;
-        size_t _count, _size;
+        size_t _count;
     };
 
     extern bool operator==(const IndexBuffer& left, const IndexBuffer& right);

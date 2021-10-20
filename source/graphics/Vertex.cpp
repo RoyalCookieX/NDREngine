@@ -21,33 +21,33 @@ namespace NDR
     uint32_t VertexAttribute::GetStride() const { return _count * sizeof(float); }
 
     VertexLayout::VertexLayout():
-        _stride(0)
+        _vertexSize(0)
     {
     }
 
     // VertexLayout
     VertexLayout::VertexLayout(const std::vector<VertexAttribute>& attributes):
         _attributes(attributes),
-        _stride(0)
+        _vertexSize(0)
     {
         for (auto attribute : _attributes)
-            _stride += attribute.GetStride();
+            _vertexSize += attribute.GetStride();
     }
 
     VertexAttribute& VertexLayout::operator[](int32_t index) { return GetAttribute(index); }
-
-    uint32_t VertexLayout::GetStride() const { return _stride; }
+    size_t VertexLayout::GetVertexSize() const { return _vertexSize; }
+    uint32_t VertexLayout::GetAttributeComponentCount() const { return (uint32_t)(_vertexSize / sizeof(float)); }
     VertexAttribute& VertexLayout::GetAttribute(int32_t index) { return _attributes[index]; }
+    uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
     
     VertexLayout& VertexLayout::AddAttribute(const VertexAttribute& attribute)
     {
         _attributes.emplace_back(attribute);
-        _stride += attribute.GetStride();
+        _vertexSize += attribute.GetStride();
         return *this;
     }
     
-    uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
-
+    // VertexArray
     VertexArray::VertexArray():
         _id(0)
     {
@@ -75,7 +75,7 @@ namespace NDR
                 attribute.GetCount(),
                 GL_FLOAT,
                 attribute.IsNormalized(),
-                _layout.GetStride(),
+                _layout.GetVertexSize(),
                 (const void*)offset);
             offset += attribute.GetStride();
         }

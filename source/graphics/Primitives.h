@@ -2,6 +2,20 @@
 
 namespace NDR
 {
+    static std::vector<float> CreateLine(
+        const glm::mat4& mvp,
+        const glm::vec4& color = glm::vec4(1.0f))
+    {
+        const glm::vec4 v0 = mvp * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        const glm::vec4 v1 = mvp * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+        return
+        {
+            v0.x, v0.y, v0.z, v0.w, color.r, color.g, color.b, color.a,
+            v1.x, v1.y, v1.z, v1.w, color.r, color.g, color.b, color.a,
+        };
+    }
+    
     static std::vector<float> CreateQuad(
         const glm::mat4& mvp,
         const std::array<float, 8>& uvs,

@@ -23,5 +23,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/vector_angle.hpp> 
 #include <stb_image.h>
 #include <tiny_obj_loader.h>

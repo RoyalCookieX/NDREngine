@@ -1,7 +1,7 @@
 #pragma once
 #include "core/Window.h"
 
-namespace NDR { namespace PlatformAPI
+namespace NDR
 {
     class Window_win32 : public Window
     {
@@ -31,5 +31,4 @@ namespace NDR { namespace PlatformAPI
         
         inline static uint32_t _windowCount = 0;
     };
-}
 }

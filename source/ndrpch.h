@@ -13,6 +13,7 @@
 #include <sstream>
 #include <fstream>
 #include <queue>
+#include <optional>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -26,3 +27,4 @@
 #include <glm/gtx/vector_angle.hpp> 
 #include <stb_image.h>
 #include <tiny_obj_loader.h>
+#include <mini/ini.h>

@@ -28,6 +28,7 @@ project "engine"
         "%{ENGINE_INCLUDE_DIR.glm}",
         "%{ENGINE_INCLUDE_DIR.stb_image}",
         "%{ENGINE_INCLUDE_DIR.tiny_obj_loader}",
+        "%{ENGINE_INCLUDE_DIR.mini}",
     }
     links
     {

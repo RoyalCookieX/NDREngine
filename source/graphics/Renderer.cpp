@@ -48,16 +48,14 @@ namespace NDR
         quadLayout.AddAttribute({4, false}); // color
         quadLayout.AddAttribute({2, false}); // texCoords
         quadLayout.AddAttribute({1, false}); // texIndex
-        //TODO: Make Engine Assets Path
-        _quadBatch = RenderBatch(1024, 4, 6, quadLayout, Texture2D({1, 1, 1}), LoadShader("assets/shaders/Quad.shader"));
+        _quadBatch = RenderBatch(1024, 4, 6, quadLayout, Texture2D({1, 1, 1}), LoadShader("assets/shaders/Quad.shader", AssetRoot::ENGINE));
         
         VertexLayout lineLayout;
         lineLayout.AddAttribute({4, false}); // position
         lineLayout.AddAttribute({4, false}); // color
         VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount());
         _lineVertexArray = VertexArray(std::move(linevb), lineLayout);
-        //TODO: Make Engine Assets Path
-        _lineShader = LoadShader("assets/shaders/Line.shader");
+        _lineShader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
     }
 
     Renderer::~Renderer() { }

@@ -60,7 +60,7 @@ namespace NDR
         Texture2D(const TextureProperties& properties, uint8_t* buffer);
         virtual ~Texture2D() override;
 
-        Texture2D(const Texture&) = delete;
+        Texture2D(const Texture2D&) = delete;
         Texture2D& operator=(const Texture2D&) = delete;
 
         Texture2D(Texture2D&& other) noexcept;

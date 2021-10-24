@@ -21,7 +21,7 @@ namespace NDR
         void SetViewProj(const glm::mat4& viewProj);
         void Clear() const;
 
-        void DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+        void DrawElements(const VertexArray& va, const Shader& shader);
 
         void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color = glm::vec4(1.0f));
         

@@ -17,16 +17,16 @@ namespace NDR
     }
     
     static std::vector<float> CreateQuad(
-        const glm::mat4& mvp,
+        const glm::mat4& model,
         const std::array<float, 8>& uvs,
         const glm::vec4& color = glm::vec4(1.0f),
         float texIndex = 0)
     {
         // get position of vertices
-        const glm::vec4 v0 = mvp * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v1 = mvp * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
-        const glm::vec4 v2 = mvp * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
-        const glm::vec4 v3 = mvp * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
+        const glm::vec4 v0 = model * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v1 = model * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
+        const glm::vec4 v2 = model * glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
+        const glm::vec4 v3 = model * glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
         
         return
         {

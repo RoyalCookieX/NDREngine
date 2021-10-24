@@ -53,8 +53,8 @@ namespace NDR
         VertexLayout lineLayout;
         lineLayout.AddAttribute({4, false}); // position
         lineLayout.AddAttribute({4, false}); // color
-        VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount());
-        _lineVertexArray = VertexArray(std::move(linevb), lineLayout);
+        VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount(), lineLayout);
+        _lineVertexArray = VertexArray(std::move(linevb), IndexBuffer());
         _lineShader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
     }
 
@@ -62,12 +62,11 @@ namespace NDR
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    void Renderer::DrawElements(const VertexArray& va, const IndexBuffer& ib, const Shader& shader)
+    void Renderer::DrawElements(const VertexArray& va, const Shader& shader)
     {
         va.Bind();
-        ib.Bind();
         shader.Use();
-        glDrawElements(GL_TRIANGLES, ib.GetSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
@@ -91,7 +90,7 @@ namespace NDR
         _lineVertexArray.Bind();
         _lineShader.Use();
         
-        glDrawArrays(GL_LINES, 0, vertices.size());
+        glDrawArrays(GL_LINES, 0, (GLsizei)vertices.size());
     }
 
     void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _quadBatch.GetDefaultTexture(), color); }
@@ -101,8 +100,7 @@ namespace NDR
         {
             Flush();
         }
-
-        const glm::mat4 mvp = _viewProj * transform.GetMatrix();
+        
         const std::array<float, 8> uvs
         {
            0.0f, 0.0f,
@@ -111,7 +109,7 @@ namespace NDR
            0.0f, 1.0f,
         };
         const float texIndex = _quadBatch.GetTextureIndex(texture);
-        const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
+        const std::vector<float> vertices = CreateQuad(transform.GetMatrix(), uvs, color, texIndex);
 
         _quadBatch.AddElement(vertices);
     }
@@ -122,11 +120,10 @@ namespace NDR
         {
             Flush();
         }
-
-        const glm::mat4 mvp = _viewProj * transform.GetMatrix();
+        
         const std::array<float, 8> uvs = textureAtlas.GetUVs(x, y);
         const float texIndex = _quadBatch.GetTextureIndex(textureAtlas);
-        const std::vector<float> vertices = CreateQuad(mvp, uvs, color, texIndex);
+        const std::vector<float> vertices = CreateQuad(transform.GetMatrix(), uvs, color, texIndex);
 
         _quadBatch.AddElement(vertices);
     }
@@ -136,10 +133,13 @@ namespace NDR
         if(_quadBatch.GetIndicesCount() <= 0)
             return;
         
-        for(size_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
+        for(uint32_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
             _quadBatch.GetBoundTexture(i).Bind(i);
+
+        _quadBatch.GetDefaultShader().Use();
+        _quadBatch.GetDefaultShader().SetMat4("u_ViewProj", _viewProj);
                 
-        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetIndexBuffer(), _quadBatch.GetDefaultShader());
+        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetDefaultShader());
         _quadBatch.Reset();
     }
 

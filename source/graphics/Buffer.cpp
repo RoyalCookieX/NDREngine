@@ -10,16 +10,18 @@ namespace NDR
     {
     }
 
-    VertexBuffer::VertexBuffer(size_t count):
-        _count(count)
+    VertexBuffer::VertexBuffer(const size_t count, const VertexLayout& layout):
+        _count(count),
+        _layout(layout)
     {
         glCreateBuffers(1, &_id);
         glBindBuffer(GL_ARRAY_BUFFER, _id);
         glBufferData(GL_ARRAY_BUFFER, GetSize(), nullptr, GL_DYNAMIC_DRAW);
     }
 
-    VertexBuffer::VertexBuffer(std::vector<float> vertices):
-        _count(vertices.size())
+    VertexBuffer::VertexBuffer(std::vector<float> vertices, const VertexLayout& layout):
+        _count(vertices.size()),
+        _layout(layout)
     {
         glCreateBuffers(1, &_id);
         glBindBuffer(GL_ARRAY_BUFFER, _id);
@@ -30,10 +32,12 @@ namespace NDR
 
     VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept:
         _id(other._id),
-        _count(other._count)
+        _count(other._count),
+        _layout(other._layout)
     {
         other._id = 0;
         other._count = 0;
+        other._layout = {};
     }
 
     VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
@@ -43,21 +47,26 @@ namespace NDR
             Release();
             _id = other._id;
             _count = other._count;
+            _layout = other._layout;
 
             other._id = 0;
             other._count = 0;
+            other._layout = {};
         }
         return *this;
     }
     size_t VertexBuffer::GetCount() const { return _count; }
     size_t VertexBuffer::GetSize() const { return _count * sizeof(float); }
 
+    const VertexLayout& VertexBuffer::GetLayout() const { return _layout; }
+
     void VertexBuffer::Bind() const { glBindBuffer(GL_ARRAY_BUFFER, _id); }
 
     void VertexBuffer::SetData(const uint64_t offset, std::vector<float> vertices)
     {
 #ifdef NDR_DEBUG
-        assert(("[VertexBuffer Error]: Data and Offset are invalid!", vertices.size() + offset <= GetSize()));
+        const size_t usedSize = (vertices.size() * sizeof(float)) + offset;
+        assert(("[VertexBuffer Error]: Data and Offset are invalid!", usedSize <= GetSize()));
 #endif
         glBindBuffer(GL_ARRAY_BUFFER, _id);
         glBufferSubData(GL_ARRAY_BUFFER, offset, vertices.size() * sizeof(float), vertices.data());
@@ -70,8 +79,8 @@ namespace NDR
         _count = 0;
     }
     
-    bool operator==(const VertexBuffer& left, const VertexBuffer& right) { return left._id == right._id; }
-    bool operator!=(const VertexBuffer& left, const VertexBuffer& right) { return !(left == right); }
+    bool VertexBuffer::operator==(const VertexBuffer& other) const { return _id == other._id; }
+    bool VertexBuffer::operator!=(const VertexBuffer& other) const { return !(*this == other); }
 
     IndexBuffer::IndexBuffer():
         _id(0),
@@ -122,6 +131,6 @@ namespace NDR
         _count = 0;
     }
 
-    bool operator==(const IndexBuffer& left, const IndexBuffer& right) { return left._id == right._id; }
-    bool operator!=(const IndexBuffer& left, const IndexBuffer& right) { return !(left == right); }
+    bool IndexBuffer::operator==(const IndexBuffer& other) const { return _id == other._id; }
+    bool IndexBuffer::operator!=(const IndexBuffer& other) const { return !(*this == other); }
 }

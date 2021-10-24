@@ -25,7 +25,6 @@ namespace NDR
         virtual float GetTextureIndex(Texture& texture);
 
         virtual const VertexArray& GetVertexArray() const { return _va; }
-        virtual const IndexBuffer& GetIndexBuffer() const { return _ib; }
         
         virtual uint32_t GetElementCount() { return _elementCount; }
         virtual uint32_t GetIndicesCount() { return _indicesCount; }
@@ -47,7 +46,6 @@ namespace NDR
         int32_t _maxTextureSlots;
 
         VertexArray _va;
-        IndexBuffer _ib;
         std::vector<int32_t> _textureIndexes;
         std::vector<Texture*> _boundTextures;
 

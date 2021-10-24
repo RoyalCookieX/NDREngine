@@ -31,9 +31,8 @@ namespace NDR
         for(int32_t i = 0; i < _maxTextureSlots; i++)
             _textureIndexes.push_back(i);
 
-        // setup vertex array
-        VertexBuffer vb(_maxElements * layout.GetAttributeComponentCount());
-        _va = VertexArray(std::move(vb), layout);
+        // setup vertex buffer 
+        VertexBuffer vb(_maxElements * RenderBatch::GetVerticesPerElement() * layout.GetAttributeComponentCount(), layout);
 
         // setup index buffer
         std::vector<uint32_t> indices;
@@ -49,7 +48,10 @@ namespace NDR
             indices.push_back(index + 3);
             index += 4;
         }
-        _ib = IndexBuffer(indices);
+        IndexBuffer ib(indices);
+        
+        // setup vertex array
+        _va = VertexArray(std::move(vb), std::move(ib));
 
         _defaultTexture = (Texture2D&&)texture;
         _defaultShader = (Shader&&)shader;
@@ -66,7 +68,6 @@ namespace NDR
         _indicesCount = other._indicesCount;
         _maxTextureSlots = other._maxTextureSlots;
         _va = std::move(other._va);
-        _ib = std::move(other._ib);
         _textureIndexes = std::move(other._textureIndexes);
         _boundTextures = std::move(other._boundTextures);
         _defaultTexture = std::move(other._defaultTexture);
@@ -91,7 +92,6 @@ namespace NDR
             _indicesCount = other._indicesCount;
             _maxTextureSlots = other._maxTextureSlots;
             _va = std::move(other._va);
-            _ib = std::move(other._ib);
             _textureIndexes = std::move(other._textureIndexes);
             _boundTextures = std::move(other._boundTextures);
             _defaultTexture = std::move(other._defaultTexture);
@@ -116,7 +116,7 @@ namespace NDR
 
     void RenderBatch::AddElement(std::vector<float> vertices)
     {
-        const uint64_t offset = _elementCount * GetVerticesPerElement() * _va.GetVertexLayout().GetVertexSize();       
+        const uint64_t offset = _elementCount * GetVerticesPerElement() * _va.GetVertexBuffer().GetLayout().GetVertexSize();       
         _va.GetVertexBuffer().SetData(offset, vertices);
         _elementCount++;
         _indicesCount += GetIndiciesPerElement();

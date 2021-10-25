@@ -1,6 +1,5 @@
 #include "ndrpch.h"
 #include "Buffer.h"
-#include "glad/glad.h"
 
 namespace NDR
 {
@@ -55,6 +54,10 @@ namespace NDR
         }
         return *this;
     }
+
+    bool VertexBuffer::operator==(const VertexBuffer& other) const { return _id == other._id; }
+    bool VertexBuffer::operator!=(const VertexBuffer& other) const { return !(*this == other); }
+    
     size_t VertexBuffer::GetCount() const { return _count; }
     size_t VertexBuffer::GetSize() const { return _count * sizeof(float); }
 
@@ -78,9 +81,6 @@ namespace NDR
         _id = 0;
         _count = 0;
     }
-    
-    bool VertexBuffer::operator==(const VertexBuffer& other) const { return _id == other._id; }
-    bool VertexBuffer::operator!=(const VertexBuffer& other) const { return !(*this == other); }
 
     IndexBuffer::IndexBuffer():
         _id(0),
@@ -119,6 +119,9 @@ namespace NDR
         }
         return *this;
     }
+
+    bool IndexBuffer::operator==(const IndexBuffer& other) const { return _id == other._id; }
+    bool IndexBuffer::operator!=(const IndexBuffer& other) const { return !(*this == other); }
     
     size_t IndexBuffer::GetCount() const { return _count; }
     size_t IndexBuffer::GetSize() const { return _count * sizeof(uint32_t); }
@@ -130,7 +133,4 @@ namespace NDR
         _id = 0;
         _count = 0;
     }
-
-    bool IndexBuffer::operator==(const IndexBuffer& other) const { return _id == other._id; }
-    bool IndexBuffer::operator!=(const IndexBuffer& other) const { return !(*this == other); }
 }

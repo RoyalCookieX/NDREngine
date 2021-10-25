@@ -19,17 +19,16 @@ namespace NDR
 
     Shader LoadShader(const std::string& assetPath, AssetRoot root)
     {
-        enum SHADERTYPE { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
-        SHADERTYPE type = NONE;
+        ShaderStage type = NONE;
         
         std::string line;
         std::stringstream sources[2];
         std::ifstream filestream(GetAssetRootPath(assetPath, root));
         while(std::getline(filestream, line))
         {
-            if(line.find("#shader vertex") != std::string::npos)
+            if(line.find("#vertex") != std::string::npos)
                 type = VERTEX;
-            else if(line.find("#shader fragment") != std::string::npos)
+            else if(line.find("#fragment") != std::string::npos)
                 type = FRAGMENT;
             else if(type != NONE)
                 sources[type] << line << std::endl;
@@ -44,7 +43,7 @@ namespace NDR
     //     std::vector<tinyobj::material_t> materials;
     //     std::string errorMsg;
     //
-    //     if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(root).append(assetPath).c_str()))
+    //     if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(assetPath, root).c_str()))
     //     {
     //         std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
     //         return Mesh();
@@ -74,16 +73,16 @@ namespace NDR
     //         verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
     //     }
     //
-    //     VertexBuffer vertexBuffer(verts);
-    //     IndexBuffer indexBuffer(indices);
     //     VertexLayout layout;
     //     layout
     //     .AddAttribute({3, false})  // position
     //     .AddAttribute({2, false})  // tex coords
     //     .AddAttribute({3, false}); // normals
-    //     VertexArray vertexArray(std::move(vertexBuffer), layout);        
+    //     VertexBuffer vb(verts, layout);
+    //     IndexBuffer ib(indices);
+    //     VertexArray vertexArray(std::move(vb), std::move(ib));        
     //
-    //     return Mesh(std::move(vertexArray), std::move(indexBuffer), LoadShader("assets/shaders/Cube.shader"));
+    //     return Mesh(std::move(vertexArray), LoadShader("assets/shaders/Cube.shader"));
     // }
 
     Texture2D LoadTexture2D(const std::string& assetPath, AssetRoot root)

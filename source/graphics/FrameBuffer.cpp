@@ -77,12 +77,12 @@ namespace NDR
         return *this;
     }
 
+    bool Framebuffer::operator==(const Framebuffer& other) const { return _id == other._id; }
+    bool Framebuffer::operator!=(const Framebuffer& other) const { return !(*this == other); }
+
     void Framebuffer::Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, _id); }
     void Framebuffer::Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
     uint32_t Framebuffer::GetColorAttachmentID() const { return _colorAttachment; }
     uint32_t Framebuffer::GetDepthAttachmentID() const { return _depthAttachment; }
-
-    bool operator==(const Framebuffer& left, const Framebuffer& right) { return left._id == right._id; }
-    bool operator!=(const Framebuffer& left, const Framebuffer& right) { return !(left == right); }
 }

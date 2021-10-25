@@ -2,10 +2,13 @@
 
 namespace NDR
 {
+    /*
+     * TODO: Compose Framebuffer of Attachments
+    */
+
     enum class FramebufferMode
     {
-        SCREENSIZE,
-        FIXED
+        SCREENSIZE, FIXED
     };
     
     class Framebuffer
@@ -27,13 +30,11 @@ namespace NDR
         uint32_t GetColorAttachmentID() const;
         uint32_t GetDepthAttachmentID() const;
 
-        friend bool operator==(const Framebuffer& left, const Framebuffer& right);
+        bool operator==(const Framebuffer& other) const;
+        bool operator!=(const Framebuffer& other) const;
     private:
         uint32_t _id, _colorAttachment, _depthAttachment;
         FramebufferMode _mode;
         int32_t _width, _height;
     };
-
-    extern bool operator==(const Framebuffer& left, const Framebuffer& right);
-    extern bool operator!=(const Framebuffer& left, const Framebuffer& right);
 }

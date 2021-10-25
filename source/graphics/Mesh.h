@@ -1,7 +1,6 @@
 #pragma once
-#include "Buffer.h"
-#include "Shader.h"
 #include "Vertex.h"
+#include "Shader.h"
 
 namespace NDR
 {
@@ -9,7 +8,7 @@ namespace NDR
     {
     public:
         Mesh();
-        Mesh(VertexArray&& vertexArray, IndexBuffer&& indexBuffer, Shader&& shader);
+        Mesh(VertexArray&& vertexArray, Shader&& shader);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -18,16 +17,14 @@ namespace NDR
         Mesh(Mesh&& other) noexcept;
         Mesh& operator=(Mesh&& other) noexcept;
 
+        bool operator==(const Mesh& other) const;
+        bool operator!=(const Mesh& other) const;
+
         const VertexArray& GetVertexArray() const;
-        const IndexBuffer& GetIndexBuffer() const;
         const Shader& GetShader() const;
 
     private:
         VertexArray _vertexArray;
-        IndexBuffer _indexBuffer;
         Shader _shader;
     };
-
-    extern bool operator==(const Mesh& left, const Mesh& right);
-    extern bool operator!=(const Mesh& left, const Mesh& right);
 }

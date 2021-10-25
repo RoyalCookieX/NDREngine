@@ -6,12 +6,6 @@
 
 namespace NDR
 {
-    enum class BlendMode
-    {
-        OPAQUE = 0,
-        TRANSPARENT = 1
-    };
-
     class Renderer
     {
     public:
@@ -32,7 +26,6 @@ namespace NDR
         void Flush();
         
         void DrawBackground(const glm::vec4& color) const;
-        void SetBlendMode(const BlendMode& blendMode) const;
     private:
         glm::mat4 _viewProj;
 

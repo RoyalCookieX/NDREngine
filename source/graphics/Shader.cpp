@@ -3,12 +3,16 @@
 
 namespace NDR
 {
-    Shader::Shader(): _program(0) { }
+    Shader::Shader():
+        _program(0)
+    {
+    }
+    
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
         _program = glCreateProgram();
-        const uint32_t vs = CompileSource(GL_VERTEX_SHADER, vertexSource.c_str());
-        const uint32_t fs = CompileSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
+        const uint32_t vs = CompileSource(VERTEX, vertexSource);
+        const uint32_t fs = CompileSource(FRAGMENT, fragmentSource);
 
         glAttachShader(_program, vs);
         glAttachShader(_program, fs);
@@ -23,10 +27,9 @@ namespace NDR
 
     Shader::Shader(Shader&& other) noexcept:
         _program(other._program),
-        _uniformLocationCache(other._uniformLocationCache)
+        _uniformLocationCache(std::move(other._uniformLocationCache))
     {
         other._program = 0;
-        other._uniformLocationCache.clear();
     }
 
     Shader& Shader::operator=(Shader&& other) noexcept
@@ -34,22 +37,21 @@ namespace NDR
         if(*this != other)
         {
             _program = other._program;
-            _uniformLocationCache = other._uniformLocationCache;
+            _uniformLocationCache = std::move(other._uniformLocationCache);
 
             other._program = 0;
-            other._uniformLocationCache.clear();
         }
         return *this;
     }
 
+    bool Shader::operator==(const Shader& other) const { return _program == other._program; }
+    bool Shader::operator!=(const Shader& other) const { return !(*this == other); }
+
     uint32_t Shader::GetProgram() const { return _program; }
 
-    void Shader::Use() const
-    {
-        glUseProgram(_program);
-    }
+    void Shader::Use() const { glUseProgram(_program); }
 
-    void Shader::SetInt(const std::string& uniformName, int32_t value) const
+    void Shader::SetInt(const std::string& uniformName, const int32_t value) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform1i(id, value);
@@ -67,29 +69,25 @@ namespace NDR
         glUniform1f(id, value);
     }
 
-    void Shader::SetVec2(const std::string& uniformName, glm::vec2 vec2) const { return SetVec2(uniformName, vec2.x, vec2.y); }
-    void Shader::SetVec2(const std::string& uniformName, float const x, float const y) const
+    void Shader::SetVec2(const std::string& uniformName, const glm::vec2& vec2) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
-        glUniform2f(id, x, y);
+        glUniform2f(id, vec2.x, vec2.y);
     }
 
-    void Shader::SetVec3(const std::string& uniformName, glm::vec3 vec3) const { return SetVec3(uniformName, vec3.x, vec3.y, vec3.z); }
-    void Shader::SetVec3(const std::string& uniformName, float const x, float const y, float const z) const
+    void Shader::SetVec3(const std::string& uniformName, const glm::vec3& vec3) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
-        glUniform3f(id, x, y, z);
+        glUniform3f(id, vec3.x, vec3.y, vec3.z);
     }
     
-    void Shader::SetVec4(const std::string& uniformName, glm::vec4 vec4) const { return SetVec4(uniformName, vec4.x, vec4.y, vec4.z, vec4.w); }
-
-    void Shader::SetVec4(const std::string& uniformName, float const x, float const y, float const z, const float w) const
+    void Shader::SetVec4(const std::string& uniformName, const glm::vec4& vec4) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
-        glUniform4f(id, x, y, z, w);
+        glUniform4f(id, vec4.x, vec4.y, vec4.z, vec4.w);
     }
 
-    void Shader::SetMat4(const std::string& uniformName, glm::mat4 mat4) const
+    void Shader::SetMat4(const std::string& uniformName, const glm::mat4& mat4) const
     {
         const uint32_t id = GetUniformLocation(uniformName);
         glUniformMatrix4fv(id, 1, false, glm::value_ptr(mat4));
@@ -106,9 +104,16 @@ namespace NDR
         return _uniformLocationCache[uniformName];
     }
 
-    int32_t Shader::CompileSource(uint32_t shaderType, const std::string& source)
+    int32_t Shader::CompileSource(ShaderStage stage, const std::string& source)
     {
         const char* src = source.c_str();
+        uint32_t shaderType = 0;
+        switch(stage)
+        {
+            case VERTEX: shaderType = GL_VERTEX_SHADER; break;
+            case FRAGMENT: shaderType = GL_FRAGMENT_SHADER; break;
+            default: break;
+        }
         const uint32_t id = glCreateShader(shaderType);
         glShaderSource(id, 1, &src, nullptr);
         glCompileShader(id);
@@ -121,12 +126,12 @@ namespace NDR
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
             char* message = (char*)alloca(length * sizeof(char));
             glGetShaderInfoLog(id, length, &length, message);
-            std::cout << "[OpenGL]: " << (shaderType == GL_VERTEX_SHADER ? "Vertex"
-                :shaderType == GL_FRAGMENT_SHADER ? "Fragment"
-                :"Unknown") << " Shader Failed to compile!\n" << message << std::endl;;
+            std::cout << "[OpenGL Error]: " <<
+                ( shaderType == GL_VERTEX_SHADER ?   "Vertex"
+                : shaderType == GL_FRAGMENT_SHADER ? "Fragment"
+                : "Unknown")
+            << " Shader Failed to compile! " << message << std::endl;
         }
         return id;
     }
-    bool operator==(const Shader& left, const Shader& right) { return left._program == right._program; }
-    bool operator!=(const Shader& left, const Shader& right) { return !(left == right); }
 }

@@ -4,6 +4,10 @@
 #include "Primitives.h"
 #include "utility/AssetManager.h"
 
+/*
+ * TODO: Move Face Culling and Blending to Material
+*/
+
 namespace NDR
 {   
 #ifdef NDR_DEBUG
@@ -38,10 +42,17 @@ namespace NDR
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(MessageCallback, nullptr);
 #endif
+        // Depth Testing
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+
+        // Cull Back Face
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+
+        // Transparent Blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         VertexLayout quadLayout;
         quadLayout.AddAttribute({4, false}); // position
@@ -51,7 +62,7 @@ namespace NDR
         _quadBatch = RenderBatch(1024, 4, 6, quadLayout, Texture2D({1, 1, 1}), LoadShader("assets/shaders/Quad.shader", AssetRoot::ENGINE));
         
         VertexLayout lineLayout;
-        lineLayout.AddAttribute({4, false}); // position
+        lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
         VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount(), lineLayout);
         _lineVertexArray = VertexArray(std::move(linevb), IndexBuffer());
@@ -69,22 +80,19 @@ namespace NDR
         glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
-    void Renderer::SetViewProj(const glm::mat4& viewProj) { _viewProj = viewProj; }
+    void Renderer::SetViewProj(const glm::mat4& viewProj)
+    {
+        _viewProj = viewProj;
+        //TODO: Create Uniform Buffer Class
+        _quadBatch.GetDefaultShader().Use();
+        _quadBatch.GetDefaultShader().SetMat4("u_ViewProj", _viewProj);
+        _lineShader.Use();
+        _lineShader.SetMat4("u_ViewProj", _viewProj);
+    }
 
     void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
-    {
-        const glm::vec3 displacement = (end - start);
-        const glm::vec3 dir = glm::normalize(displacement);
-        const float scale = glm::length(displacement);
-        const glm::quat rot = glm::rotation(VEC3_RIGHT, dir);
-        
-        const glm::mat4 mvp = _viewProj
-            * glm::translate(start)
-            * glm::toMat4(rot)
-            * glm::scale(glm::vec3(scale))
-        ;
-        
-        const std::vector<float> vertices = CreateLine(mvp, color);
+    {        
+        const std::vector<float> vertices = CreateLine(start, end, color);
 
         _lineVertexArray.GetVertexBuffer().SetData(0, vertices);
         _lineVertexArray.Bind();
@@ -135,31 +143,10 @@ namespace NDR
         
         for(uint32_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
             _quadBatch.GetBoundTexture(i).Bind(i);
-
-        _quadBatch.GetDefaultShader().Use();
-        _quadBatch.GetDefaultShader().SetMat4("u_ViewProj", _viewProj);
-                
+    
         DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetDefaultShader());
         _quadBatch.Reset();
     }
 
     void Renderer::DrawBackground(const glm::vec4& color) const { glClearColor(color.r, color.g, color.b, color.a); }
-    void Renderer::SetBlendMode(const BlendMode& blendMode) const
-    {
-        switch (blendMode)
-        {
-        case BlendMode::OPAQUE:
-            {
-                glDisable(GL_BLEND);
-                break;
-            }
-        case BlendMode::TRANSPARENT:
-            {
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                break;
-            }
-        default: break;
-        }
-    }
 }

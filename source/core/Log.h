@@ -1,6 +1,10 @@
 #pragma once
 #include "math/Transform.h"
 
+/*
+ * TODO: Custom Debug Logs and Asserts
+*/
+
 namespace NDR
 {
     inline std::ostream& Format(std::ostream& os)

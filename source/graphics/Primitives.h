@@ -3,16 +3,14 @@
 namespace NDR
 {
     static std::vector<float> CreateLine(
-        const glm::mat4& mvp,
+        const glm::vec3& start,
+        const glm::vec3& end,
         const glm::vec4& color = glm::vec4(1.0f))
     {
-        const glm::vec4 v0 = mvp * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        const glm::vec4 v1 = mvp * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
         return
         {
-            v0.x, v0.y, v0.z, v0.w, color.r, color.g, color.b, color.a,
-            v1.x, v1.y, v1.z, v1.w, color.r, color.g, color.b, color.a,
+            start.x, start.y, start.z, color.r, color.g, color.b, color.a,
+            end.x,   end.y,   end.z,   color.r, color.g, color.b, color.a,
         };
     }
     

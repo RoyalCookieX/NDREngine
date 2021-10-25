@@ -25,6 +25,7 @@ namespace NDR
     {        
         RenderBatch::Reset();
 
+        // TODO: Move Retrieval of Max Texture Units to a different class
         // get number of texture slots
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
         _textureIndexes.reserve(_maxTextureSlots);

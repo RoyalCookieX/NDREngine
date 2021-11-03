@@ -4,12 +4,40 @@ namespace NDR
 {
     /*
      * TODO: Compose Shader of Unique Shader Stages
-     * TODO: Use reflection to use the shader data for Materials
     */
     
     enum ShaderStage
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1, COMPUTE = 2, GEOMETRY = 3
+        VERTEX = 0, FRAGMENT = 1, COMPUTE = 2, GEOMETRY = 3
+    };
+
+    enum class ShaderType
+    {
+        NONE,
+        BOOL,
+        INT,
+        UINT,
+        FLOAT,
+        VEC2,
+        VEC3,
+        VEC4,
+        MAT4,
+        SAMPLER2D
+    };
+
+    struct ShaderUniform
+    {
+    public:
+        ShaderUniform(const std::string& name, int32_t location, uint32_t count, ShaderType type);
+
+        std::string GetName() const;
+        int32_t GetLocation() const;
+        ShaderType GetType() const;
+    private:
+        std::string _name;
+        int32_t _location;
+        uint32_t _count;
+        ShaderType _type;
     };
     
     class Shader
@@ -40,11 +68,12 @@ namespace NDR
         void SetMat4(const std::string& uniformName, const glm::mat4& mat4) const;
         
         static int32_t CompileSource(ShaderStage stage, const std::string& source);
-    
     private:
         int32_t GetUniformLocation(const std::string& uniformName) const;
-
+        
         uint32_t _program;
-        mutable std::unordered_map<std::string, uint32_t> _uniformLocationCache;
+        std::vector<ShaderUniform> _uniformData;
     };
+
+    size_t GetShaderTypeSize(ShaderType type);
 }

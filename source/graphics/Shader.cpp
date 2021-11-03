@@ -3,6 +3,35 @@
 
 namespace NDR
 {
+    ShaderType GetShaderType(uint32_t shaderType)
+    {
+        switch (shaderType)
+        {
+            case GL_BOOL:           return ShaderType::BOOL; 
+            case GL_INT:            return ShaderType::INT;  
+            case GL_UNSIGNED_INT:   return ShaderType::UINT; 
+            case GL_FLOAT:          return ShaderType::FLOAT;
+            case GL_FLOAT_VEC2:     return ShaderType::VEC2; 
+            case GL_FLOAT_VEC3:     return ShaderType::VEC3; 
+            case GL_FLOAT_VEC4:     return ShaderType::VEC4; 
+            case GL_FLOAT_MAT4:     return ShaderType::MAT4;
+            case GL_SAMPLER_2D:     return ShaderType::SAMPLER2D;
+            default:                return ShaderType::NONE;
+        }
+    }
+    
+    ShaderUniform::ShaderUniform(const std::string& name, int32_t location, uint32_t count, ShaderType type):
+        _name(name),
+        _location(location),
+        _count(count),
+        _type(type)
+    {
+    }
+
+    std::string ShaderUniform::GetName() const { return _name; }
+    int32_t ShaderUniform::GetLocation() const { return _location; }
+    ShaderType ShaderUniform::GetType() const { return _type; }
+
     Shader::Shader():
         _program(0)
     {
@@ -10,24 +39,53 @@ namespace NDR
     
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
+        // create shader and its stages
         _program = glCreateProgram();
         const uint32_t vs = CompileSource(VERTEX, vertexSource);
         const uint32_t fs = CompileSource(FRAGMENT, fragmentSource);
 
+        // compile/link shader
         glAttachShader(_program, vs);
         glAttachShader(_program, fs);
         glLinkProgram(_program);
         glValidateProgram(_program);
-        
+
+        // delete shader stages
         glDeleteShader(vs);
         glDeleteShader(fs);
+
+        // get uniforms from shader
+        int32_t maxLength;
+        glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
+        char* name = new char[maxLength + 1];
+
+        // add uniforms to _uniformData
+        int32_t uniformCount;
+        glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &uniformCount);
+        _uniformData.reserve(uniformCount);
+        int32_t offset = 0;
+        for(int32_t i = 0; i < uniformCount; i++)
+        {
+            int32_t size;
+            uint32_t type;
+            glGetActiveUniform(_program, i, maxLength, nullptr, &size, &type, name);
+            std::string uniformName(name);
+            //TODO: Only do this step with NVIDIA Drivers
+            if(const auto leftBracketIndex = uniformName.find('['); leftBracketIndex != std::string::npos)
+                uniformName.replace(leftBracketIndex, maxLength - leftBracketIndex, "");
+            
+            _uniformData.emplace_back(uniformName, offset, size, GetShaderType(type));
+            offset += size;
+        }
+        
+        delete[] name;
     }
 
     Shader::~Shader() { glDeleteProgram(_program); }
 
     Shader::Shader(Shader&& other) noexcept:
         _program(other._program),
-        _uniformLocationCache(std::move(other._uniformLocationCache))
+        _uniformData(std::move(other._uniformData))
     {
         other._program = 0;
     }
@@ -37,7 +95,7 @@ namespace NDR
         if(*this != other)
         {
             _program = other._program;
-            _uniformLocationCache = std::move(other._uniformLocationCache);
+            _uniformData = std::move(other._uniformData);
 
             other._program = 0;
         }
@@ -94,14 +152,13 @@ namespace NDR
     }
 
     int32_t Shader::GetUniformLocation(const std::string& uniformName) const
-    {
-        if(_uniformLocationCache.find(uniformName) == _uniformLocationCache.end())
+    {        
+        for(auto uniform : _uniformData)
         {
-            uint32_t id = glGetUniformLocation(_program, uniformName.c_str());
-            _uniformLocationCache.emplace(uniformName, id);
-            return id;
+            if(uniform.GetName() == uniformName)
+                return uniform.GetLocation();
         }
-        return _uniformLocationCache[uniformName];
+        return -1;
     }
 
     int32_t Shader::CompileSource(ShaderStage stage, const std::string& source)
@@ -133,5 +190,21 @@ namespace NDR
             << " Shader Failed to compile! " << message << std::endl;
         }
         return id;
+    }
+
+    size_t GetShaderTypeSize(ShaderType type)
+    {
+        switch (type)
+        {
+            case ShaderType::BOOL:  return sizeof(bool);
+            case ShaderType::INT:   return sizeof(int32_t);
+            case ShaderType::UINT:  return sizeof(uint32_t);
+            case ShaderType::FLOAT: return sizeof(float);
+            case ShaderType::VEC2:  return sizeof(glm::vec2);
+            case ShaderType::VEC3:  return sizeof(glm::vec3);
+            case ShaderType::VEC4:  return sizeof(glm::vec4);
+            case ShaderType::MAT4:  return sizeof(glm::mat4);
+            default:                return 0;
+        }
     }
 }

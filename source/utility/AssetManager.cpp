@@ -19,19 +19,23 @@ namespace NDR
 
     Shader LoadShader(const std::string& assetPath, AssetRoot root)
     {
-        ShaderStage type = NONE;
-        
+        int index = -1;
         std::string line;
         std::stringstream sources[2];
         std::ifstream filestream(GetAssetRootPath(assetPath, root));
+        
         while(std::getline(filestream, line))
         {
             if(line.find("#vertex") != std::string::npos)
-                type = VERTEX;
+                index = VERTEX;
             else if(line.find("#fragment") != std::string::npos)
-                type = FRAGMENT;
-            else if(type != NONE)
-                sources[type] << line << std::endl;
+                index = FRAGMENT;
+            else if(line.find("#compute") != std::string::npos)
+                index = COMPUTE;
+            else if(line.find("#geometry") != std::string::npos)
+                index = GEOMETRY;
+            else if(index != -1)
+                sources[index] << line << std::endl;
         }
         return Shader(sources[0].str(), sources[1].str());
     }

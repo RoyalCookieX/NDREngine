@@ -46,16 +46,8 @@ namespace NDR
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
-        // Cull Back Face
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-
-        // Transparent Blending
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         VertexLayout quadLayout;
-        quadLayout.AddAttribute({4, false}); // position
+        quadLayout.AddAttribute({3, false}); // position
         quadLayout.AddAttribute({4, false}); // color
         quadLayout.AddAttribute({2, false}); // texCoords
         quadLayout.AddAttribute({1, false}); // texIndex
@@ -77,6 +69,13 @@ namespace NDR
     {
         va.Bind();
         shader.Use();
+        glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::DrawElements(const VertexArray& va, const Material& material)
+    {
+        va.Bind();
+        material.Use();
         glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
@@ -105,9 +104,7 @@ namespace NDR
     void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
     {
         if(_quadBatch.IsFull())
-        {
             Flush();
-        }
         
         const std::array<float, 8> uvs
         {
@@ -125,9 +122,7 @@ namespace NDR
     void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
     {
         if(_quadBatch.IsFull())
-        {
             Flush();
-        }
         
         const std::array<float, 8> uvs = textureAtlas.GetUVs(x, y);
         const float texIndex = _quadBatch.GetTextureIndex(textureAtlas);

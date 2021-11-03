@@ -1,11 +1,16 @@
 #pragma once
 
+#include "Material.h"
 #include "RenderBatch.h"
 #include "Texture.h"
 #include "math/Transform.h"
 
 namespace NDR
 {
+    /*
+     * TODO: Make Renderer class static
+     * TODO: DrawElements(Mesh) function
+    */
     class Renderer
     {
     public:
@@ -16,6 +21,7 @@ namespace NDR
         void Clear() const;
 
         void DrawElements(const VertexArray& va, const Shader& shader);
+        void DrawElements(const VertexArray& va, const Material& material);
 
         void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color = glm::vec4(1.0f));
         

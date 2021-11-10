@@ -1,14 +1,28 @@
 #pragma once
 #include "Vertex.h"
-#include "Shader.h"
+#include "Material.h"
 
 namespace NDR
 {
+    struct SubMesh
+    {
+    public:
+        SubMesh(IndexBuffer&& indexBuffer, Material&& mat);
+
+        IndexBuffer& GetIndexBuffer();
+        const IndexBuffer& GetIndexBuffer() const;
+        Material& GetMaterial();
+        const Material& GetMaterial() const;
+    private:
+        IndexBuffer _ib;
+        Material _mat;
+    };
+    
     class Mesh
     {
     public:
         Mesh();
-        Mesh(VertexArray&& vertexArray, Shader&& shader);
+        Mesh(VertexBuffer&& vertexBuffer, std::vector<SubMesh>&& subMeshes);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -21,10 +35,17 @@ namespace NDR
         bool operator!=(const Mesh& other) const;
 
         const VertexArray& GetVertexArray() const;
-        const Shader& GetShader() const;
-
+        VertexBuffer& GetVertexBuffer();
+        const VertexBuffer& GetVertexBuffer() const;
+        SubMesh& GetSubMesh(int32_t index);
+        const SubMesh& GetSubMesh(int32_t index) const;
+        IndexBuffer& GetIndexBuffer(int32_t index);
+        const IndexBuffer& GetIndexBuffer(int32_t index) const;
+        Material& GetMaterial(int32_t index);
+        const Material& GetMaterial(int32_t index) const;
+        uint32_t GetSubMeshCount() const;
     private:
-        VertexArray _vertexArray;
-        Shader _shader;
+        VertexArray _va;
+        std::vector<SubMesh> _subMeshes;
     };
 }

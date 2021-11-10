@@ -22,7 +22,7 @@ namespace NDR
     {
     public:
         Material();
-        Material(Shader&& shader, int32_t flags);
+        Material(Shader&& shader, int32_t flags = 0);
         ~Material();
 
         Material(const Material&) = delete;
@@ -38,6 +38,7 @@ namespace NDR
         bool HasFlags(int32_t flags) const;
         void EnableFlags(int32_t flags);
         void DisableFlags(int32_t flags);
+        Shader& GetShader();
         const Shader& GetShader() const;
     private:
         Shader _shader;

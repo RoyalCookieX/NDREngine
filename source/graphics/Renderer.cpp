@@ -4,10 +4,6 @@
 #include "Primitives.h"
 #include "utility/AssetManager.h"
 
-/*
- * TODO: Move Face Culling and Blending to Material
-*/
-
 namespace NDR
 {   
 #ifdef NDR_DEBUG
@@ -57,7 +53,7 @@ namespace NDR
         lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
         VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount(), lineLayout);
-        _lineVertexArray = VertexArray(std::move(linevb), IndexBuffer());
+        _lineVertexArray = VertexArray(std::move(linevb));
         _lineShader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
     }
 
@@ -65,18 +61,28 @@ namespace NDR
 
     void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
-    void Renderer::DrawElements(const VertexArray& va, const Shader& shader)
+    void Renderer::DrawMesh(const Mesh& mesh)
     {
-        va.Bind();
-        shader.Use();
-        glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+        mesh.GetVertexArray().Bind();
+        for(uint32_t i = 0; i < mesh.GetSubMeshCount(); i++)
+        {
+            mesh.GetIndexBuffer(i).Bind();
+            mesh.GetMaterial(i).Use();
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer(i).GetCount(), GL_UNSIGNED_INT, nullptr);
+        }
     }
 
-    void Renderer::DrawElements(const VertexArray& va, const Material& material)
+    void Renderer::DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader)
     {
-        va.Bind();
-        material.Use();
-        glDrawElements(GL_TRIANGLES, (GLsizei)va.GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+        vertexArray.Bind();
+        indexBuffer.Bind();
+        shader.Use();
+        glDrawElements(GL_TRIANGLES, (GLsizei)indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Material& material)
+    {
+        DrawElements(vertexArray, indexBuffer, material.GetShader());
     }
 
     void Renderer::SetViewProj(const glm::mat4& viewProj)
@@ -139,7 +145,7 @@ namespace NDR
         for(uint32_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
             _quadBatch.GetBoundTexture(i).Bind(i);
     
-        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetDefaultShader());
+        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetIndexBuffer(), _quadBatch.GetDefaultShader());
         _quadBatch.Reset();
     }
 

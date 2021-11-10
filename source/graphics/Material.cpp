@@ -57,6 +57,7 @@ namespace NDR
         _flags = _flags & ~flags;
     }
 
+    Shader& Material::GetShader() { return _shader; }
     const Shader& Material::GetShader() const { return _shader; }
 
     void Material::Use() const

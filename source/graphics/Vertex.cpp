@@ -8,10 +8,8 @@ namespace NDR
     {
     }
 
-    VertexArray::VertexArray(VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer):
-        _id(0),
-        _vertexBuffer(std::move(vertexBuffer)),
-        _indexBuffer(std::move(indexBuffer))
+    VertexArray::VertexArray(VertexBuffer&& vertexBuffer):
+        _vertexBuffer(std::move(vertexBuffer))
     {
         // create vertex array object
         glCreateVertexArrays(1, &_id);
@@ -41,8 +39,7 @@ namespace NDR
 
     VertexArray::VertexArray(VertexArray&& other) noexcept:
         _id(other._id),
-        _vertexBuffer(std::move(other._vertexBuffer)),
-        _indexBuffer(std::move(other._indexBuffer))
+        _vertexBuffer(std::move(other._vertexBuffer))
     {
         other._id = 0;
     }
@@ -53,7 +50,6 @@ namespace NDR
         {
             _id = other._id;
             _vertexBuffer = std::move(other._vertexBuffer);
-            _indexBuffer = std::move(other._indexBuffer);
 
             other._id = 0;
         }
@@ -62,14 +58,11 @@ namespace NDR
 
     VertexBuffer& VertexArray::GetVertexBuffer() { return _vertexBuffer; }
     const VertexBuffer& VertexArray::GetVertexBuffer() const { return _vertexBuffer; }
-    IndexBuffer& VertexArray::GetIndexBuffer() { return _indexBuffer; }
-    const IndexBuffer& VertexArray::GetIndexBuffer() const { return _indexBuffer; }
 
     void VertexArray::Bind() const
     {
         glBindVertexArray(_id);
         _vertexBuffer.Bind();
-        _indexBuffer.Bind();
     }
 
     bool VertexArray::operator==(const VertexArray& other) const { return _id == other._id; }

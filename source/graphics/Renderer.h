@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Material.h"
+#include "Mesh.h"
 #include "RenderBatch.h"
 #include "Texture.h"
 #include "math/Transform.h"
@@ -9,7 +10,6 @@ namespace NDR
 {
     /*
      * TODO: Make Renderer class static
-     * TODO: DrawElements(Mesh) function
     */
     class Renderer
     {
@@ -20,8 +20,10 @@ namespace NDR
         void SetViewProj(const glm::mat4& viewProj);
         void Clear() const;
 
-        void DrawElements(const VertexArray& va, const Shader& shader);
-        void DrawElements(const VertexArray& va, const Material& material);
+        void DrawMesh(const Mesh& mesh);
+
+        void DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader);
+        void DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Material& material);
 
         void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color = glm::vec4(1.0f));
         

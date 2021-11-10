@@ -7,7 +7,7 @@ namespace NDR
     {
     public:
         VertexArray();
-        VertexArray(VertexBuffer&& vertexBuffer, IndexBuffer&& indexBuffer);
+        VertexArray(VertexBuffer&& vertexBuffer);
         ~VertexArray();
 
         VertexArray(const VertexArray&) = delete;
@@ -18,8 +18,6 @@ namespace NDR
 
         VertexBuffer& GetVertexBuffer();
         const VertexBuffer& GetVertexBuffer() const;
-        IndexBuffer& GetIndexBuffer();
-        const IndexBuffer& GetIndexBuffer() const;
         
         void Bind() const;
 
@@ -29,6 +27,5 @@ namespace NDR
         uint32_t _id;
         
         VertexBuffer _vertexBuffer;
-        IndexBuffer _indexBuffer;
     };
 }

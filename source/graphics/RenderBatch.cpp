@@ -49,10 +49,10 @@ namespace NDR
             indices.push_back(index + 3);
             index += 4;
         }
-        IndexBuffer ib(indices);
         
-        // setup vertex array
-        _va = VertexArray(std::move(vb), std::move(ib));
+        // setup vertex array and index buffer
+        _va = VertexArray(std::move(vb));
+        _ib = IndexBuffer(indices);
 
         _defaultTexture = (Texture2D&&)texture;
         _defaultShader = (Shader&&)shader;
@@ -69,6 +69,7 @@ namespace NDR
         _indicesCount = other._indicesCount;
         _maxTextureSlots = other._maxTextureSlots;
         _va = std::move(other._va);
+        _ib = std::move(other._ib);
         _textureIndexes = std::move(other._textureIndexes);
         _boundTextures = std::move(other._boundTextures);
         _defaultTexture = std::move(other._defaultTexture);
@@ -93,6 +94,7 @@ namespace NDR
             _indicesCount = other._indicesCount;
             _maxTextureSlots = other._maxTextureSlots;
             _va = std::move(other._va);
+            _ib = std::move(other._ib);
             _textureIndexes = std::move(other._textureIndexes);
             _boundTextures = std::move(other._boundTextures);
             _defaultTexture = std::move(other._defaultTexture);

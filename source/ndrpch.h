@@ -1,5 +1,9 @@
 #pragma once
 
+#if _MSC_VER
+#include <intrin.h>
+#endif
+
 #include <memory>
 #include <cstdio>
 #include <string>
@@ -14,6 +18,8 @@
 #include <fstream>
 #include <queue>
 #include <optional>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

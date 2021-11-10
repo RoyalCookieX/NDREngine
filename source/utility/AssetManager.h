@@ -5,14 +5,14 @@
 
 namespace NDR
 {
-    class AssetManager
+    enum class AssetRoot
     {
-    public:
-        //TODO: make GetAssetRootPath() dynamic
-        static std::string GetAssetRootPath();
-        
-        static Shader LoadShader(const std::string& assetPath);
-        static Mesh LoadMesh(const std::string& assetPath);
-        static Texture LoadTexture(const std::string& assetPath);
+        GAME, ENGINE
     };
+        
+    extern Shader LoadShader(const std::string& assetPath, AssetRoot root = AssetRoot::GAME);
+    // TODO: Load Meshes from filepath
+    // extern Mesh LoadMesh(const std::string& assetPath, AssetRoot root = AssetRoot::GAME);
+    extern Texture2D LoadTexture2D(const std::string& assetPath, AssetRoot root = AssetRoot::GAME);
+    extern Texture2DAtlas LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root = AssetRoot::GAME);
 }

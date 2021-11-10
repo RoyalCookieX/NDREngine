@@ -5,11 +5,9 @@ namespace NDR
 {
     Window* Window::Create(const WindowProps& props)
     {
-        return new PlatformAPI::Window_win32(props);
+        return new Window_win32(props);
     }
     
-namespace PlatformAPI
-{
     Window_win32::Window_win32(const WindowProps& properties):
         _properties(properties)
     {
@@ -75,4 +73,4 @@ namespace PlatformAPI
 
     void Window_win32::Dispatch(Event* event) const { for (auto callback : _callbacks) callback(event); }
 }
-}
+

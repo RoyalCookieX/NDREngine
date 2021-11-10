@@ -1,15 +1,28 @@
 #pragma once
-#include "Buffer.h"
-#include "Shader.h"
 #include "Vertex.h"
+#include "Material.h"
 
 namespace NDR
 {
+    struct SubMesh
+    {
+    public:
+        SubMesh(IndexBuffer&& indexBuffer, Material&& mat);
+
+        IndexBuffer& GetIndexBuffer();
+        const IndexBuffer& GetIndexBuffer() const;
+        Material& GetMaterial();
+        const Material& GetMaterial() const;
+    private:
+        IndexBuffer _ib;
+        Material _mat;
+    };
+    
     class Mesh
     {
     public:
         Mesh();
-        Mesh(VertexArray&& vertexArray, IndexBuffer&& indexBuffer, Shader&& shader);
+        Mesh(VertexBuffer&& vertexBuffer, std::vector<SubMesh>&& subMeshes);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -18,16 +31,21 @@ namespace NDR
         Mesh(Mesh&& other) noexcept;
         Mesh& operator=(Mesh&& other) noexcept;
 
+        bool operator==(const Mesh& other) const;
+        bool operator!=(const Mesh& other) const;
+
         const VertexArray& GetVertexArray() const;
-        const IndexBuffer& GetIndexBuffer() const;
-        const Shader& GetShader() const;
-
+        VertexBuffer& GetVertexBuffer();
+        const VertexBuffer& GetVertexBuffer() const;
+        SubMesh& GetSubMesh(int32_t index);
+        const SubMesh& GetSubMesh(int32_t index) const;
+        IndexBuffer& GetIndexBuffer(int32_t index);
+        const IndexBuffer& GetIndexBuffer(int32_t index) const;
+        Material& GetMaterial(int32_t index);
+        const Material& GetMaterial(int32_t index) const;
+        uint32_t GetSubMeshCount() const;
     private:
-        VertexArray _vertexArray;
-        IndexBuffer _indexBuffer;
-        Shader _shader;
+        VertexArray _va;
+        std::vector<SubMesh> _subMeshes;
     };
-
-    extern bool operator==(const Mesh& left, const Mesh& right);
-    extern bool operator!=(const Mesh& left, const Mesh& right);
 }

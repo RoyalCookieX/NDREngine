@@ -13,8 +13,7 @@ namespace NDR
         void Run();
 
         virtual void Initialize() = 0;
-        virtual void Tick() = 0;
-        virtual void OnDraw() = 0;
+        virtual void Tick(float deltaTime) = 0;
         virtual void Shutdown() = 0;
 
         Window* GetWindow() const { return _window; }

@@ -1,41 +1,47 @@
 #pragma once
 
+#define VEC3_ZERO glm::vec3(0.0f)
+#define VEC3_ONE glm::vec3(1.0f)
+#define VEC3_RIGHT glm::vec3(1.0f, 0.0f, 0.0f)
+#define VEC3_UP glm::vec3(0.0f, 1.0f, 0.0f)
+#define VEC3_FORWARD glm::vec3(0.0f, 0.0f, 1.0f)
+
+#define QUAT_IDENTITY glm::identity<glm::quat>()
+
+#define MAT4_IDENTITY glm::mat4(1.0f)
+
 namespace NDR
 {
+    enum class TransformSpace { WORLD, LOCAL };
+    
     struct Transform
     {
     public:
         Transform();
         Transform(const glm::mat4& matrix);
         Transform(const glm::vec3& position);
-        Transform(const glm::vec3& position, const glm::quat& rotation);
-        Transform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
+        Transform(const glm::vec3& position, const glm::vec3& eulerDeg);
+        Transform(const glm::vec3& position, const glm::vec3& eulerDeg, const glm::vec3& scale);
         
-        const glm::mat4& GetMatrix() const;
-        glm::vec3 GetPosition(bool isLocal = false) const;
-        glm::quat GetRotation(bool isLocal = false) const;
-        glm::vec3 GetScale() const;
+        glm::mat4 GetMatrix() const;
+        glm::vec3 GetPosition(TransformSpace space = TransformSpace::WORLD) const;
+        glm::quat GetRotation(TransformSpace space = TransformSpace::WORLD) const;
+        glm::vec3 GetScale(TransformSpace space = TransformSpace::WORLD) const;
 
-        void SetPosition(const glm::vec3& newPosition, bool isLocal = false);
-        Transform& Translate(const glm::vec3& translation, bool isLocal = false);
-        
-        void SetRotation(const glm::quat& newRotation, bool isLocal = false);
-        void SetRotation(const glm::vec3& newEuler, bool isLocal = false);
-        void SetRotation(float degrees, const glm::vec3& axis, bool isLocal = false);
-        Transform& Rotate(const glm::quat& rotation, bool isLocal = false);
-        Transform& Rotate(const glm::vec3& euler, bool isLocal = false);
-        Transform& Rotate(float degrees, const glm::vec3& axis, bool isLocal = false);
-        
-        void SetScale(const glm::vec3& newScale);
+        Transform& SetPosition(const glm::vec3& position, TransformSpace space = TransformSpace::LOCAL);
+        Transform& SetRotation(const glm::vec3& eulerDeg, TransformSpace space = TransformSpace::LOCAL);
+        Transform& SetScale(const glm::vec3& scale);
+
+        Transform& Translate(const glm::vec3& translation, TransformSpace space = TransformSpace::LOCAL);
+        Transform& Rotate(const glm::vec3& eulerDeg, TransformSpace space = TransformSpace::LOCAL);
+        Transform& Rotate(float degrees, const glm::vec3& axis, TransformSpace = TransformSpace::LOCAL);
         Transform& Scale(const glm::vec3& scalar);
 
         glm::vec3 GetRight() const;
         glm::vec3 GetUp() const;
         glm::vec3 GetForward() const;
-        
     private:
         std::tuple<glm::vec3, glm::quat, glm::vec3> Decompose() const;
-        void ConstructMatrix(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale);
         
         glm::mat4 _matrix;
     };

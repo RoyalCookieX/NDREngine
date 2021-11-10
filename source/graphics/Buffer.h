@@ -1,4 +1,5 @@
 #pragma once
+#include "Layout.h"
 
 namespace NDR
 {
@@ -6,8 +7,8 @@ namespace NDR
     {
     public:
         VertexBuffer();
-        VertexBuffer(size_t size);
-        VertexBuffer(std::vector<float> vertices);
+        VertexBuffer(size_t count, const VertexLayout& layout);
+        VertexBuffer(std::vector<float> vertices, const VertexLayout& layout);
         ~VertexBuffer();
 
         VertexBuffer(const VertexBuffer&) = delete;
@@ -16,21 +17,21 @@ namespace NDR
         VertexBuffer(VertexBuffer&& other) noexcept;
         VertexBuffer& operator=(VertexBuffer&& other) noexcept;
 
+        bool operator==(const VertexBuffer& other) const;
+        bool operator!=(const VertexBuffer& other) const;
+
         size_t GetCount() const;
         size_t GetSize() const;
+        const VertexLayout& GetLayout() const;
 
         void Bind() const;
         void SetData(uint64_t offset, std::vector<float> vertices);
         void Release();
-
-        friend bool operator==(const VertexBuffer& left, const VertexBuffer& right);
     private:
         uint32_t _id;
-        size_t _count, _size;
+        size_t _count;
+        VertexLayout _layout;
     };
-
-    extern bool operator==(const VertexBuffer& left, const VertexBuffer& right);
-    extern bool operator!=(const VertexBuffer& left, const VertexBuffer& right);
 
     class IndexBuffer
     {
@@ -45,18 +46,16 @@ namespace NDR
         IndexBuffer(IndexBuffer&& other) noexcept;
         IndexBuffer& operator=(IndexBuffer&& other) noexcept;
 
+        bool operator==(const IndexBuffer& other) const;
+        bool operator!=(const IndexBuffer& other) const;
+
         size_t GetCount() const;
         size_t GetSize() const;
         
         void Bind() const;
         void Release();
-
-        friend bool operator==(const IndexBuffer& left, const IndexBuffer& right);
     private:
         uint32_t _id;
-        size_t _count, _size;
+        size_t _count;
     };
-
-    extern bool operator==(const IndexBuffer& left, const IndexBuffer& right);
-    extern bool operator!=(const IndexBuffer& left, const IndexBuffer& right);
 }

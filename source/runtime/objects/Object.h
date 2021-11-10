@@ -8,7 +8,6 @@ namespace NDR
     public:
         Object();
         Object(const Transform& transform);
-        Object(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
         virtual ~Object();
 
         Object(const Object& other);

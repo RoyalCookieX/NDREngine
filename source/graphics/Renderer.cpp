@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "Primitives.h"
+#include "core/Log.h"
 #include "utility/AssetManager.h"
 
 namespace NDR
@@ -17,10 +18,12 @@ namespace NDR
                      const GLchar* message,
                      const void* userParam )
     {
-        if(type == GL_DEBUG_TYPE_OTHER) return;
-        fprintf( stderr, "[OpenGL%s]: %s\n",
-            type == GL_DEBUG_TYPE_ERROR ? " Error" : "",
-            message );
+        switch (type)
+        {
+            case GL_DEBUG_TYPE_OTHER: break;
+            case GL_DEBUG_TYPE_ERROR: NDR_LOGERROR("[Renderer]: %s", message); break;
+            default: NDR_LOGINFO("[Renderer]: %s", message); break;
+        }
     }
 #endif
 
@@ -29,8 +32,7 @@ namespace NDR
     {
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
-            printf("GLAD did not initialize!\n");
-            glfwTerminate();
+            NDR_LOGFATAL("[GLAD] GLAD did not initialize!\n");
             return;
         }
 #ifdef NDR_DEBUG

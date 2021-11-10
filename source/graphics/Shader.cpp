@@ -1,6 +1,8 @@
 #include "ndrpch.h"
 #include "Shader.h"
 
+#include "core/Log.h"
+
 namespace NDR
 {
     ShaderType GetShaderType(uint32_t shaderType)
@@ -164,12 +166,27 @@ namespace NDR
     int32_t Shader::CompileSource(ShaderStage stage, const std::string& source)
     {
         const char* src = source.c_str();
+        char* shaderTypeName;
         uint32_t shaderType = 0;
         switch(stage)
         {
-            case VERTEX: shaderType = GL_VERTEX_SHADER; break;
-            case FRAGMENT: shaderType = GL_FRAGMENT_SHADER; break;
-            default: break;
+            case VERTEX:
+                {
+                    shaderType = GL_VERTEX_SHADER;
+                    shaderTypeName = "Vertex";
+                    break;
+                }
+            case FRAGMENT:
+                {
+                    shaderType = GL_FRAGMENT_SHADER;
+                    shaderTypeName = "Fragment";
+                    break;
+                }
+            default:
+                {
+                    shaderTypeName = "Unknown";
+                    break;
+                }
         }
         const uint32_t id = glCreateShader(shaderType);
         glShaderSource(id, 1, &src, nullptr);
@@ -183,11 +200,7 @@ namespace NDR
             glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
             char* message = (char*)alloca(length * sizeof(char));
             glGetShaderInfoLog(id, length, &length, message);
-            std::cout << "[OpenGL Error]: " <<
-                ( shaderType == GL_VERTEX_SHADER ?   "Vertex"
-                : shaderType == GL_FRAGMENT_SHADER ? "Fragment"
-                : "Unknown")
-            << " Shader Failed to compile! " << message << std::endl;
+            NDR_LOGERROR("[%s Shader]: %s", shaderTypeName, message);
         }
         return id;
     }

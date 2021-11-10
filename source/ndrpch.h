@@ -14,6 +14,8 @@
 #include <fstream>
 #include <queue>
 #include <optional>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

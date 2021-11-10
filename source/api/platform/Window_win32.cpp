@@ -1,6 +1,8 @@
 #include "ndrpch.h"
 #include "Window_win32.h"
 
+#include "core/Log.h"
+
 namespace NDR
 {
     Window* Window::Create(const WindowProps& props)
@@ -16,7 +18,7 @@ namespace NDR
         {
             if(!glfwInit())
             {
-                printf("GLFW did not initalize!\n");
+                NDR_LOGFATAL("[GLFW]: GLFW did not initalize!");
                 glfwTerminate();
                 return;
             }
@@ -34,7 +36,7 @@ namespace NDR
         _window = glfwCreateWindow(properties.width, properties.height, properties.name.c_str(), nullptr, nullptr);
         if(_window == nullptr)
         {
-            printf("GLFW Window did not initalize!");
+            NDR_LOGFATAL("[GLFW]: GLFW Window did not initalize!");
             glfwTerminate();
         }
         Window_win32::SetContextCurrent();

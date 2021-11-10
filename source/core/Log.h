@@ -1,12 +1,34 @@
 #pragma once
 #include "math/Transform.h"
 
-/*
- * TODO: Custom Debug Logs and Asserts
-*/
+#if NDR_DEBUG
+#define NDR_LOGDEBUG(message, ...) NDR::LogMessage(NDR::LogLevel::NDRDEBUG, message, __VA_ARGS__)
+#else
+#define LOGDEBUG()
+#endif
+#define NDR_LOGINFO(message, ...) NDR::LogMessage(NDR::LogLevel::NDRINFO, message, __VA_ARGS__)
+#define NDR_LOGWARN(message, ...) NDR::LogMessage(NDR::LogLevel::NDRWARN, message, __VA_ARGS__)
+#define NDR_LOGERROR(message, ...) NDR::LogMessage(NDR::LogLevel::NDRERROR, message, __VA_ARGS__)
+#define NDR_LOGFATAL(message, ...) NDR::LogMessage(NDR::LogLevel::NDRFATAL, message, __VA_ARGS__)
+
+#define NDR_ASSERT(expression, message) NDR::AssertMessage(expression, message, __FILE__, __LINE__)
 
 namespace NDR
 {
+    enum class LogLevel
+    {
+        NDRDEBUG = 0,
+        NDRINFO = 1,
+        NDRWARN = 2,
+        NDRERROR = 3,
+        NDRFATAL = 4
+    };
+    
+    extern void LogMessage(LogLevel level, const char* format, ...);
+    extern void AssertMessage(bool expression, const char* format, const char* file, int32_t line);
+
+    extern void PrintToConsole(LogLevel level, const char* message);
+    
     inline std::ostream& Format(std::ostream& os)
     {
         return os << std::fixed << std::setprecision(2);

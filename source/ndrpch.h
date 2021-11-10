@@ -1,9 +1,5 @@
 #pragma once
 
-#if _MSC_VER
-#include <intrin.h>
-#endif
-
 #include <memory>
 #include <cstdio>
 #include <string>

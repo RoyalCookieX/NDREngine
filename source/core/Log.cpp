@@ -7,20 +7,23 @@
     #define DEBUGBREAK
 #endif
 
-//TODO: Add Platform Specific Logging to terminal
-
 namespace NDR
 {
-    void LogMessage(LogType logType, const char* format, ...)
+    void LogMessage(LogLevel level, const char* format, ...)
     {        
         va_list args;
         va_start(args, format);
 
         const char* logLevels[5] { "[DEBUG] ", "[INFO] ", "[WARNING] ", "[ERROR] ", "[FATAL] " };
-        char buffer[32768];
-        std::memset(buffer, 0, sizeof(buffer));
-        sprintf_s(buffer, sizeof(buffer), "%s%s\n", logLevels[(int32_t)logType], format);
-        vprintf_s(buffer, args);
+        //TODO: make levelMsg and message length dynamic
+        char levelMsg[16384];
+        char message[16384];
+        std::memset(levelMsg, 0, sizeof(levelMsg));
+        std::memset(message, 0, sizeof(message));
+        
+        sprintf_s(levelMsg, sizeof(levelMsg), "%s%s\n", logLevels[(int32_t)level], format);
+        vsprintf_s(message, sizeof(message), levelMsg, args);
+        PrintToConsole(level, message);
         
         va_end(args);
     }
@@ -29,7 +32,7 @@ namespace NDR
     {
         if(!expression)
         {
-            LogMessage(LogType::FATAL, "%s | %s @ LINE %d", message, file, line);
+            NDR_LOGFATAL("%s | %s @ LINE %d", message, file, line);
             DEBUGBREAK;
         }           
     }

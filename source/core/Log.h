@@ -2,30 +2,32 @@
 #include "math/Transform.h"
 
 #if NDR_DEBUG
-#define NDR_LOGDEBUG(message, ...) NDR::LogMessage(NDR::LogType::DEBUG, message, __VA_ARGS__)
+#define NDR_LOGDEBUG(message, ...) NDR::LogMessage(NDR::LogLevel::NDRDEBUG, message, __VA_ARGS__)
 #else
 #define LOGDEBUG()
 #endif
-#define NDR_LOGINFO(message, ...) NDR::LogMessage(NDR::LogType::INFO, message, __VA_ARGS__)
-#define NDR_LOGWARN(message, ...) NDR::LogMessage(NDR::LogType::WARN, message, __VA_ARGS__)
-#define NDR_LOGERROR(message, ...) NDR::LogMessage(NDR::LogType::ERROR, message, __VA_ARGS__)
-#define NDR_LOGFATAL(message, ...) NDR::LogMessage(NDR::LogType::FATAL, message, __VA_ARGS__)
+#define NDR_LOGINFO(message, ...) NDR::LogMessage(NDR::LogLevel::NDRINFO, message, __VA_ARGS__)
+#define NDR_LOGWARN(message, ...) NDR::LogMessage(NDR::LogLevel::NDRWARN, message, __VA_ARGS__)
+#define NDR_LOGERROR(message, ...) NDR::LogMessage(NDR::LogLevel::NDRERROR, message, __VA_ARGS__)
+#define NDR_LOGFATAL(message, ...) NDR::LogMessage(NDR::LogLevel::NDRFATAL, message, __VA_ARGS__)
 
 #define NDR_ASSERT(expression, message) NDR::AssertMessage(expression, message, __FILE__, __LINE__)
 
 namespace NDR
 {
-    enum class LogType
+    enum class LogLevel
     {
-        DEBUG = 0,
-        INFO = 1,
-        WARN = 2,
-        ERROR = 3,
-        FATAL = 4
+        NDRDEBUG = 0,
+        NDRINFO = 1,
+        NDRWARN = 2,
+        NDRERROR = 3,
+        NDRFATAL = 4
     };
     
-    extern void LogMessage(LogType logType, const char* format, ...);
+    extern void LogMessage(LogLevel level, const char* format, ...);
     extern void AssertMessage(bool expression, const char* format, const char* file, int32_t line);
+
+    extern void PrintToConsole(LogLevel level, const char* message);
     
     inline std::ostream& Format(std::ostream& os)
     {

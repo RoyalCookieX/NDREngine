@@ -9,7 +9,7 @@ namespace NDR
     void Engine::PreInitialize()
     {
         _window = Window::Create({800, 600, "NDREngine", false});
-        _renderer = new Renderer();
+        _renderer = CreateUniquePtr<Renderer>();
     }
 
     void Engine::Run()
@@ -35,7 +35,5 @@ namespace NDR
 
     void Engine::PostShutdown()
     {
-        delete _window;
-        delete _renderer;
     }
 }

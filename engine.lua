@@ -1,4 +1,4 @@
-project "engine"
+project "Engine"
     targetname "NDREngine"
     kind "StaticLib"
     language "C++"
@@ -23,12 +23,12 @@ project "engine"
     includedirs
     {
         "source",
-        "%{ENGINE_INCLUDE_DIR.glfw}",
-        "%{ENGINE_INCLUDE_DIR.glad}",
-        "%{ENGINE_INCLUDE_DIR.glm}",
-        "%{ENGINE_INCLUDE_DIR.stb_image}",
-        "%{ENGINE_INCLUDE_DIR.tiny_obj_loader}",
-        "%{ENGINE_INCLUDE_DIR.mini}",
+        "external/glad/include",
+        "external/glfw/include",
+        "external/glm/include",
+        "external/stb_image/include",
+        "external/tiny_obj_loader/include",
+        "external/mini/include",
     }
     links
     {

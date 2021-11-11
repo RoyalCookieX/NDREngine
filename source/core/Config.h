@@ -1,7 +1,7 @@
 #pragma once
 
-#define NDR_ENGINE_CONFIG_PATH "cache/engine.ini"
-#define NDR_GAME_CONFIG_PATH "cache/game.ini"
+#define NDR_ENGINE_CONFIG_PATH "config/engine.ini"
+#define NDR_GAME_CONFIG_PATH "config/game.ini"
 
 namespace NDR
 {

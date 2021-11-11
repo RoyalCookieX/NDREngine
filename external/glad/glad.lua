@@ -1,6 +1,3 @@
-APP_INCLUDE_DIR["glad"] = "external/glad/include"
-ENGINE_INCLUDE_DIR["glad"] = "%{wks.location}/%{APP_INCLUDE_DIR.glad}"
-
 project "glad"
     kind "StaticLib"
     language "C"

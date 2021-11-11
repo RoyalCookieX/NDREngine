@@ -1,6 +1,3 @@
-APP_INCLUDE_DIR["glfw"] = "external/glfw/include"
-ENGINE_INCLUDE_DIR["glfw"] = "%{wks.location}/%{APP_INCLUDE_DIR.glfw}"
-
 project "glfw"
     kind "StaticLib"
     language "C"

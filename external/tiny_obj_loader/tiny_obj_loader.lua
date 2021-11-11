@@ -1,6 +1,3 @@
-APP_INCLUDE_DIR["tiny_obj_loader"] = "external/tiny_obj_loader/include"
-ENGINE_INCLUDE_DIR["tiny_obj_loader"] = "%{wks.location}/%{APP_INCLUDE_DIR.tiny_obj_loader}"
-
 project "tiny_obj_loader"
     kind "StaticLib"
     language "C++"

@@ -1,12 +1,6 @@
 #include "ndrpch.h"
 #include "Log.h"
 
-#if _MSC_VER
-    #define DEBUGBREAK __debugbreak()
-#else
-    #define DEBUGBREAK
-#endif
-
 namespace NDR
 {
     void LogMessage(LogLevel level, const char* format, ...)
@@ -26,14 +20,5 @@ namespace NDR
         PrintToConsole(level, message);
         
         va_end(args);
-    }
-
-    void AssertMessage(bool expression, const char* message, const char* file, int32_t line)
-    {
-        if(!expression)
-        {
-            NDR_LOGFATAL("%s | %s @ LINE %d", message, file, line);
-            DEBUGBREAK;
-        }           
     }
 }

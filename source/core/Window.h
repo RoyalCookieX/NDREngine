@@ -1,5 +1,6 @@
 #pragma once
 #include "input/Event.h"
+#include "utility/Memory.h"
 
 namespace NDR
 {
@@ -39,7 +40,7 @@ namespace NDR
         virtual uint32_t GetWidth() const = 0;
         virtual uint32_t GetHeight() const = 0;
 
-        static Window* Create(const WindowProps& props);
+        static UniquePtr<Window> Create(const WindowProps& props);
     protected:
         virtual void Dispatch(Event* event) const = 0;
     };

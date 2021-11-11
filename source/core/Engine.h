@@ -2,6 +2,7 @@
 
 #include "core/Window.h"
 #include "graphics/Renderer.h"
+#include "utility/Memory.h"
 
 namespace NDR 
 {
@@ -16,14 +17,16 @@ namespace NDR
         virtual void Tick(float deltaTime) = 0;
         virtual void Shutdown() = 0;
 
-        Window* GetWindow() const { return _window; }
-        Renderer* GetRenderer() const { return _renderer; }
+        UniquePtr<Window>& GetWindow() { return _window; }
+        const UniquePtr<Window>& GetWindow() const { return _window; }
+        UniquePtr<Renderer>& GetRenderer() { return _renderer; }
+        const UniquePtr<Renderer>& GetRenderer() const { return _renderer; }
     
     private:
         void PreInitialize();
         void PostShutdown();
     
-        Window* _window = nullptr;
-        Renderer* _renderer = nullptr;
+        UniquePtr<Window> _window;
+        UniquePtr<Renderer> _renderer;
     };
 }

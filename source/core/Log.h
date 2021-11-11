@@ -11,8 +11,6 @@
 #define NDR_LOGERROR(message, ...) NDR::LogMessage(NDR::LogLevel::NDRERROR, message, __VA_ARGS__)
 #define NDR_LOGFATAL(message, ...) NDR::LogMessage(NDR::LogLevel::NDRFATAL, message, __VA_ARGS__)
 
-#define NDR_ASSERT(expression, message) NDR::AssertMessage(expression, message, __FILE__, __LINE__)
-
 namespace NDR
 {
     enum class LogLevel
@@ -25,8 +23,6 @@ namespace NDR
     };
     
     extern void LogMessage(LogLevel level, const char* format, ...);
-    extern void AssertMessage(bool expression, const char* format, const char* file, int32_t line);
-
     extern void PrintToConsole(LogLevel level, const char* message);
     
     inline std::ostream& Format(std::ostream& os)

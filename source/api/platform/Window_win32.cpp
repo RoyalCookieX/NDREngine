@@ -5,9 +5,9 @@
 
 namespace NDR
 {
-    Window* Window::Create(const WindowProps& props)
+    UniquePtr<Window> Window::Create(const WindowProps& props)
     {
-        return new Window_win32(props);
+        return UniquePtr<Window>(new Window_win32(props));
     }
     
     Window_win32::Window_win32(const WindowProps& properties):

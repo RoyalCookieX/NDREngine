@@ -26,9 +26,9 @@ project "Engine"
         "external/glad/include",
         "external/glfw/include",
         "external/glm/include",
+        "external/json/single_include",
         "external/stb_image/include",
         "external/tiny_obj_loader/include",
-        "external/mini/include",
     }
     links
     {

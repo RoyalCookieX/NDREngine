@@ -30,7 +30,7 @@ This is a C++ 3D Engine that I work on in my personal time as a way to learn C++
  - GLFW (Windowing Library)
  - glm (Math Library)
  - stb_image (Image Loading Library)
- - mini (Config File Library)
+ - nlohmann/json (JSON File Library)
  - tiny_obj_loader (OBJ Model Loading Library)
 
 # Goals (In no particular order/priority):

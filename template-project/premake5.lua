@@ -34,8 +34,21 @@ for name, value in pairs(REQUIRED_VARS) do
     end
 end
 
---TODO: Change Config File to JSON
-io.writefile("config/engine.ini", ("[Core]\nEnginePath=" .. ENGINE_PATH))
+-- Creeate Config File
+ENGINE_CONFIG_PATH = "config/engine.json"
+
+JSON_OBJ = {["Core"]={}}
+JSON_STR = io.readfile(ENGINE_CONFIG_PATH)
+if JSON_STR == nil or JSON_STR == "" then
+    JSON_OBJ["Core"]["EnginePath"] = ENGINE_PATH
+else
+    JSON_OBJ, ERR = json.decode(JSON_STR)
+end
+
+JSON_OBJ["Core"]["EnginePath"] = ENGINE_PATH
+
+JSON_STR, ERR = json.encode(JSON_OBJ)
+io.writefile(ENGINE_CONFIG_PATH, JSON_STR)
 
 TARGET_DIR = "%{wks.location}/binaries/%{cfg.buildcfg}/%{cfg.platform}"
 OBJECT_DIR = "!$(SolutionDir)intermediates/$(Configuration)/$(Platform)/$(ProjectName)"

@@ -1,3 +1,5 @@
+include "defines"
+
 project "glfw"
     kind "StaticLib"
     language "C"

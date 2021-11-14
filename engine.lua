@@ -1,3 +1,5 @@
+include "defines"
+
 project "Engine"
     targetname "NDREngine"
     kind "StaticLib"

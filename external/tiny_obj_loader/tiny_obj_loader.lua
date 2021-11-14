@@ -1,3 +1,5 @@
+include "defines"
+
 project "tiny_obj_loader"
     kind "StaticLib"
     language "C++"

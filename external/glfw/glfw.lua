@@ -1,5 +1,4 @@
-APP_INCLUDE_DIR["glfw"] = "external/glfw/include"
-ENGINE_INCLUDE_DIR["glfw"] = "%{wks.location}/%{APP_INCLUDE_DIR.glfw}"
+include "defines"
 
 project "glfw"
     kind "StaticLib"

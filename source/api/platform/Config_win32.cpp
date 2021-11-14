@@ -1,93 +1,78 @@
 #include <ndrpch.h>
 #include "core/Config.h"
+#include "core/Log.h"
 
 namespace NDR
 {
-    static std::map<std::string, mINI::INIStructure> configCache;
-
-    static mINI::INIStructure GetConfig(const std::string& filepath)
+    static nlohmann::json LoadJSON(const std::string& filepath)
     {
-        if(configCache.find(filepath) != configCache.end())
-            return configCache[filepath];
-
-        const mINI::INIFile configFile(filepath);
-        mINI::INIStructure config;
-        if(configFile.read(config))
+        if(!std::filesystem::exists(filepath))
         {
-            configCache.insert(std::make_pair(filepath, config));
-            return config;           
+            std::ofstream ofs(filepath);
+            ofs << "{}";
         }
-        perror("[Config Error]: Config file does not exist!\n");
-        return {};
+        
+        std::ifstream ifs(filepath);
+        nlohmann::json json;
+        ifs >> json;
+        return json;
     }
 
-    static void SetConfig(const std::string& filepath, mINI::INIStructure& config)
+    static void SaveJSON(const std::string& filepath, nlohmann::json json)
     {
-        if(configCache.find(filepath) != configCache.end())
-            configCache[filepath] = config;
-        
-        const mINI::INIFile configFile(filepath);
-        configFile.write(config, true);
+        std::ofstream ofs(filepath);
+        ofs << std::setw(4) << json << std::endl;
     }
     
     bool Config::GetBool(const std::string& filepath, const std::string& section, const std::string& key)
     {
-        auto config = GetConfig(filepath);
-        std::istringstream iss(config[section][key]);
-        bool value;
-        iss >> std::boolalpha >> value;
-        return value;
+        auto json = LoadJSON(filepath);
+        return json[section][key].get<bool>();
     }
 
     int32_t Config::GetInt(const std::string& filepath, const std::string& section, const std::string& key)
     {
-        auto config = GetConfig(filepath);
-        std::istringstream iss(config[section][key]);
-        int32_t value;
-        iss >> value;
-        return value;
+        auto json = LoadJSON(filepath);
+        return json[section][key].get<int32_t>();
     }
 
     float Config::GetFloat(const std::string& filepath, const std::string& section, const std::string& key)
     {
-        auto config = GetConfig(filepath);
-        std::istringstream iss(config[section][key]);
-        float value;
-        iss >> value;
-        return value;
+        auto json = LoadJSON(filepath);
+        return json[section][key].get<float>();
     }
 
     std::string Config::GetString(const std::string& filepath, const std::string& section, const std::string& key)
     {
-        auto config = GetConfig(filepath);
-        return config[section][key];
+        auto json = LoadJSON(filepath);
+        return json[section][key].get<std::string>();
     }
 
     void Config::SetBool(const std::string& filepath, const std::string& section, const std::string& key, const bool value)
     {
-        auto config = GetConfig(filepath);
-        config[section][key] = value ? "true" : "false";
-        SetConfig(filepath, config);
+        auto json = LoadJSON(filepath);
+        json[section][key] = value;
+        SaveJSON(filepath, json);
     }
 
     void Config::SetInt(const std::string& filepath, const std::string& section, const std::string& key, const int32_t value)
     {
-        auto config = GetConfig(filepath);
-        config[section][key] = std::to_string(value);
-        SetConfig(filepath, config);
+        auto json = LoadJSON(filepath);
+        json[section][key] = value;
+        SaveJSON(filepath, json);
     }
 
     void Config::SetFloat(const std::string& filepath, const std::string& section, const std::string& key, const float value)
     {
-        auto config = GetConfig(filepath);
-        config[section][key] = std::to_string(value);
-        SetConfig(filepath, config);
+        auto json = LoadJSON(filepath);
+        json[section][key] = value;
+        SaveJSON(filepath, json);
     }
 
     void Config::SetString(const std::string& filepath, const std::string& section, const std::string& key, const std::string& value)
     {
-        auto config = GetConfig(filepath);
-        config[section][key] = value;
-        SetConfig(filepath, config);
+        auto json = LoadJSON(filepath);
+        json[section][key] = value;
+        SaveJSON(filepath, json);
     }
 }

@@ -1,5 +1,4 @@
-APP_INCLUDE_DIR["stb_image"] = "external/stb_image/include"
-ENGINE_INCLUDE_DIR["stb_image"] = "%{wks.location}/%{APP_INCLUDE_DIR.stb_image}"
+include "defines"
 
 project "stb_image"
     kind "StaticLib"

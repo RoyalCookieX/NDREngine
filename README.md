@@ -18,12 +18,11 @@ This is a C++ 3D Engine that I work on in my personal time as a way to learn C++
 
 # Create a Project (Work In Progress)
 1. Copy the ``template-project`` folder and save that folder somewhere else (Desktop, Documents, etc). Rename the folder to your liking.
-2. Into your new folder, edit ``generateProjectFiles.cmd``.
+2. Into your new folder, edit ``build.bat``.
 3. Set Project Variables:
     - ``PROJECT_NAME`` -  The name of your project.
     - ``ENGINE_PATH`` -  The file path to NDREngine.
-4. Run ``generateProjectFiles.cmd``.
-
+4. Run ``build.bat``.
     
 # External Libraries:
  - glad (OpenGL Library)

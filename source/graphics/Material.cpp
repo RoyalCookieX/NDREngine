@@ -45,18 +45,16 @@ namespace NDR
     }
     bool Material::operator!=(const Material& other) const { return !(*this == other); }
 
-    bool Material::HasFlags(int32_t flags) const { return _flags & flags; }
-
-    void Material::EnableFlags(int32_t flags)
+    void Material::SetTexture(const std::string& textureName, const Texture& texture) const
     {
-        _flags = _flags | flags;
+        auto it = _boundTextures.find(textureName);
+        if(it != _boundTextures.end())
+        {
+            it->second = &texture;
+        }
+        else
+        {
+            _boundTextures.emplace(std::make_pair(textureName, &texture));
+        }
     }
-
-    void Material::DisableFlags(int32_t flags)
-    {
-        _flags = _flags & ~flags;
-    }
-
-    Shader& Material::GetShader() { return _shader; }
-    const Shader& Material::GetShader() const { return _shader; }
 }

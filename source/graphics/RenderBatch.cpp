@@ -135,7 +135,7 @@ namespace NDR
         float texIndex = -1.0f;
         for(size_t i = 0; i < _boundTextures.size(); i++)
         {
-            if(_boundTextures[i]->GetTextureID() == texture.GetTextureID())
+            if(_boundTextures[i]->GetRendererID() == texture.GetRendererID())
             {
                 texIndex = (float)i;
                 break;

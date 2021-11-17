@@ -1,5 +1,6 @@
 #pragma once
 #include "Shader.h"
+#include "Texture.h"
 
 namespace NDR
 {
@@ -17,7 +18,7 @@ namespace NDR
         OPAQUE          = 1 << 4,
         TRANSPARENT     = 1 << 5,
     };
-    
+
     class Material
     {
     public:
@@ -34,13 +35,18 @@ namespace NDR
         bool operator==(const Material& other) const;
         bool operator!=(const Material& other) const;
 
-        bool HasFlags(int32_t flags) const;
-        void EnableFlags(int32_t flags);
-        void DisableFlags(int32_t flags);
-        Shader& GetShader();
-        const Shader& GetShader() const;
+        std::map<std::string, const Texture*>& GetBoundTextures() { return _boundTextures; }
+        const std::map<std::string, const Texture*>& GetBoundTextures() const { return _boundTextures; }
+        Shader& GetShader() { return _shader; }
+        const Shader& GetShader() const { return _shader; }
+        
+        bool HasFlags(int32_t flags) const { return _flags & flags; }
+        void EnableFlags(int32_t flags) { _flags = _flags | flags; }
+        void DisableFlags(int32_t flags) { _flags = _flags & ~flags; }
+        void SetTexture(const std::string& textureName, const Texture& texture) const;
     private:
         Shader _shader;
         int32_t _flags;
+        mutable std::map<std::string, const Texture*> _boundTextures;
     };
 }

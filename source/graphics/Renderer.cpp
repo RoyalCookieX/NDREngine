@@ -36,15 +36,28 @@ namespace NDR
     
     static void BindVertexBuffer(const VertexBuffer& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.GetRendererID()); }
     static void BindIndexBuffer(const IndexBuffer& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.GetRendererID()); }
-    static void BindUniformBuffer(const UniformBuffer& uniformBuffer, uint32_t binding) { }
     static void BindVertexArray(const VertexArray& vertexArray)
     {
         glBindVertexArray(vertexArray.GetRendererID());
         BindVertexBuffer(vertexArray.GetVertexBuffer());
     }
     static void BindShader(const Shader& shader) { glUseProgram(shader.GetRendererID()); }
+    static void BindTexture(const Texture& texture, uint32_t slot = 0)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, texture.GetRendererID());
+    }
     static void BindMaterial(const Material& material)
     {
+        // bind textures
+        auto it = material.GetBoundTextures().begin();
+        for(size_t i = 0; i < material.GetBoundTextures().size(); i++)
+        {
+            BindTexture(*it->second, i);
+            material.SetTexture(it->first, *it->second);
+            ++it;
+        }
+        
         // set material flags
         // cull face
         if(material.HasFlags(ENABLECULLING))

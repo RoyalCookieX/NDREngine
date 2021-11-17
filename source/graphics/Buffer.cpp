@@ -129,7 +129,8 @@ namespace NDR
     {
     }
 
-    UniformBuffer::UniformBuffer(size_t size, uint32_t binding)
+    UniformBuffer::UniformBuffer(size_t size, uint32_t binding):
+        _size(size)
     {
         glCreateBuffers(1, &_rendererID);
         glBindBuffer(GL_UNIFORM_BUFFER, _rendererID);

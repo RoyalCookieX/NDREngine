@@ -40,54 +40,79 @@ namespace NDR
         return Shader(sources[0].str(), sources[1].str());
     }
 
-    // Mesh LoadMesh(const std::string& assetPath, AssetRoot root)
-    // {
-    //     tinyobj::attrib_t attributes;
-    //     std::vector<tinyobj::shape_t> shapes;
-    //     std::vector<tinyobj::material_t> materials;
-    //     std::string errorMsg;
-    //
-    //     if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(assetPath, root).c_str()))
-    //     {
-    //         std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
-    //         return Mesh();
-    //     }
-    //     
-    //     tinyobj::mesh_t mesh = shapes[0].mesh;
-    //     std::unordered_set<uint32_t> indexCache;
-    //     std::vector<float> verts;
-    //     std::vector<uint32_t> indices;
-    //
-    //     for(uint32_t i = 0; i < mesh.indices.size(); i++)
-    //     {
-    //         tinyobj::index_t index = mesh.indices[i];
-    //         const int posIndex = index.vertex_index;
-    //         const int texIndex = index.texcoord_index;
-    //         const int nmlIndex = index.normal_index;
-    //
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 0]);
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 1]);
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 2]);
-    //
-    //         verts.push_back(attributes.texcoords[texIndex * 2 + 0]);
-    //         verts.push_back(attributes.texcoords[texIndex * 2 + 1]);
-    //
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 0]);
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
-    //     }
-    //
-    //     VertexLayout layout;
-    //     layout
-    //     .AddAttribute({3, false})  // position
-    //     .AddAttribute({2, false})  // tex coords
-    //     .AddAttribute({3, false}); // normals
-    //     VertexBuffer vb(verts, layout);
-    //     IndexBuffer ib(indices);
-    //     VertexArray vertexArray(std::move(vb), std::move(ib));        
-    //
-    //     return Mesh(std::move(vertexArray), LoadShader("assets/shaders/Cube.shader"));
-    // }
+    Mesh LoadMesh(const std::string& assetPath, AssetRoot root)
+    {
+        tinyobj::attrib_t attributes;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string errorMsg;
+    
+        if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(assetPath, root).c_str()))
+        {
+            std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
+            return Mesh();
+        }
+        
+        tinyobj::mesh_t mesh = shapes[0].mesh;
+        std::unordered_set<uint32_t> indexCache;
+        std::vector<float> verts;
+        std::vector<uint32_t> indices;
+    
+        for(uint32_t i = 0; i < mesh.indices.size(); i++)
+        {
+            tinyobj::index_t index = mesh.indices[i];
+            const int32_t posIndex = index.vertex_index;
+            const int32_t texIndex = index.texcoord_index;
+            const int32_t nmlIndex = index.normal_index;
+
+            if(posIndex > -1)
+            {
+                verts.push_back(attributes.vertices[posIndex * 3 + 0]);
+                verts.push_back(attributes.vertices[posIndex * 3 + 1]);
+                verts.push_back(attributes.vertices[posIndex * 3 + 2]);                
+            }
+            else
+            {
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+            }
+
+            if(texIndex > -1)
+            {
+                verts.push_back(attributes.texcoords[texIndex * 2 + 0]);
+                verts.push_back(attributes.texcoords[texIndex * 2 + 1]);             
+            }
+            else
+            {
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+            }
+
+            if(nmlIndex > -1)
+            {
+                verts.push_back(attributes.normals[nmlIndex * 3 + 0]);
+                verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
+                verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
+            }
+            else
+            {
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+            }
+        }
+    
+        VertexLayout layout;
+        layout.AddAttribute({3, false}); // position
+        layout.AddAttribute({2, false}); // tex coords
+        layout.AddAttribute({3, false}); // normals
+        VertexBuffer vertexBuffer(verts, layout);
+        IndexBuffer indexBuffer(indices);
+        std::vector<SubMesh> subMeshes;
+        subMeshes.emplace_back(std::move(indexBuffer), LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE));
+        return Mesh(std::move(vertexBuffer), std::move(subMeshes));
+    }
 
     Texture2D LoadTexture2D(const std::string& assetPath, AssetRoot root)
     {

@@ -3,7 +3,7 @@
 
 namespace NDR
 {
-    bool Texture::operator==(const Texture& other) const { return GetTextureID() == other.GetTextureID(); }
+    bool Texture::operator==(const Texture& other) const { return GetRendererID() == other.GetRendererID(); }
     bool Texture::operator!=(const Texture& other) const { return !(*this == other); }
 
     static void InitalizeTexture(uint32_t& id, const TextureProperties* properties, uint8_t* buffer)
@@ -33,13 +33,13 @@ namespace NDR
     }
 
     Texture2D::Texture2D():
-        _id(0),
+        _rendererID(0),
         _properties(0, 0, 0)
     {
     }
 
     Texture2D::Texture2D(const TextureProperties& properties):
-        _id(0),
+        _rendererID(0),
         _properties(properties)
     {
         const size_t bufferSize = _properties.width * _properties.height * _properties.bitsPerPixel;
@@ -47,54 +47,46 @@ namespace NDR
         for(size_t i = 0; i < bufferSize; i++)
             buffer[i] = 255;
 
-        InitalizeTexture(_id, &_properties, buffer);
+        InitalizeTexture(_rendererID, &_properties, buffer);
         delete[] buffer;
     }
 
     Texture2D::Texture2D(const TextureProperties& properties, uint8_t* buffer):   
-        _id(0),
+        _rendererID(0),
         _properties(properties)
     {
-        InitalizeTexture(_id, &_properties, buffer);
+        InitalizeTexture(_rendererID, &_properties, buffer);
     }
 
-    Texture2D::~Texture2D() { glDeleteTextures(1, &_id); }
+    Texture2D::~Texture2D() { glDeleteTextures(1, &_rendererID); }
 
     Texture2D::Texture2D(Texture2D&& other) noexcept:
-        _id(other._id),
+        _rendererID(other._rendererID),
         _properties(other._properties)
     {
-        other._id = 0;
+        other._rendererID = 0;
     }
 
     Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
     {
         if(*this != other)
         {
-            _id = other._id;
+            _rendererID = other._rendererID;
             _properties = other._properties;
 
-            other._id = 0;
+            other._rendererID = 0;
         }
         return *this;
     }
-
-    uint32_t Texture2D::GetTextureID() const { return _id; }
-
-    void Texture2D::Bind(uint32_t slot) const
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, _id);
-    }
-
+    
     Texture2DAtlas::Texture2DAtlas():
-        _id(0),
+        _rendererID(0),
         _properties(0, 0, 0, 0, 0)
     {
     }
 
     Texture2DAtlas::Texture2DAtlas(const TextureAtlasProperties& properties):
-        _id(0),
+        _rendererID(0),
         _properties(properties)
     {
         const size_t bufferSize = _properties.width * _properties.height * _properties.bitsPerPixel;
@@ -102,32 +94,32 @@ namespace NDR
         for(size_t i = 0; i < bufferSize; i++)
             buffer[i] = 255;
         
-        InitalizeTexture(_id, &_properties, buffer);
+        InitalizeTexture(_rendererID, &_properties, buffer);
         delete[] buffer;
     }
 
     Texture2DAtlas::Texture2DAtlas(const TextureAtlasProperties& properties, uint8_t* buffer):
-        _id(0),
+        _rendererID(0),
         _properties(properties)
     {
-        InitalizeTexture(_id, &_properties, buffer);
+        InitalizeTexture(_rendererID, &_properties, buffer);
     }
 
     Texture2DAtlas::Texture2DAtlas(Texture2DAtlas&& other) noexcept:
-        _id(other._id),
+        _rendererID(other._rendererID),
         _properties(other._properties)
     {
-        other._id = 0;
+        other._rendererID = 0;
     }
 
     Texture2DAtlas& Texture2DAtlas::operator=(Texture2DAtlas&& other) noexcept
     {
         if(*this != other)
         {
-            _id = other._id;
+            _rendererID = other._rendererID;
             _properties = other._properties;
 
-            other._id = 0;
+            other._rendererID = 0;
         }
         return *this;
     }
@@ -144,13 +136,5 @@ namespace NDR
             uOffset * x + uOffset,  vOffset * y + vOffset,
             uOffset * x + 0.0f,     vOffset * y + vOffset,
         };
-    }
-
-    uint32_t Texture2DAtlas::GetTextureID() const { return _id; }
-
-    void Texture2DAtlas::Bind(uint32_t slot) const
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, _id);
     }
 }

@@ -72,9 +72,6 @@ namespace NDR
             uint32_t type;
             glGetActiveUniform(_rendererID, i, maxLength, nullptr, &size, &type, name);
             std::string uniformName(name);
-            //TODO: Only do this step with NVIDIA Drivers
-            if(const auto leftBracketIndex = uniformName.find('['); leftBracketIndex != std::string::npos)
-                uniformName.replace(leftBracketIndex, maxLength - leftBracketIndex, "");
             
             _uniformData.emplace_back(uniformName, offset, size, GetShaderType(type));
             offset += size;
@@ -109,54 +106,63 @@ namespace NDR
 
     void Shader::SetInt(const std::string& uniformName, const int32_t value) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform1i(id, value);
     }
 
     void Shader::SetIntArray(const std::string& uniformName, int32_t* values, uint32_t count) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform1iv(id, count, values);
     }
 
     void Shader::SetFloat(const std::string& uniformName, float const value) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform1f(id, value);
     }
 
     void Shader::SetVec2(const std::string& uniformName, const glm::vec2& vec2) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform2f(id, vec2.x, vec2.y);
     }
 
     void Shader::SetVec3(const std::string& uniformName, const glm::vec3& vec3) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform3f(id, vec3.x, vec3.y, vec3.z);
     }
     
     void Shader::SetVec4(const std::string& uniformName, const glm::vec4& vec4) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniform4f(id, vec4.x, vec4.y, vec4.z, vec4.w);
     }
 
     void Shader::SetMat4(const std::string& uniformName, const glm::mat4& mat4) const
     {
+        glUseProgram(_rendererID);
         const uint32_t id = GetUniformLocation(uniformName);
         glUniformMatrix4fv(id, 1, false, glm::value_ptr(mat4));
     }
 
     int32_t Shader::GetUniformLocation(const std::string& uniformName) const
-    {        
-        for(auto uniform : _uniformData)
-        {
-            if(uniform.GetName() == uniformName)
-                return uniform.GetLocation();
-        }
-        return -1;
+    {
+        //TODO: Fix Uniform Location Issue
+        return glGetUniformLocation(_rendererID, uniformName.c_str());
+        // for(auto uniform : _uniformData)
+        // {
+        //     if(uniform.GetName() == uniformName)
+        //         return uniform.GetLocation();
+        // }
+        // return -1;
     }
 
     int32_t Shader::CompileSource(ShaderStage stage, const std::string& source)

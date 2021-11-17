@@ -59,32 +59,4 @@ namespace NDR
 
     Shader& Material::GetShader() { return _shader; }
     const Shader& Material::GetShader() const { return _shader; }
-
-    void Material::Use() const
-    {
-        // set material flags
-        // cull face
-        if(HasFlags(ENABLECULLING))
-        {
-            glEnable(GL_CULL_FACE);
-            if(HasFlags(CULLBACK))
-                glCullFace(GL_BACK);
-            else if(HasFlags(CULLFRONT))
-                glCullFace(GL_FRONT);
-        }
-        else glDisable(GL_CULL_FACE);
-
-        // blending
-        if(HasFlags(ENABLEBLENDING))
-        {
-            glEnable(GL_BLEND);
-            if(HasFlags(OPAQUE))
-                glDisable(GL_BLEND);
-            else if(HasFlags(TRANSPARENT))
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-        else glDisable(GL_BLEND);
-
-        _shader.Use();
-    }
 }

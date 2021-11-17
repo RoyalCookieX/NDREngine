@@ -4,7 +4,7 @@
 namespace NDR
 {
     VertexArray::VertexArray():
-        _id(0)
+        _rendererID(0)
     {
     }
 
@@ -12,10 +12,9 @@ namespace NDR
         _vertexBuffer(std::move(vertexBuffer))
     {
         // create vertex array object
-        glCreateVertexArrays(1, &_id);
-        glBindVertexArray(_id);
-
-        _vertexBuffer.Bind();
+        glCreateVertexArrays(1, &_rendererID);
+        glBindVertexArray(_rendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer.GetRendererID());
 
         // setup vertex attributes
         auto offset = 0;
@@ -35,36 +34,27 @@ namespace NDR
         }
     }
 
-    VertexArray::~VertexArray() { glDeleteVertexArrays(1, &_id); }
+    VertexArray::~VertexArray() { glDeleteVertexArrays(1, &_rendererID); }
 
     VertexArray::VertexArray(VertexArray&& other) noexcept:
-        _id(other._id),
+        _rendererID(other._rendererID),
         _vertexBuffer(std::move(other._vertexBuffer))
     {
-        other._id = 0;
+        other._rendererID = 0;
     }
 
     VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
     {
         if(*this != other)
         {
-            _id = other._id;
+            _rendererID = other._rendererID;
             _vertexBuffer = std::move(other._vertexBuffer);
 
-            other._id = 0;
+            other._rendererID = 0;
         }
         return *this;
     }
 
-    VertexBuffer& VertexArray::GetVertexBuffer() { return _vertexBuffer; }
-    const VertexBuffer& VertexArray::GetVertexBuffer() const { return _vertexBuffer; }
-
-    void VertexArray::Bind() const
-    {
-        glBindVertexArray(_id);
-        _vertexBuffer.Bind();
-    }
-
-    bool VertexArray::operator==(const VertexArray& other) const { return _id == other._id; }
+    bool VertexArray::operator==(const VertexArray& other) const { return _rendererID == other._rendererID; }
     bool VertexArray::operator!=(const VertexArray& other) const { return !(*this == other); }
 }

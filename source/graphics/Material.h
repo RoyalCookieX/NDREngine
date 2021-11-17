@@ -34,7 +34,6 @@ namespace NDR
         bool operator==(const Material& other) const;
         bool operator!=(const Material& other) const;
 
-        void Use() const;
         bool HasFlags(int32_t flags) const;
         void EnableFlags(int32_t flags);
         void DisableFlags(int32_t flags);

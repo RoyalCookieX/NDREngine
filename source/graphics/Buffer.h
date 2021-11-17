@@ -1,4 +1,5 @@
 #pragma once
+#include "NDRTypes.h"
 #include "Layout.h"
 
 namespace NDR
@@ -7,7 +8,7 @@ namespace NDR
     {
     public:
         VertexBuffer();
-        VertexBuffer(size_t count, const VertexLayout& layout);
+        VertexBuffer(uint32_t count, const VertexLayout& layout);
         VertexBuffer(std::vector<float> vertices, const VertexLayout& layout);
         ~VertexBuffer();
 
@@ -20,16 +21,16 @@ namespace NDR
         bool operator==(const VertexBuffer& other) const;
         bool operator!=(const VertexBuffer& other) const;
 
-        size_t GetCount() const;
-        size_t GetSize() const;
-        const VertexLayout& GetLayout() const;
+        RendererID GetRendererID() const { return _rendererID; }
+        uint32_t GetCount() const { return _count; }
+        size_t GetSize() const { return _count * sizeof(float); }
+        VertexLayout& GetLayout() { return _layout; }
+        const VertexLayout& GetLayout() const { return _layout; }
 
-        void Bind() const;
-        void SetData(uint64_t offset, std::vector<float> vertices);
-        void Release();
+        void SetData(uint32_t offset, std::vector<float> vertices);
     private:
-        uint32_t _id;
-        size_t _count;
+        RendererID _rendererID;
+        uint32_t _count;
         VertexLayout _layout;
     };
 
@@ -49,13 +50,11 @@ namespace NDR
         bool operator==(const IndexBuffer& other) const;
         bool operator!=(const IndexBuffer& other) const;
 
-        size_t GetCount() const;
-        size_t GetSize() const;
-        
-        void Bind() const;
-        void Release();
+        RendererID GetRendererID() const { return _rendererID; }
+        uint32_t GetCount() const { return _count; }
+        size_t GetSize() const { return _count * sizeof(uint32_t); }
     private:
-        uint32_t _id;
-        size_t _count;
+        RendererID _rendererID;
+        uint32_t _count;
     };
 }

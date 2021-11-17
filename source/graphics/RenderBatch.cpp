@@ -56,7 +56,7 @@ namespace NDR
 
         _defaultTexture = (Texture2D&&)texture;
         _defaultShader = (Shader&&)shader;
-        _defaultShader.Use();
+        glUseProgram(_defaultShader.GetRendererID());
         _defaultShader.SetIntArray("u_Textures", _textureIndexes.data(), (uint32_t)_textureIndexes.size());
     }
 

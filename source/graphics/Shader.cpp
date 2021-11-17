@@ -35,22 +35,22 @@ namespace NDR
     ShaderType ShaderUniform::GetType() const { return _type; }
 
     Shader::Shader():
-        _program(0)
+        _rendererID(0)
     {
     }
     
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
         // create shader and its stages
-        _program = glCreateProgram();
+        _rendererID = glCreateProgram();
         const uint32_t vs = CompileSource(VERTEX, vertexSource);
         const uint32_t fs = CompileSource(FRAGMENT, fragmentSource);
 
         // compile/link shader
-        glAttachShader(_program, vs);
-        glAttachShader(_program, fs);
-        glLinkProgram(_program);
-        glValidateProgram(_program);
+        glAttachShader(_rendererID, vs);
+        glAttachShader(_rendererID, fs);
+        glLinkProgram(_rendererID);
+        glValidateProgram(_rendererID);
 
         // delete shader stages
         glDeleteShader(vs);
@@ -58,19 +58,19 @@ namespace NDR
 
         // get uniforms from shader
         int32_t maxLength;
-        glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
+        glGetProgramiv(_rendererID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
         char* name = new char[maxLength + 1];
 
         // add uniforms to _uniformData
         int32_t uniformCount;
-        glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &uniformCount);
+        glGetProgramiv(_rendererID, GL_ACTIVE_UNIFORMS, &uniformCount);
         _uniformData.reserve(uniformCount);
         int32_t offset = 0;
         for(int32_t i = 0; i < uniformCount; i++)
         {
             int32_t size;
             uint32_t type;
-            glGetActiveUniform(_program, i, maxLength, nullptr, &size, &type, name);
+            glGetActiveUniform(_rendererID, i, maxLength, nullptr, &size, &type, name);
             std::string uniformName(name);
             //TODO: Only do this step with NVIDIA Drivers
             if(const auto leftBracketIndex = uniformName.find('['); leftBracketIndex != std::string::npos)
@@ -83,33 +83,29 @@ namespace NDR
         delete[] name;
     }
 
-    Shader::~Shader() { glDeleteProgram(_program); }
+    Shader::~Shader() { glDeleteProgram(_rendererID); }
 
     Shader::Shader(Shader&& other) noexcept:
-        _program(other._program),
+        _rendererID(other._rendererID),
         _uniformData(std::move(other._uniformData))
     {
-        other._program = 0;
+        other._rendererID = 0;
     }
 
     Shader& Shader::operator=(Shader&& other) noexcept
     {
         if(*this != other)
         {
-            _program = other._program;
+            _rendererID = other._rendererID;
             _uniformData = std::move(other._uniformData);
 
-            other._program = 0;
+            other._rendererID = 0;
         }
         return *this;
     }
 
-    bool Shader::operator==(const Shader& other) const { return _program == other._program; }
+    bool Shader::operator==(const Shader& other) const { return _rendererID == other._rendererID; }
     bool Shader::operator!=(const Shader& other) const { return !(*this == other); }
-
-    uint32_t Shader::GetProgram() const { return _program; }
-
-    void Shader::Use() const { glUseProgram(_program); }
 
     void Shader::SetInt(const std::string& uniformName, const int32_t value) const
     {

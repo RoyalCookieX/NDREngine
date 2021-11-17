@@ -1,4 +1,5 @@
 #pragma once
+#include "NDRTypes.h"
 #include "Buffer.h"
 
 namespace NDR
@@ -16,16 +17,14 @@ namespace NDR
         VertexArray(VertexArray&& other) noexcept;
         VertexArray& operator=(VertexArray&& other) noexcept;
 
-        VertexBuffer& GetVertexBuffer();
-        const VertexBuffer& GetVertexBuffer() const;
-        
-        void Bind() const;
-
         bool operator==(const VertexArray& other) const;
         bool operator!=(const VertexArray& other) const;
+
+        RendererID GetRendererID() const { return _rendererID; }
+        VertexBuffer& GetVertexBuffer() { return _vertexBuffer; }
+        const VertexBuffer& GetVertexBuffer() const { return  _vertexBuffer; }
     private:
-        uint32_t _id;
-        
+        RendererID _rendererID;
         VertexBuffer _vertexBuffer;
     };
 }

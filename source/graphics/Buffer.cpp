@@ -5,6 +5,7 @@
 
 namespace NDR
 {
+    // VertexBuffer
     VertexBuffer::VertexBuffer():
         _rendererID(0),
         _count(0)
@@ -75,6 +76,7 @@ namespace NDR
         glBufferSubData(GL_ARRAY_BUFFER, (uint64_t)offset, vertices.size() * sizeof(float), vertices.data());
     }
 
+    // IndexBuffer
     IndexBuffer::IndexBuffer():
         _rendererID(0),
         _count(0)
@@ -119,4 +121,55 @@ namespace NDR
 
     bool IndexBuffer::operator==(const IndexBuffer& other) const { return _rendererID == other._rendererID; }
     bool IndexBuffer::operator!=(const IndexBuffer& other) const { return !(*this == other); }
+
+    // UniformBuffer
+    UniformBuffer::UniformBuffer():
+        _rendererID(0),
+        _size(0)
+    {
+    }
+
+    UniformBuffer::UniformBuffer(size_t size, uint32_t binding)
+    {
+        glCreateBuffers(1, &_rendererID);
+        glBindBuffer(GL_UNIFORM_BUFFER, _rendererID);
+        glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+        glBindBufferRange(GL_UNIFORM_BUFFER, binding, _rendererID, 0, size);
+    }
+
+    UniformBuffer::~UniformBuffer()
+    {
+        glDeleteBuffers(1, &_rendererID);
+        _rendererID = 0;
+        _size = 0;
+    }
+
+    UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept:
+        _rendererID(other._rendererID),
+        _size(other._size)
+    {
+        other._rendererID = 0;
+        other._size = 0;
+    }
+
+    UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept
+    {
+        if(*this != other)
+        {
+            _rendererID = other._rendererID;
+            _size = other._size;
+
+            other._rendererID = 0;
+            other._size = 0;
+        }
+        return *this;
+    }
+
+    bool UniformBuffer::operator==(const UniformBuffer& other) const { return _rendererID == other._rendererID; }
+    bool UniformBuffer::operator!=(const UniformBuffer& other) const { return !(*this == other); }
+
+    void UniformBuffer::SetData(size_t offset, size_t size, const void* data)
+    {
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+    }
 }

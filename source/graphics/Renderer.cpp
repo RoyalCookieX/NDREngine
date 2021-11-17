@@ -36,6 +36,7 @@ namespace NDR
     
     static void BindVertexBuffer(const VertexBuffer& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.GetRendererID()); }
     static void BindIndexBuffer(const IndexBuffer& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.GetRendererID()); }
+    static void BindUniformBuffer(const UniformBuffer& uniformBuffer, uint32_t binding) { }
     static void BindVertexArray(const VertexArray& vertexArray)
     {
         glBindVertexArray(vertexArray.GetRendererID());
@@ -112,7 +113,11 @@ namespace NDR
             start.x, start.y, start.z, color.r, color.g, color.b, color.a,
             end.x,   end.y,   end.z,   color.r, color.g, color.b, color.a,
         };
+        BindVertexArray(sLineRendererData.vertexArray);
+        BindShader(sLineRendererData.shader);
         sLineRendererData.vertexArray.GetVertexBuffer().SetData(0, vertices);
+
+        glDrawArrays(GL_LINES, 0, sLineRendererData.vertexArray.GetVertexBuffer().GetCount());
     }
 
     void Renderer::DrawTriangles(const VertexArray& vertexArray, const Material& material)

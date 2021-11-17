@@ -57,4 +57,26 @@ namespace NDR
         RendererID _rendererID;
         uint32_t _count;
     };
+
+    class UniformBuffer
+    {
+    public:
+        UniformBuffer();
+        UniformBuffer(size_t size, uint32_t binding);
+        ~UniformBuffer();
+
+        UniformBuffer(const UniformBuffer&) = delete;
+        UniformBuffer& operator=(const UniformBuffer&) = delete;
+
+        UniformBuffer(UniformBuffer&& other) noexcept;
+        UniformBuffer& operator=(UniformBuffer&& other) noexcept;
+
+        bool operator==(const UniformBuffer& other) const;
+        bool operator!=(const UniformBuffer& other) const;
+
+        void SetData(size_t offset, size_t size, const void* data);
+    private:
+        RendererID _rendererID;
+        size_t _size;
+    };
 }

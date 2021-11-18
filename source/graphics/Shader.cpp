@@ -34,11 +34,6 @@ namespace NDR
     int32_t ShaderUniform::GetLocation() const { return _location; }
     ShaderType ShaderUniform::GetType() const { return _type; }
 
-    Shader::Shader():
-        _rendererID(0)
-    {
-    }
-    
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
         // create shader and its stages

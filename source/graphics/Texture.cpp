@@ -3,9 +3,6 @@
 
 namespace NDR
 {
-    bool Texture::operator==(const Texture& other) const { return GetRendererID() == other.GetRendererID(); }
-    bool Texture::operator!=(const Texture& other) const { return !(*this == other); }
-
     static void InitalizeTexture(uint32_t& id, const TextureProperties* properties, uint8_t* buffer)
     {
         glCreateTextures(GL_TEXTURE_2D, 1, &id);
@@ -32,12 +29,6 @@ namespace NDR
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture2D::Texture2D():
-        _rendererID(0),
-        _properties(0, 0, 0)
-    {
-    }
-
     Texture2D::Texture2D(const TextureProperties& properties):
         _rendererID(0),
         _properties(properties)
@@ -59,32 +50,7 @@ namespace NDR
     }
 
     Texture2D::~Texture2D() { glDeleteTextures(1, &_rendererID); }
-
-    Texture2D::Texture2D(Texture2D&& other) noexcept:
-        _rendererID(other._rendererID),
-        _properties(other._properties)
-    {
-        other._rendererID = 0;
-    }
-
-    Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
-    {
-        if(*this != other)
-        {
-            _rendererID = other._rendererID;
-            _properties = other._properties;
-
-            other._rendererID = 0;
-        }
-        return *this;
-    }
     
-    Texture2DAtlas::Texture2DAtlas():
-        _rendererID(0),
-        _properties(0, 0, 0, 0, 0)
-    {
-    }
-
     Texture2DAtlas::Texture2DAtlas(const TextureAtlasProperties& properties):
         _rendererID(0),
         _properties(properties)
@@ -105,24 +71,7 @@ namespace NDR
         InitalizeTexture(_rendererID, &_properties, buffer);
     }
 
-    Texture2DAtlas::Texture2DAtlas(Texture2DAtlas&& other) noexcept:
-        _rendererID(other._rendererID),
-        _properties(other._properties)
-    {
-        other._rendererID = 0;
-    }
-
-    Texture2DAtlas& Texture2DAtlas::operator=(Texture2DAtlas&& other) noexcept
-    {
-        if(*this != other)
-        {
-            _rendererID = other._rendererID;
-            _properties = other._properties;
-
-            other._rendererID = 0;
-        }
-        return *this;
-    }
+    Texture2DAtlas::~Texture2DAtlas() { glDeleteTextures(1, &_rendererID); }
 
     std::array<float, 8> Texture2DAtlas::GetUVs(uint32_t x, uint32_t y) const
     {

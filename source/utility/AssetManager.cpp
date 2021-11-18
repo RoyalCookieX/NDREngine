@@ -29,7 +29,7 @@ namespace NDR
         return ss.str();
     }
 
-    Shader LoadShader(const std::string& assetPath, AssetRoot root)
+    SharedPtr<Shader> LoadShader(const std::string& assetPath, AssetRoot root)
     {
         int index = -1;
         std::string line;
@@ -49,11 +49,11 @@ namespace NDR
             else if(index != -1)
                 sources[index] << line << std::endl;
         }
-        return Shader(sources[0].str(), sources[1].str());
+        return CreateSharedPtr<Shader>(sources[0].str(), sources[1].str());
     }
 
     // From https://github.com/tinyobjloader/tinyobjloader
-    Mesh LoadMesh(const std::string& assetPath, AssetRoot root)
+    SharedPtr<Mesh> LoadMesh(const std::string& assetPath, AssetRoot root)
     {
         // parse .obj file and check for warnings/errors
         tinyobj::ObjReaderConfig readerConfig;
@@ -148,29 +148,30 @@ namespace NDR
                 indexOffset += verticesPerFace;
             }
             NDR_LOGDEBUG("Index Buffer Count: %d", indices.size());
-            IndexBuffer indexBuffer(indices);
-            Material material(LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
-                         ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
+            SharedPtr<IndexBuffer> indexBuffer = CreateSharedPtr<IndexBuffer>(indices);
+            SharedPtr<Material> material = CreateSharedPtr<Material>(
+                LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
+                ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
             subMeshes.emplace_back(std::move(indexBuffer), std::move(material));
         }
         NDR_LOGDEBUG("Vertex Buffer Count: %d", vertices.size());
-        VertexBuffer vertexBuffer(vertices, layout);
-        return Mesh(std::move(vertexBuffer), std::move(subMeshes));
+        SharedPtr<VertexBuffer> vertexBuffer = CreateSharedPtr<VertexBuffer>(vertices, layout);
+        return CreateSharedPtr<Mesh>(std::move(vertexBuffer), std::move(subMeshes));
     }
 
-    Texture2D LoadTexture2D(const std::string& assetPath, AssetRoot root)
+    SharedPtr<Texture2D> LoadTexture2D(const std::string& assetPath, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return Texture2D({width, height, bpp}, buffer);
+        return CreateSharedPtr<Texture2D>(TextureProperties(width, height, bpp), buffer);
     }
 
-    Texture2DAtlas LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root)
+    SharedPtr<Texture2DAtlas> LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return Texture2DAtlas({width, height, cellWidth, cellHeight, bpp}, buffer);
+        return CreateSharedPtr<Texture2DAtlas>(TextureAtlasProperties(width, height, cellWidth, cellHeight, bpp), buffer);
     }
 }

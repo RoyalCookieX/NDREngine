@@ -44,27 +44,20 @@ namespace NDR
     class Texture
     {
     public:
-        virtual ~Texture() { }
+        virtual ~Texture() = default;
 
         virtual RendererID GetRendererID() const = 0;
-
-        bool operator==(const Texture& other) const;
-        bool operator!=(const Texture& other) const;
     };
 
     class Texture2D : public Texture
     {
     public:
-        Texture2D();
         Texture2D(const TextureProperties& properties);
         Texture2D(const TextureProperties& properties, uint8_t* buffer);
         virtual ~Texture2D() override;
 
         Texture2D(const Texture2D&) = delete;
         Texture2D& operator=(const Texture2D&) = delete;
-
-        Texture2D(Texture2D&& other) noexcept;
-        Texture2D& operator=(Texture2D&& other) noexcept;
 
         virtual uint32_t GetRendererID() const override { return _rendererID; }
 
@@ -76,15 +69,12 @@ namespace NDR
     class Texture2DAtlas : public Texture
     {
     public:
-        Texture2DAtlas();
         Texture2DAtlas(const TextureAtlasProperties& properties);
         Texture2DAtlas(const TextureAtlasProperties& properties, uint8_t* buffer);
+        virtual ~Texture2DAtlas() override; 
 
         Texture2DAtlas(const Texture&) = delete;
         Texture2DAtlas& operator=(const Texture2DAtlas&) = delete;
-
-        Texture2DAtlas(Texture2DAtlas&& other) noexcept;
-        Texture2DAtlas& operator=(Texture2DAtlas&& other) noexcept;
 
         virtual uint32_t GetRendererID() const override { return _rendererID; }
         virtual std::array<float, 8> GetUVs(uint32_t x, uint32_t y) const;

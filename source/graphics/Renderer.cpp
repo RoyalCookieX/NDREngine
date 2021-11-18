@@ -28,60 +28,66 @@ namespace NDR
     struct LineRendererData
     {
     public:
-        VertexArray vertexArray;
-        Shader shader;
+        void Initalize()
+        {
+            vertexArray = CreateSharedPtr<VertexArray>();
+            shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+        }
+        
+        SharedPtr<VertexArray> vertexArray;
+        SharedPtr<Shader> shader;
     };
 
-    inline LineRendererData sLineRendererData;
+    static LineRendererData sLineRendererData;
     
-    static void BindVertexBuffer(const VertexBuffer& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.GetRendererID()); }
-    static void BindIndexBuffer(const IndexBuffer& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.GetRendererID()); }
-    static void BindVertexArray(const VertexArray& vertexArray)
+    static void BindVertexBuffer(const SharedPtr<VertexBuffer>& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID()); }
+    static void BindIndexBuffer(const SharedPtr<IndexBuffer>& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer->GetRendererID()); }
+    static void BindVertexArray(const SharedPtr<VertexArray>& vertexArray)
     {
-        glBindVertexArray(vertexArray.GetRendererID());
-        BindVertexBuffer(vertexArray.GetVertexBuffer());
+        glBindVertexArray(vertexArray->GetRendererID());
+        BindVertexBuffer(vertexArray->GetVertexBuffer(0));
     }
-    static void BindShader(const Shader& shader) { glUseProgram(shader.GetRendererID()); }
-    static void BindTexture(const Texture& texture, uint32_t slot = 0)
+    static void BindShader(const SharedPtr<Shader>& shader) { glUseProgram(shader->GetRendererID()); }
+    static void BindTexture(const SharedPtr<Texture>& texture, uint32_t slot = 0)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, texture.GetRendererID());
+        glBindTexture(GL_TEXTURE_2D, texture->GetRendererID());
     }
-    static void BindMaterial(const Material& material)
+    static void BindMaterial(const SharedPtr<Material>& material)
     {
         // bind textures
-        auto it = material.GetBoundTextures().begin();
-        for(size_t i = 0; i < material.GetBoundTextures().size(); i++)
+        auto it = material->GetBoundTextures().begin();
+        for(size_t i = 0; i < material->GetBoundTextures().size(); i++)
         {
-            BindTexture(*it->second, i);
-            material.SetTexture(it->first, *it->second);
+            BindTexture(it->second, i);
+            material->SetTexture(it->first, it->second);
             ++it;
         }
         
         // set material flags
         // cull face
-        if(material.HasFlags(ENABLECULLING))
+        if(material->HasFlags(ENABLECULLING))
         {
             glEnable(GL_CULL_FACE);
-            if(material.HasFlags(CULLBACK))
+            if(material->HasFlags(CULLBACK))
                 glCullFace(GL_BACK);
-            else if(material.HasFlags(CULLFRONT))
+            else if(material->HasFlags(CULLFRONT))
                 glCullFace(GL_FRONT);
         }
         else glDisable(GL_CULL_FACE);
 
         // blending
-        if(material.HasFlags(ENABLEBLENDING))
+        if(material->HasFlags(ENABLEBLENDING))
         {
             glEnable(GL_BLEND);
-            if(material.HasFlags(OPAQUE))
+            if(material->HasFlags(OPAQUE))
                 glDisable(GL_BLEND);
-            else if(material.HasFlags(TRANSPARENT))
+            else if(material->HasFlags(TRANSPARENT))
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
         else glDisable(GL_BLEND);
 
-        BindShader(material.GetShader());
+        BindShader(material->GetShader());
     }
 
     void Renderer::Initialize()
@@ -100,12 +106,12 @@ namespace NDR
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
+        sLineRendererData.Initalize();
         VertexLayout lineLayout;
         lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
-        VertexBuffer lineVertexBuffer(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
-        sLineRendererData.vertexArray = VertexArray(std::move(lineVertexBuffer));
-        sLineRendererData.shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+        SharedPtr<VertexBuffer> lineVertexBuffer = CreateSharedPtr<VertexBuffer>(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
+        sLineRendererData.vertexArray->AddVertexBuffer(std::move(lineVertexBuffer));
 #endif
     }
 
@@ -128,26 +134,26 @@ namespace NDR
         };
         BindVertexArray(sLineRendererData.vertexArray);
         BindShader(sLineRendererData.shader);
-        sLineRendererData.vertexArray.GetVertexBuffer().SetData(0, vertices);
+        sLineRendererData.vertexArray->GetVertexBuffer()->SetData(0, vertices);
 
-        glDrawArrays(GL_LINES, 0, sLineRendererData.vertexArray.GetVertexBuffer().GetCount());
+        glDrawArrays(GL_LINES, 0, sLineRendererData.vertexArray->GetVertexBuffer()->GetCount());
     }
 
-    void Renderer::DrawTriangles(const VertexArray& vertexArray, const Material& material)
+    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<Material>& material)
     {
         BindVertexArray(vertexArray);
         BindMaterial(material);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertexArray.GetVertexBuffer().GetCount());
+        glDrawArrays(GL_TRIANGLES, 0, vertexArray->GetVertexBuffer()->GetCount());
     }
 
-    void Renderer::DrawTriangles(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Material& material)
+    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<Material>& material)
     {
         BindVertexArray(vertexArray);
         BindIndexBuffer(indexBuffer);
         BindMaterial(material);
 
-        glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::DrawBackground(const glm::vec4& color)

@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "Texture.h"
+#include "utility/Memory.h"
 
 namespace NDR
 {
@@ -22,31 +23,26 @@ namespace NDR
     class Material
     {
     public:
-        Material();
-        Material(Shader&& shader, int32_t flags = 0);
+        using BoundTextureMap = std::map<std::string, SharedPtr<Texture>>;
+        
+        Material(const SharedPtr<Shader>& shader, int32_t flags = 0);
         ~Material();
 
         Material(const Material&) = delete;
         Material& operator=(const Material&) = delete;
 
-        Material(Material&& other) noexcept;
-        Material& operator=(Material&& other) noexcept;
-
-        bool operator==(const Material& other) const;
-        bool operator!=(const Material& other) const;
-
-        std::map<std::string, const Texture*>& GetBoundTextures() { return _boundTextures; }
-        const std::map<std::string, const Texture*>& GetBoundTextures() const { return _boundTextures; }
-        Shader& GetShader() { return _shader; }
-        const Shader& GetShader() const { return _shader; }
+        BoundTextureMap& GetBoundTextures() { return _boundTextures; }
+        const BoundTextureMap& GetBoundTextures() const { return _boundTextures; }
+        SharedPtr<Shader>& GetShader() { return _shader; }
+        const SharedPtr<Shader>& GetShader() const { return _shader; }
         
         bool HasFlags(int32_t flags) const { return _flags & flags; }
         void EnableFlags(int32_t flags) { _flags = _flags | flags; }
         void DisableFlags(int32_t flags) { _flags = _flags & ~flags; }
-        void SetTexture(const std::string& textureName, const Texture& texture) const;
+        void SetTexture(const std::string& textureName, const SharedPtr<Texture>& texture) const;
     private:
-        Shader _shader;
+        SharedPtr<Shader> _shader;
         int32_t _flags;
-        mutable std::map<std::string, const Texture*> _boundTextures;
+        mutable BoundTextureMap _boundTextures;
     };
 }

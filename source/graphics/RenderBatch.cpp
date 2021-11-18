@@ -5,17 +5,8 @@
 
 namespace NDR
 {
-    RenderBatch::RenderBatch():
-        _maxElements(1),
-        _verticesPerElement(1),
-        _indicesPerElement(1),
-        _elementCount(0),
-        _indicesCount(0),
-        _maxTextureSlots(0)
-    {
-    }
-
-    RenderBatch::RenderBatch(const uint32_t maxElements, const uint32_t verticesPerElement, const uint32_t indicesPerElement, const VertexLayout& layout, Texture&& texture, Shader&& shader):
+    /*
+    RenderBatch::RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader):
         _maxElements(maxElements),
         _verticesPerElement(verticesPerElement),
         _indicesPerElement(indicesPerElement),
@@ -23,7 +14,7 @@ namespace NDR
         _indicesCount(0),
         _maxTextureSlots(0)
     {        
-        RenderBatch::Reset();
+        Reset();
 
         // TODO: Move Retrieval of Max Texture Units to a different class
         // get number of texture slots
@@ -32,14 +23,11 @@ namespace NDR
         for(int32_t i = 0; i < _maxTextureSlots; i++)
             _textureIndexes.push_back(i);
 
-        // setup vertex buffer 
-        VertexBuffer vb(_maxElements * RenderBatch::GetVerticesPerElement() * layout.GetAttributeComponentCount(), layout);
-
         // setup index buffer
         std::vector<uint32_t> indices;
-        indices.reserve(RenderBatch::GetMaxIndices());
+        indices.reserve(GetMaxIndices());
         uint32_t index = 0;
-        for (uint32_t i = 0; i < RenderBatch::GetMaxIndices(); i += 6)
+        for (uint32_t i = 0; i < GetMaxIndices(); i += 6)
         {
             indices.push_back(index + 0);
             indices.push_back(index + 1);
@@ -51,63 +39,17 @@ namespace NDR
         }
         
         // setup vertex array and index buffer
-        _va = VertexArray(std::move(vb));
-        _ib = IndexBuffer(indices);
+        _va->AddVertexBuffer(CreateSharedPtr<VertexBuffer>(_maxElements * GetVerticesPerElement() * layout.GetAttributeComponentCount(), layout));
+        _ib = CreateSharedPtr<IndexBuffer>(indices);
 
-        _defaultTexture = (Texture2D&&)texture;
-        _defaultShader = (Shader&&)shader;
-        glUseProgram(_defaultShader.GetRendererID());
-        _defaultShader.SetIntArray("u_Textures", _textureIndexes.data(), (uint32_t)_textureIndexes.size());
+        _defaultTexture = CreateSharedPtr<Texture2D>(texture);
+        _defaultShader = CreateSharedPtr<Shader>(shader);
+        glUseProgram(_defaultShader->GetRendererID());
+        _defaultShader->SetIntArray("u_Textures", _textureIndexes.data(), (uint32_t)_textureIndexes.size());
     }
 
-    RenderBatch::RenderBatch(RenderBatch&& other) noexcept
+    RenderBatch::~RenderBatch()
     {
-        _maxElements = other._maxElements;
-        _verticesPerElement = other._verticesPerElement;
-        _indicesPerElement = other._indicesPerElement;
-        _elementCount = other._elementCount;
-        _indicesCount = other._indicesCount;
-        _maxTextureSlots = other._maxTextureSlots;
-        _va = std::move(other._va);
-        _ib = std::move(other._ib);
-        _textureIndexes = std::move(other._textureIndexes);
-        _boundTextures = std::move(other._boundTextures);
-        _defaultTexture = std::move(other._defaultTexture);
-        _defaultShader = std::move(other._defaultShader);
-
-        other._maxElements = 0;
-        other._verticesPerElement = 0;
-        other._indicesPerElement = 0;
-        other._elementCount = 0;
-        other._indicesCount = 0;
-        other._maxTextureSlots = 0;
-    }
-
-    RenderBatch& RenderBatch::operator=(RenderBatch&& other) noexcept
-    {
-        if(this->_va != other._va)
-        {
-            _maxElements = other._maxElements;
-            _verticesPerElement = other._verticesPerElement;
-            _indicesPerElement = other._indicesPerElement;
-            _elementCount = other._elementCount;
-            _indicesCount = other._indicesCount;
-            _maxTextureSlots = other._maxTextureSlots;
-            _va = std::move(other._va);
-            _ib = std::move(other._ib);
-            _textureIndexes = std::move(other._textureIndexes);
-            _boundTextures = std::move(other._boundTextures);
-            _defaultTexture = std::move(other._defaultTexture);
-            _defaultShader = std::move(other._defaultShader);
-
-            other._maxElements = 0;
-            other._verticesPerElement = 0;
-            other._indicesPerElement = 0;
-            other._elementCount = 0;
-            other._indicesCount = 0;
-            other._maxTextureSlots = 0;
-        }
-        return *this;
     }
 
     void RenderBatch::Reset()
@@ -119,8 +61,8 @@ namespace NDR
 
     void RenderBatch::AddElement(std::vector<float> vertices)
     {
-        const uint64_t offset = _elementCount * GetVerticesPerElement() * _va.GetVertexBuffer().GetLayout().GetVertexSize();       
-        _va.GetVertexBuffer().SetData(offset, vertices);
+        const uint64_t offset = _elementCount * GetVerticesPerElement() * _va->GetVertexBuffer(0)->GetLayout().GetVertexSize();       
+        _va->GetVertexBuffer(0)->SetData(offset, vertices);
         _elementCount++;
         _indicesCount += GetIndiciesPerElement();
     }
@@ -149,4 +91,5 @@ namespace NDR
         }
         return texIndex;
     }
+    */
 }

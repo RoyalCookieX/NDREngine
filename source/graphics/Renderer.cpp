@@ -25,20 +25,28 @@ namespace NDR
     }
 #endif
 
-    struct LineRendererData
+    struct CameraUBOData
+    {
+        glm::mat4 projection;
+        glm::mat4 view;
+    };
+    
+    struct RendererData
     {
     public:
         void Initalize()
         {
             vertexArray = CreateSharedPtr<VertexArray>();
             shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+            
+            cameraBuffer = CreateSharedPtr<UniformBuffer>(sizeof(CameraUBOData), 0);
         }
         
         SharedPtr<VertexArray> vertexArray;
         SharedPtr<Shader> shader;
+        SharedPtr<UniformBuffer> cameraBuffer;
     };
-
-    static LineRendererData sLineRendererData;
+    static RendererData sRendererData;
     
     static void BindVertexBuffer(const SharedPtr<VertexBuffer>& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID()); }
     static void BindIndexBuffer(const SharedPtr<IndexBuffer>& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer->GetRendererID()); }
@@ -90,39 +98,55 @@ namespace NDR
         BindShader(material->GetShader());
     }
 
+    static bool sInitialized;
+
     void Renderer::Initialize()
     {
+        if(sInitialized)
+            return;
+        
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             NDR_LOGFATAL("[Renderer]: GLAD did not initalize!");
             return;
         }
+        NDR_LOGINFO("%s", glGetString(GL_VENDOR));
+        NDR_LOGINFO("%s", glGetString(GL_VERSION));
+        NDR_LOGINFO("%s", glGetString(GL_RENDERER));
 #if NDR_DEBUG
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(MessageCallback, nullptr);
-
+#endif
         //TODO: Move to material flags
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
-        sLineRendererData.Initalize();
+        sRendererData.Initalize();
         VertexLayout lineLayout;
         lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
         SharedPtr<VertexBuffer> lineVertexBuffer = CreateSharedPtr<VertexBuffer>(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
-        sLineRendererData.vertexArray->AddVertexBuffer(std::move(lineVertexBuffer));
-#endif
+        sRendererData.vertexArray->AddVertexBuffer(std::move(lineVertexBuffer));
     }
 
     void Renderer::Shutdown()
     {
-        
+        if(!sInitialized)
+            return;
     }
 
     void Renderer::Clear()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void Renderer::SetViewProjection(const glm::mat4& view, const glm::mat4& projection)
+    {
+        CameraUBOData cameraUBO;
+        cameraUBO.projection = projection;
+        cameraUBO.view = view;
+        sRendererData.cameraBuffer->SetData(0, sizeof(CameraUBOData), &cameraUBO);
     }
 
     void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
@@ -132,11 +156,11 @@ namespace NDR
             start.x, start.y, start.z, color.r, color.g, color.b, color.a,
             end.x,   end.y,   end.z,   color.r, color.g, color.b, color.a,
         };
-        BindVertexArray(sLineRendererData.vertexArray);
-        BindShader(sLineRendererData.shader);
-        sLineRendererData.vertexArray->GetVertexBuffer()->SetData(0, vertices);
+        BindVertexArray(sRendererData.vertexArray);
+        BindShader(sRendererData.shader);
+        sRendererData.vertexArray->GetVertexBuffer()->SetData(0, vertices);
 
-        glDrawArrays(GL_LINES, 0, sLineRendererData.vertexArray->GetVertexBuffer()->GetCount());
+        glDrawArrays(GL_LINES, 0, sRendererData.vertexArray->GetVertexBuffer()->GetCount());
     }
 
     void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<Material>& material)
@@ -154,6 +178,15 @@ namespace NDR
         BindMaterial(material);
 
         glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::DrawMesh(const SharedPtr<Mesh>& mesh, const Transform& transform)
+    {
+        for(uint32_t i = 0; i < mesh->GetSubMeshCount(); i++)
+        {
+            mesh->GetMaterial(i)->GetShader()->SetMat4("u_Model", transform.GetMatrix());
+            DrawTriangles(mesh->GetVertexArray(), mesh->GetIndexBuffer(i), mesh->GetMaterial(i));
+        }
     }
 
     void Renderer::DrawBackground(const glm::vec4& color)

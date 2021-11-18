@@ -1,5 +1,7 @@
 #include "ndrpch.h"
 #include "AssetManager.h"
+
+#include "Time.h"
 #include "core/Config.h"
 #include "core/Log.h"
 
@@ -55,6 +57,8 @@ namespace NDR
     // From https://github.com/tinyobjloader/tinyobjloader
     SharedPtr<Mesh> LoadMesh(const std::string& assetPath, AssetRoot root)
     {
+        float startTime = Time::GetTime();
+        
         // parse .obj file and check for warnings/errors
         tinyobj::ObjReaderConfig readerConfig;
         readerConfig.mtl_search_path = "./";
@@ -147,15 +151,18 @@ namespace NDR
                 }
                 indexOffset += verticesPerFace;
             }
-            NDR_LOGDEBUG("Index Buffer Count: %d", indices.size());
+            NDR_LOGDEBUG("Index Count: %d", indices.size());
             SharedPtr<IndexBuffer> indexBuffer = CreateSharedPtr<IndexBuffer>(indices);
             SharedPtr<Material> material = CreateSharedPtr<Material>(
                 LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
                 ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
             subMeshes.emplace_back(std::move(indexBuffer), std::move(material));
         }
-        NDR_LOGDEBUG("Vertex Buffer Count: %d", vertices.size());
+        NDR_LOGDEBUG("Vertex Count: %d", vertices.size() / layout.GetAttributeComponentCount());
         SharedPtr<VertexBuffer> vertexBuffer = CreateSharedPtr<VertexBuffer>(vertices, layout);
+        
+        float currentTime = Time::GetTime();
+        NDR_LOGDEBUG("OBJ Loaded: %f ms", (currentTime - startTime) * 1000.0f);
         return CreateSharedPtr<Mesh>(std::move(vertexBuffer), std::move(subMeshes));
     }
 

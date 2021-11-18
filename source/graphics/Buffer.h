@@ -9,7 +9,7 @@ namespace NDR
     public:
         VertexBuffer();
         VertexBuffer(uint32_t count, const VertexLayout& layout);
-        VertexBuffer(std::vector<float> vertices, const VertexLayout& layout);
+        VertexBuffer(const std::vector<float>& vertices, const VertexLayout& layout);
         ~VertexBuffer();
 
         VertexBuffer(const VertexBuffer&) = delete;
@@ -38,7 +38,7 @@ namespace NDR
     {
     public:
         IndexBuffer();
-        IndexBuffer(std::vector<uint32_t> indices);
+        IndexBuffer(const std::vector<uint32_t>& indices);
         ~IndexBuffer();
 
         IndexBuffer(const IndexBuffer&) = delete;

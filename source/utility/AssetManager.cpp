@@ -3,6 +3,17 @@
 #include "core/Config.h"
 #include "core/Log.h"
 
+namespace tinyobj
+{
+    bool operator==(const index_t& left, const index_t& right)
+    {
+        return
+        left.vertex_index == right.vertex_index &&
+        left.texcoord_index == right.texcoord_index &&
+        left.normal_index == right.normal_index;
+    }
+}
+
 namespace NDR
 {
     std::string GetAssetRootPath(const std::string& assetPath, AssetRoot root)
@@ -41,122 +52,109 @@ namespace NDR
         return Shader(sources[0].str(), sources[1].str());
     }
 
-    //TODO: Move this somewhere else
-    struct MeshIndex
-    {
-    public:
-        MeshIndex(int32_t posIndex, int32_t texIndex, int32_t nmlIndex):
-            posIndex(posIndex),
-            texIndex(texIndex),
-            nmlIndex(nmlIndex)
-        {
-        }
-        bool operator==(const MeshIndex& other) const
-        {
-            return
-            posIndex == other.posIndex &&
-            texIndex == other.texIndex &&
-            nmlIndex == other.nmlIndex;
-        }
-
-        int32_t posIndex, texIndex, nmlIndex;
-    };
-
+    // From https://github.com/tinyobjloader/tinyobjloader
     Mesh LoadMesh(const std::string& assetPath, AssetRoot root)
     {
-        tinyobj::attrib_t attributes;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
-        std::string errorMsg;
-    
-        if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(assetPath, root).c_str()))
+        // parse .obj file and check for warnings/errors
+        tinyobj::ObjReaderConfig readerConfig;
+        readerConfig.mtl_search_path = "./";
+        readerConfig.triangulate = true;
+        
+        tinyobj::ObjReader reader;
+        if(!reader.ParseFromFile(GetAssetRootPath(assetPath, root), readerConfig))
         {
-            NDR_LOGERROR("[AssetManager]: %s", errorMsg.c_str());
-            return Mesh();
+            if(!reader.Error().empty())
+                NDR_LOGERROR("[AssetManager]: %s", reader.Error());
+            if(!reader.Warning().empty())
+                NDR_LOGWARN("[AssetManager]: %s", reader.Warning());
+            return {};
         }
+
+        const tinyobj::attrib_t& assetAttributes = reader.GetAttrib();
+        const std::vector<tinyobj::shape_t>& assetShapes = reader.GetShapes();
+        const std::vector<tinyobj::material_t>& assetMaterials = reader.GetMaterials();
+        std::vector<tinyobj::index_t> meshIndexCache;
 
         VertexLayout layout;
         layout.AddAttribute({3, false}); // position
         layout.AddAttribute({2, false}); // tex coords
         layout.AddAttribute({3, false}); // normals
-        std::vector<float> verts;
+        std::vector<float> vertices;
         std::vector<SubMesh> subMeshes;
-        std::vector<MeshIndex> indexCache;
-        
-        for (auto shape : shapes)
+
+        const bool hasTexCoords = assetAttributes.texcoords.size() > 0;
+        const bool hasNormals = assetAttributes.normals.size() > 0;
+        for(size_t shapeIndex = 0; shapeIndex < assetShapes.size(); shapeIndex++)
         {
-            tinyobj::mesh_t mesh = shape.mesh;
+            size_t indexOffset = 0;
+            const tinyobj::mesh_t& mesh = assetShapes[shapeIndex].mesh;
+
             std::vector<uint32_t> indices;
-    
-            for(uint32_t i = 0; i < mesh.indices.size(); i++)
+            
+            for(size_t faceIndex = 0; faceIndex < mesh.num_face_vertices.size(); faceIndex++)
             {
-                MeshIndex meshIndex(
-                    mesh.indices[i].vertex_index,
-                    mesh.indices[i].texcoord_index,
-                    mesh.indices[i].normal_index);
-
-                auto indexLocation = std::find(indexCache.begin(), indexCache.end(), meshIndex);
-                if(indexLocation != indexCache.end())
+                size_t verticesPerFace = (size_t)mesh.num_face_vertices[faceIndex];
+                for(size_t vertexIndex = 0; vertexIndex < verticesPerFace; vertexIndex++)
                 {
-                    indices.push_back((uint32_t)std::distance(indexCache.begin(), indexLocation));
-                }
-                else
-                {
-                    const int32_t posIndex = meshIndex.posIndex;
-                    const int32_t texIndex = meshIndex.texIndex;
-                    const int32_t nmlIndex = meshIndex.nmlIndex;
-
-                    if(posIndex > -1)
+                    const tinyobj::index_t vertexAttributeIndex = mesh.indices[indexOffset + vertexIndex];
+                    const auto& indexLocation = std::find(meshIndexCache.begin(), meshIndexCache.end(), vertexAttributeIndex);
+                    if(indexLocation == meshIndexCache.end())
                     {
-                        verts.push_back(attributes.vertices[posIndex * 3 + 0]);
-                        verts.push_back(attributes.vertices[posIndex * 3 + 1]);
-                        verts.push_back(attributes.vertices[posIndex * 3 + 2]);                
-                    }
-                    else
-                    {
-                        verts.push_back(0.0f);
-                        verts.push_back(0.0f);
-                        verts.push_back(0.0f);
-                    }
-
-                    if(texIndex > -1)
-                    {
-                        verts.push_back(attributes.texcoords[texIndex * 2 + 0]);
-                        verts.push_back(attributes.texcoords[texIndex * 2 + 1]);             
-                    }
-                    else
-                    {
-                        verts.push_back(0.0f);
-                        verts.push_back(0.0f);
-                    }
-
-                    if(nmlIndex > -1)
-                    {
-                        verts.push_back(attributes.normals[nmlIndex * 3 + 0]);
-                        verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
-                        verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
-                    }
-                    else
-                    {
-                        verts.push_back(0.0f);
-                        verts.push_back(0.0f);
-                        verts.push_back(0.0f);
-                    }
+                        // add new vertex to vertexBuffer
+                        size_t posIndex = 3 * (size_t)vertexAttributeIndex.vertex_index;
+                        size_t texIndex = 2 * (size_t)vertexAttributeIndex.texcoord_index * hasTexCoords;
+                        size_t nmlIndex = 3 * (size_t)vertexAttributeIndex.normal_index * hasNormals;
                     
-                    indexCache.push_back(MeshIndex(posIndex, texIndex, nmlIndex));
-                    indices.push_back((uint32_t)indexCache.size() - 1);
-                }
-            }
+                        // position
+                        vertices.push_back(assetAttributes.vertices[posIndex + 0]);
+                        vertices.push_back(assetAttributes.vertices[posIndex + 1]);
+                        vertices.push_back(assetAttributes.vertices[posIndex + 2]);
 
+                        // tex coords
+                        if(hasTexCoords)
+                        {
+                            vertices.push_back(assetAttributes.texcoords[texIndex + 0]);
+                            vertices.push_back(assetAttributes.texcoords[texIndex + 1]);
+                        }
+                        else
+                        {
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                        }
+
+                        // normals
+                        if(hasNormals)
+                        {
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 0]);
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 1]);
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 2]);
+                        }
+                        else
+                        {
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                        }
+                        // add new indices to indexBuffer & update cache
+                        indices.push_back((uint32_t)meshIndexCache.size());
+                        meshIndexCache.push_back(vertexAttributeIndex);
+                    }
+                    else
+                    {
+                        // vertex is already defined, add that index to indexBuffer
+                        indices.push_back((uint32_t)std::distance(meshIndexCache.begin(), indexLocation));
+                    }
+                }
+                indexOffset += verticesPerFace;
+            }
+            NDR_LOGDEBUG("Index Buffer Count: %d", indices.size());
             IndexBuffer indexBuffer(indices);
-            subMeshes.emplace_back(std::move(indexBuffer), LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE));
+            Material material(LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
+                         ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
+            subMeshes.emplace_back(std::move(indexBuffer), std::move(material));
         }
-        NDR_LOGDEBUG("[AssetManager]:\n - Vertex Buffer: %d\n - Total Vertices: %d\n - Total Indices: %d",
-            verts.size(),
-            verts.size() / layout.GetAttributeComponentCount(),
-            indexCache.size());
-        
-        VertexBuffer vertexBuffer(verts, layout);
+        NDR_LOGDEBUG("Vertex Buffer Count: %d", vertices.size());
+        VertexBuffer vertexBuffer(vertices, layout);
         return Mesh(std::move(vertexBuffer), std::move(subMeshes));
     }
 

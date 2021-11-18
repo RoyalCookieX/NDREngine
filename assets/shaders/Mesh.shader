@@ -25,8 +25,8 @@ void main()
 #fragment
 #version 420 core
 
-in vec2 v_TexCoord;
-in vec3 v_Normal;
+layout(location = 0) in vec2 v_TexCoord;
+layout(location = 1) in vec3 v_Normal;
 
 uniform sampler2D u_Texture;
 

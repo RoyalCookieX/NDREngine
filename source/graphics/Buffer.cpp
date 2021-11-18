@@ -21,7 +21,7 @@ namespace NDR
         glBufferData(GL_ARRAY_BUFFER, GetSize(), nullptr, GL_DYNAMIC_DRAW);
     }
 
-    VertexBuffer::VertexBuffer(std::vector<float> vertices, const VertexLayout& layout):
+    VertexBuffer::VertexBuffer(const std::vector<float>& vertices, const VertexLayout& layout):
         _count((uint32_t)vertices.size()),
         _layout(layout)
     {
@@ -83,7 +83,7 @@ namespace NDR
     {
     }
 
-    IndexBuffer::IndexBuffer(std::vector<uint32_t> indices):
+    IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices):
         _count((uint32_t)indices.size())
     {
         glCreateBuffers(1, &_rendererID);

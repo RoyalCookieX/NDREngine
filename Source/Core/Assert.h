@@ -1,9 +1,13 @@
 #pragma once
-#include "Defines.h"
+#include "Log.h"
 
-#define NDR_ASSERT(expression, message) NDR::AssertMessage(expression, message, __FILE__, __LINE__)
+#define NDR_ASSERT(expression, message) NDR::Assert::AssertMessage(expression, message, __FILE__, __LINE__)
 
 namespace NDR
 {
-    extern void AssertMessage(bool expression, const char* format, const char* file, Int32 line);
+    class Assert
+    {
+    public:
+        static void AssertMessage(bool expression, const char* message, const char* file, Int32 line);
+    };
 }

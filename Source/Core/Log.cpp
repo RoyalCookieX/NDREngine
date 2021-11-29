@@ -3,22 +3,27 @@
 
 namespace NDR
 {
-    void LogMessage(LogLevel level, const char* format, ...)
-    {        
+    void Log::LogMessage(const char* file, Int32 line, LogLevel level, const char* message, ...)
+    {
+        // get message string
         va_list args;
-        va_start(args, format);
+        va_start(args, message);
+        const char* levelStrings[] { "[DEBUG]:   ", "[INFO]:    ", "[WARNING]: ", "[ERROR]:   ", "[FATAL]:   " };
+        const char* levelStr = levelStrings[(Int32)level];
 
-        const char* logLevels[5] { "[DEBUG] ", "[INFO] ", "[WARNING] ", "[ERROR] ", "[FATAL] " };
-        //TODO: make levelMsg and message length dynamic
-        char levelMsg[16384];
-        char message[16384];
-        std::memset(levelMsg, 0, sizeof(levelMsg));
-        std::memset(message, 0, sizeof(message));
+        std::stringstream ss;
+        ss << levelStr << message << std::endl;
+#if !defined(NDR_DISABLE_FILELINE)
+        ss << file << " @ LINE " << line << std::endl;
+#endif
+        char buffer[32000] = "";
+        vsprintf_s(buffer, sizeof(buffer), ss.str().c_str(), args);
         
-        sprintf_s(levelMsg, sizeof(levelMsg), "%s%s\n", logLevels[(Int32)level], format);
-        vsprintf_s(message, sizeof(message), levelMsg, args);
-        PrintToConsole(level, message);
-        
-        va_end(args);
+        // get console color
+        const Int32 consoleColor = LogLevelToConsoleColor(level);
+
+        // output to console
+        LogConsole(buffer, consoleColor);
     }
+
 }

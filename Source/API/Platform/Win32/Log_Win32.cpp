@@ -1,28 +1,25 @@
 #include "ndrpch.h"
-#include "core/Log.h"
+#include "Core/Log.h"
 
-#if NDR_PLATFORM_WINDOWS
 #include <Windows.h>
-#endif
 
 namespace NDR
 {
-    void PrintToConsole(LogLevel level, const char* message)
+    void Log::LogConsole(const char* message, Int32 color)
     {
-        const Int32 logColors[5] =
-        {
-            FOREGROUND_INTENSITY,                   // text grey
-            FOREGROUND_GREEN,                       // text green
-            FOREGROUND_RED | FOREGROUND_GREEN,      // text yellow
-            FOREGROUND_RED,                         // text red
-            BACKGROUND_RED                          // background red
-        };
-        
-        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-        SetConsoleTextAttribute(console, logColors[(Int32)level]);
+        const HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(consoleHandle, color);
         OutputDebugStringA(message);
-        size_t length = strlen(message);
-        LPDWORD number_written = 0;
-        WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), message, (DWORD)length, number_written, 0);
+        const USize length = strlen(message);
+        const LPDWORD number_written = nullptr;
+        WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), message, (DWORD)length, number_written, nullptr);
     }
+
+    Int32 Log::LogLevelToConsoleColor(LogLevel level)
+    {
+        static Int32 levels[5] = { 1, 2, 6, 4, 64 };
+        return levels[(Int32)level];
+    }
+
+
 }

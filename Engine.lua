@@ -1,4 +1,4 @@
-include "defines"
+include "Defines"
 
 project "Engine"
     targetname "NDREngine"
@@ -9,28 +9,28 @@ project "Engine"
     staticruntime "On"
     targetdir (TARGET_DIR)
     objdir (OBJECT_DIR)
-    pchheader "ndrpch.h"
-    pchsource "source/ndrpch.cpp"
+    pchheader "Ndrpch.h"
+    pchsource "Source/ndrpch.cpp"
     defines "NDR_GRAPHICSAPI_OPENGL"
     files
     {
-        "source/**.h", "source/**.cpp",
-        "assets/**";
+        "Source/**.h", "Source/**.cpp",
+        "Assets/**";
     }
     removefiles
     {
-        "source/ndrpch.cpp",
-        "source/platform/**.h", "source/platform/**.cpp",
+        "Source/ndrpch.cpp",
+        "Source/platform/**.h", "Source/platform/**.cpp",
     }
     includedirs
     {
-        "source",
-        "external/glad/include",
-        "external/glfw/include",
-        "external/glm/include",
-        "external/json/single_include",
-        "external/stb_image/include",
-        "external/tiny_obj_loader/include",
+        "Source",
+        "External/glad/include",
+        "External/glfw/include",
+        "External/glm/include",
+        "External/json/single_include",
+        "External/stb_image/include",
+        "External/tiny_obj_loader/include",
     }
     links
     {
@@ -44,17 +44,18 @@ project "Engine"
         defines "NDR_PLATFORM_WINDOWS"
         files 
         { 
-            "source/ndrpch.cpp",
-            "source/api/platform/*_win32.h", "source/api/platform/*_win32.cpp",
+            "Source/ndrpch.cpp",
+            "Source/API/Platform/*_win32.h", "Source/API/Platform/*_win32.cpp",
         }
     filter "platforms:x64"
         architecture "x64"
-    filter "configurations:debug"
+    filter "system:windows"
+        defines "NDR_PLATFORM_WINDOWS"
+    filter "configurations:Debug"
         defines "NDR_DEBUG"
         runtime "Debug"
         symbols "On"
-        targetsuffix "_d"
-    filter "configurations:release"
+    filter "configurations:Release"
         defines "NDR_RELEASE"
         runtime "Release"
         optimize "On"

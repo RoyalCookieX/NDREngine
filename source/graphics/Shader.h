@@ -1,4 +1,5 @@
 #pragma once
+#include "NDRTypes.h"
 
 namespace NDR
 {
@@ -43,7 +44,6 @@ namespace NDR
     class Shader
     {
     public:
-        Shader();
         Shader(const std::string& vertexSource, const std::string& fragmentSource); 
         ~Shader();
 
@@ -56,8 +56,7 @@ namespace NDR
         bool operator==(const Shader& other) const;
         bool operator!=(const Shader& other) const;
         
-        uint32_t GetProgram() const;
-        void Use() const;
+        RendererID GetRendererID() const { return _rendererID; }
 
         void SetInt(const std::string& uniformName, int32_t value) const;
         void SetIntArray(const std::string& uniformName, int32_t* value, uint32_t count) const;
@@ -71,7 +70,7 @@ namespace NDR
     private:
         int32_t GetUniformLocation(const std::string& uniformName) const;
         
-        uint32_t _program;
+        RendererID _rendererID;
         std::vector<ShaderUniform> _uniformData;
     };
 

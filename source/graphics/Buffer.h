@@ -1,4 +1,5 @@
 #pragma once
+#include "NDRTypes.h"
 #include "Layout.h"
 
 namespace NDR
@@ -6,56 +7,58 @@ namespace NDR
     class VertexBuffer
     {
     public:
-        VertexBuffer();
-        VertexBuffer(size_t count, const VertexLayout& layout);
-        VertexBuffer(std::vector<float> vertices, const VertexLayout& layout);
+        VertexBuffer(uint32_t count, const VertexLayout& layout);
+        VertexBuffer(const std::vector<float>& vertices, const VertexLayout& layout);
         ~VertexBuffer();
 
         VertexBuffer(const VertexBuffer&) = delete;
         VertexBuffer& operator=(const VertexBuffer&) = delete;
 
-        VertexBuffer(VertexBuffer&& other) noexcept;
-        VertexBuffer& operator=(VertexBuffer&& other) noexcept;
+        RendererID GetRendererID() const { return _rendererID; }
+        uint32_t GetCount() const { return _count; }
+        size_t GetSize() const { return _count * sizeof(float); }
+        VertexLayout& GetLayout() { return _layout; }
+        const VertexLayout& GetLayout() const { return _layout; }
 
-        bool operator==(const VertexBuffer& other) const;
-        bool operator!=(const VertexBuffer& other) const;
-
-        size_t GetCount() const;
-        size_t GetSize() const;
-        const VertexLayout& GetLayout() const;
-
-        void Bind() const;
-        void SetData(uint64_t offset, std::vector<float> vertices);
-        void Release();
+        void SetData(uint32_t offset, std::vector<float> vertices);
     private:
-        uint32_t _id;
-        size_t _count;
+        RendererID _rendererID;
+        uint32_t _count;
         VertexLayout _layout;
     };
 
     class IndexBuffer
     {
     public:
-        IndexBuffer();
-        IndexBuffer(std::vector<uint32_t> indices);
+        IndexBuffer(const std::vector<uint32_t>& indices);
         ~IndexBuffer();
 
         IndexBuffer(const IndexBuffer&) = delete;
         IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-        IndexBuffer(IndexBuffer&& other) noexcept;
-        IndexBuffer& operator=(IndexBuffer&& other) noexcept;
-
-        bool operator==(const IndexBuffer& other) const;
-        bool operator!=(const IndexBuffer& other) const;
-
-        size_t GetCount() const;
-        size_t GetSize() const;
-        
-        void Bind() const;
-        void Release();
+        RendererID GetRendererID() const { return _rendererID; }
+        uint32_t GetCount() const { return _count; }
+        size_t GetSize() const { return _count * sizeof(uint32_t); }
     private:
-        uint32_t _id;
-        size_t _count;
+        RendererID _rendererID;
+        uint32_t _count;
+    };
+
+    class UniformBuffer
+    {
+    public:
+        UniformBuffer(size_t size, uint32_t binding);
+        ~UniformBuffer();
+
+        UniformBuffer(const UniformBuffer&) = delete;
+        UniformBuffer& operator=(const UniformBuffer&) = delete;
+
+        RendererID GetRendererID() const { return _rendererID; }
+        size_t GetSize() const { return _size; }
+        
+        void SetData(size_t offset, size_t size, const void* data);
+    private:
+        RendererID _rendererID;
+        size_t _size;
     };
 }

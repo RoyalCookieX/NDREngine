@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "NDRTypes.h"
 #include "core/Engine.h"
 #include "core/Window.h"
 #include "core/Log.h"

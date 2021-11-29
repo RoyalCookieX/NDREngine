@@ -21,17 +21,12 @@ namespace NDR
         Framebuffer(const Framebuffer&) = delete;
         Framebuffer& operator=(const Framebuffer&) = delete;
 
-        Framebuffer(Framebuffer&& other) noexcept;
-        Framebuffer& operator=(Framebuffer&& other) noexcept;
-
         void Bind() const;
         void Unbind() const;
 
         uint32_t GetColorAttachmentID() const;
         uint32_t GetDepthAttachmentID() const;
 
-        bool operator==(const Framebuffer& other) const;
-        bool operator!=(const Framebuffer& other) const;
     private:
         uint32_t _id, _colorAttachment, _depthAttachment;
         FramebufferMode _mode;

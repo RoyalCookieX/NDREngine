@@ -1,6 +1,7 @@
 #include "ndrpch.h"
 #include "Engine.h"
 
+#include "graphics/Renderer.h"
 #include "input/Input.h"
 #include "utility/Time.h"
 
@@ -9,7 +10,7 @@ namespace NDR
     void Engine::PreInitialize()
     {
         _window = Window::Create({800, 600, "NDREngine", false});
-        _renderer = CreateUniquePtr<Renderer>();
+        Renderer::Initialize();
     }
 
     void Engine::Run()
@@ -23,9 +24,8 @@ namespace NDR
             if(Input::GetKey(NDR_KEY_ESCAPE))
                 _window->Close();
 
-            _renderer->Clear();
+            Renderer::Clear();
             Tick(Time::GetDeltaTime());
-            _renderer->Flush();
             _window->SwapBuffers();
         }
         
@@ -35,5 +35,6 @@ namespace NDR
 
     void Engine::PostShutdown()
     {
+        Renderer::Shutdown();
     }
 }

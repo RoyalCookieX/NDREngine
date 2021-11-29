@@ -4,19 +4,17 @@
 #include "Vertex.h"
 
 namespace NDR
-{    
+{
+    /*
+     *TODO: Reimplement later
     struct RenderBatch
     {
     public:
-        RenderBatch();
-        RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, Texture&& texture, Shader&& shader);
-        ~RenderBatch() { }
+        RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader);
+        ~RenderBatch();
 
         RenderBatch(const RenderBatch&) = delete;
         RenderBatch& operator=(const RenderBatch&) = delete;
-
-        RenderBatch(RenderBatch&& other) noexcept;
-        RenderBatch& operator=(RenderBatch&& other) noexcept;
 
         void Reset();
         
@@ -24,8 +22,8 @@ namespace NDR
         bool IsFull() const;
         float GetTextureIndex(Texture& texture);
 
-        const VertexArray& GetVertexArray() const { return _va; }
-        const IndexBuffer& GetIndexBuffer() const { return _ib; }
+        const SharedPtr<VertexArray>& GetVertexArray() const { return _va; }
+        const SharedPtr<IndexBuffer>& GetIndexBuffer() const { return _ib; }
         
         uint32_t GetElementCount() const { return _elementCount; }
         uint32_t GetIndicesCount() const { return _indicesCount; }
@@ -39,19 +37,20 @@ namespace NDR
         uint32_t GetBoundTextureCount() const { return (uint32_t)_boundTextures.size(); }
         int32_t GetMaxTextureSlots() const { return _maxTextureSlots; }
         Texture& GetBoundTexture(uint64_t index) { return *_boundTextures[index]; }
-        Texture2D& GetDefaultTexture() { return _defaultTexture; }
-        Shader& GetDefaultShader() { return _defaultShader; }
+        SharedPtr<Texture2D>& GetDefaultTexture() { return _defaultTexture; }
+        SharedPtr<Shader>& GetDefaultShader() { return _defaultShader; }
     private:
         uint32_t _maxElements, _verticesPerElement, _indicesPerElement;
         uint32_t _elementCount, _indicesCount;
         int32_t _maxTextureSlots;
 
-        VertexArray _va;
-        IndexBuffer _ib;
+        SharedPtr<VertexArray> _va;
+        SharedPtr<IndexBuffer> _ib;
         std::vector<int32_t> _textureIndexes;
         std::vector<Texture*> _boundTextures;
 
-        Texture2D _defaultTexture;
-        Shader _defaultShader;
+        SharedPtr<Texture2D> _defaultTexture;
+        SharedPtr<Shader> _defaultShader;
     };
+    */
 }

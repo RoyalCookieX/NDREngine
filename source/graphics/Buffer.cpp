@@ -1,136 +1,82 @@
 #include "ndrpch.h"
 #include "Buffer.h"
 
+#include "core/Log.h"
+
 namespace NDR
 {
-    VertexBuffer::VertexBuffer():
-        _id(0),
-        _count(0)
-    {
-    }
-
-    VertexBuffer::VertexBuffer(const size_t count, const VertexLayout& layout):
+    // VertexBuffer
+    VertexBuffer::VertexBuffer(const uint32_t count, const VertexLayout& layout):
         _count(count),
         _layout(layout)
     {
-        glCreateBuffers(1, &_id);
-        glBindBuffer(GL_ARRAY_BUFFER, _id);
+        glCreateBuffers(1, &_rendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, _rendererID);
         glBufferData(GL_ARRAY_BUFFER, GetSize(), nullptr, GL_DYNAMIC_DRAW);
     }
 
-    VertexBuffer::VertexBuffer(std::vector<float> vertices, const VertexLayout& layout):
-        _count(vertices.size()),
+    VertexBuffer::VertexBuffer(const std::vector<float>& vertices, const VertexLayout& layout):
+        _count((uint32_t)vertices.size()),
         _layout(layout)
     {
-        glCreateBuffers(1, &_id);
-        glBindBuffer(GL_ARRAY_BUFFER, _id);
+        glCreateBuffers(1, &_rendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, _rendererID);
         glBufferData(GL_ARRAY_BUFFER, GetSize(), vertices.data(), GL_STATIC_DRAW);
     }
 
-    VertexBuffer::~VertexBuffer() { Release(); }
-
-    VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept:
-        _id(other._id),
-        _count(other._count),
-        _layout(other._layout)
+    VertexBuffer::~VertexBuffer()
     {
-        other._id = 0;
-        other._count = 0;
-        other._layout = {};
+        glDeleteBuffers(1, &_rendererID);
+        _rendererID = 0;
+        _count = 0;
     }
 
-    VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
-    {
-        if(*this != other)
-        {
-            Release();
-            _id = other._id;
-            _count = other._count;
-            _layout = other._layout;
-
-            other._id = 0;
-            other._count = 0;
-            other._layout = {};
-        }
-        return *this;
-    }
-
-    bool VertexBuffer::operator==(const VertexBuffer& other) const { return _id == other._id; }
-    bool VertexBuffer::operator!=(const VertexBuffer& other) const { return !(*this == other); }
-    
-    size_t VertexBuffer::GetCount() const { return _count; }
-    size_t VertexBuffer::GetSize() const { return _count * sizeof(float); }
-
-    const VertexLayout& VertexBuffer::GetLayout() const { return _layout; }
-
-    void VertexBuffer::Bind() const { glBindBuffer(GL_ARRAY_BUFFER, _id); }
-
-    void VertexBuffer::SetData(const uint64_t offset, std::vector<float> vertices)
+    void VertexBuffer::SetData(const uint32_t offset, std::vector<float> vertices)
     {
 #ifdef NDR_DEBUG
         const size_t usedSize = (vertices.size() * sizeof(float)) + offset;
-        assert(("[VertexBuffer Error]: Data and Offset are invalid!", usedSize <= GetSize()));
+        if(usedSize > GetSize())
+            NDR_LOGERROR("[VertexBuffer]: Data and Offset are invalid!\n  Data + Offset: %llu\n  Buffer Size: %llu", usedSize, GetSize());
 #endif
-        glBindBuffer(GL_ARRAY_BUFFER, _id);
-        glBufferSubData(GL_ARRAY_BUFFER, offset, vertices.size() * sizeof(float), vertices.data());
+        glBindBuffer(GL_ARRAY_BUFFER, _rendererID);
+        glBufferSubData(GL_ARRAY_BUFFER, (uint64_t)offset, vertices.size() * sizeof(float), vertices.data());
     }
 
-    void VertexBuffer::Release()
+    // IndexBuffer
+    IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices):
+        _count((uint32_t)indices.size())
     {
-        glDeleteBuffers(1, &_id);
-        _id = 0;
-        _count = 0;
-    }
-
-    IndexBuffer::IndexBuffer():
-        _id(0),
-        _count(0)
-    {
-    }
-
-    IndexBuffer::IndexBuffer(std::vector<uint32_t> indices):
-        _count(indices.size())
-    {
-        glCreateBuffers(1, &_id);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _id);
+        glCreateBuffers(1, &_rendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererID);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, GetSize(), indices.data(), GL_STATIC_DRAW);
     }
 
-    IndexBuffer::~IndexBuffer() { Release(); }
-
-    IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept:
-        _id(other._id),
-        _count(other._count)
+    IndexBuffer::~IndexBuffer()
     {
-        other._id = 0;
-        other._count = 0;
-    }
-
-    IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) noexcept
-    {
-        if(*this != other)
-        {
-            Release();
-            _id = other._id;
-            _count = other._count;
-
-            other._id = 0;
-            other._count = 0;
-        }
-        return *this;
-    }
-
-    bool IndexBuffer::operator==(const IndexBuffer& other) const { return _id == other._id; }
-    bool IndexBuffer::operator!=(const IndexBuffer& other) const { return !(*this == other); }
-    
-    size_t IndexBuffer::GetCount() const { return _count; }
-    size_t IndexBuffer::GetSize() const { return _count * sizeof(uint32_t); }
-
-    void IndexBuffer::Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _id); }
-    void IndexBuffer::Release()
-    {
-        glDeleteBuffers(1, &_id);
-        _id = 0;
+        glDeleteBuffers(1, &_rendererID);
+        _rendererID = 0;
         _count = 0;
+    }
+
+    // UniformBuffer
+    UniformBuffer::UniformBuffer(size_t size, uint32_t binding):
+        _size(size)
+    {
+        glCreateBuffers(1, &_rendererID);
+        glBindBuffer(GL_UNIFORM_BUFFER, _rendererID);
+        glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+        glBindBufferRange(GL_UNIFORM_BUFFER, binding, _rendererID, 0, size);
+    }
+
+    UniformBuffer::~UniformBuffer()
+    {
+        glDeleteBuffers(1, &_rendererID);
+        _rendererID = 0;
+        _size = 0;
+    }
+
+    void UniformBuffer::SetData(size_t offset, size_t size, const void* data)
+    {
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
     }
 }

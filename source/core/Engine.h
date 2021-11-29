@@ -1,10 +1,9 @@
 #pragma once
 
 #include "core/Window.h"
-#include "graphics/Renderer.h"
 #include "utility/Memory.h"
 
-namespace NDR 
+namespace NDR
 {
     class Engine
     {
@@ -19,14 +18,11 @@ namespace NDR
 
         UniquePtr<Window>& GetWindow() { return _window; }
         const UniquePtr<Window>& GetWindow() const { return _window; }
-        UniquePtr<Renderer>& GetRenderer() { return _renderer; }
-        const UniquePtr<Renderer>& GetRenderer() const { return _renderer; }
     
     private:
         void PreInitialize();
         void PostShutdown();
     
         UniquePtr<Window> _window;
-        UniquePtr<Renderer> _renderer;
     };
 }

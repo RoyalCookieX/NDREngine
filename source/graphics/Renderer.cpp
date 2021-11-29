@@ -1,14 +1,12 @@
 #include "ndrpch.h"
 #include "Renderer.h"
 
-#include "Primitives.h"
 #include "core/Log.h"
 #include "utility/AssetManager.h"
 
 namespace NDR
-{   
-#ifdef NDR_DEBUG
-    // from https://www.khronos.org/opengl/wiki/OpenGL_Error
+{
+#if NDR_DEBUG
     inline void
     MessageCallback( GLenum source,
                      GLenum type,
@@ -27,129 +25,185 @@ namespace NDR
     }
 #endif
 
-    Renderer::Renderer():
-        _viewProj(glm::mat4(1.0f))
+    struct CameraUBOData
     {
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        glm::mat4 projection;
+        glm::mat4 view;
+    };
+    
+    struct RendererData
+    {
+    public:
+        void Initalize()
         {
-            NDR_LOGFATAL("[GLAD] GLAD did not initialize!\n");
+            initialized = true;
+            vertexArray = CreateSharedPtr<VertexArray>();
+            shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+            
+            cameraBuffer = CreateSharedPtr<UniformBuffer>(sizeof(CameraUBOData), 0);
+        }
+
+        void Shutdown()
+        {
+            initialized = false;
+        }
+
+        bool initialized;
+        
+        SharedPtr<VertexArray> vertexArray;
+        SharedPtr<Shader> shader;
+        SharedPtr<UniformBuffer> cameraBuffer;
+    };
+    static RendererData sRendererData;
+    
+    static void BindVertexBuffer(const SharedPtr<VertexBuffer>& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID()); }
+    static void BindIndexBuffer(const SharedPtr<IndexBuffer>& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer->GetRendererID()); }
+    static void BindVertexArray(const SharedPtr<VertexArray>& vertexArray)
+    {
+        glBindVertexArray(vertexArray->GetRendererID());
+        for(uint32_t i = 0; i < vertexArray->GetVertexBufferCount(); i++)
+            BindVertexBuffer(vertexArray->GetVertexBuffer(i));
+    }
+    static void BindShader(const SharedPtr<Shader>& shader) { glUseProgram(shader->GetRendererID()); }
+    static void BindTexture(const SharedPtr<Texture>& texture, uint32_t slot = 0)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, texture->GetRendererID());
+    }
+    static void BindMaterial(const SharedPtr<Material>& material)
+    {
+        // bind textures
+        auto it = material->GetBoundTextures().begin();
+        for(size_t i = 0; i < material->GetBoundTextures().size(); i++)
+        {
+            BindTexture(it->second, i);
+            material->SetTexture(it->first, it->second);
+            ++it;
+        }
+        
+        // set material flags
+        // cull face
+        if(material->HasFlags(ENABLECULLING))
+        {
+            glEnable(GL_CULL_FACE);
+            if(material->HasFlags(CULLBACK))
+                glCullFace(GL_BACK);
+            else if(material->HasFlags(CULLFRONT))
+                glCullFace(GL_FRONT);
+        }
+        else glDisable(GL_CULL_FACE);
+
+        // blending
+        if(material->HasFlags(ENABLEBLENDING))
+        {
+            glEnable(GL_BLEND);
+            if(material->HasFlags(OPAQUE))
+                glDisable(GL_BLEND);
+            else if(material->HasFlags(TRANSPARENT))
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        else glDisable(GL_BLEND);
+
+        BindShader(material->GetShader());
+    }
+
+    void Renderer::Initialize()
+    {
+        if(sRendererData.initialized)
+            return;
+        
+        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            NDR_LOGFATAL("[Renderer]: GLAD did not initalize!");
             return;
         }
-#ifdef NDR_DEBUG
+        NDR_LOGINFO("%s", glGetString(GL_VENDOR));
+        NDR_LOGINFO("%s", glGetString(GL_VERSION));
+        NDR_LOGINFO("%s", glGetString(GL_RENDERER));
+#if NDR_DEBUG
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(MessageCallback, nullptr);
 #endif
-        // Depth Testing
+        //TODO: Move to material flags
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
-        VertexLayout quadLayout;
-        quadLayout.AddAttribute({3, false}); // position
-        quadLayout.AddAttribute({4, false}); // color
-        quadLayout.AddAttribute({2, false}); // texCoords
-        quadLayout.AddAttribute({1, false}); // texIndex
-        _quadBatch = RenderBatch(1024, 4, 6, quadLayout, Texture2D({1, 1, 1}), LoadShader("assets/shaders/Quad.shader", AssetRoot::ENGINE));
-        
+        sRendererData.Initalize();
         VertexLayout lineLayout;
         lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
-        VertexBuffer linevb(2 * lineLayout.GetAttributeComponentCount(), lineLayout);
-        _lineVertexArray = VertexArray(std::move(linevb));
-        _lineShader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+        SharedPtr<VertexBuffer> lineVertexBuffer = CreateSharedPtr<VertexBuffer>(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
+        sRendererData.vertexArray->AddVertexBuffer(std::move(lineVertexBuffer));
     }
 
-    Renderer::~Renderer() { }
-
-    void Renderer::Clear() const { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
-
-    void Renderer::DrawMesh(const Mesh& mesh)
+    void Renderer::Shutdown()
     {
-        mesh.GetVertexArray().Bind();
-        for(uint32_t i = 0; i < mesh.GetSubMeshCount(); i++)
+        if(!sRendererData.initialized)
+            return;
+        sRendererData.Shutdown();
+    }
+
+    void Renderer::Clear()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void Renderer::SetViewProjection(const glm::mat4& view, const glm::mat4& projection)
+    {
+        CameraUBOData cameraUBO;
+        cameraUBO.projection = projection;
+        cameraUBO.view = view;
+        sRendererData.cameraBuffer->SetData(0, sizeof(CameraUBOData), &cameraUBO);
+    }
+
+    void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color, const float width)
+    {
+        std::vector<float> vertices
         {
-            mesh.GetIndexBuffer(i).Bind();
-            mesh.GetMaterial(i).Use();
-            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.GetIndexBuffer(i).GetCount(), GL_UNSIGNED_INT, nullptr);
+            start.x, start.y, start.z, color.r, color.g, color.b, color.a,
+            end.x,   end.y,   end.z,   color.r, color.g, color.b, color.a,
+        };
+        BindVertexArray(sRendererData.vertexArray);
+        BindShader(sRendererData.shader);
+        sRendererData.vertexArray->GetVertexBuffer()->SetData(0, vertices);
+
+        glLineWidth(width);
+        glDrawArrays(GL_LINES, 0, sRendererData.vertexArray->GetVertexBuffer()->GetCount());
+    }
+
+    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<Material>& material)
+    {
+        BindVertexArray(vertexArray);
+        BindMaterial(material);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertexArray->GetVertexBuffer()->GetCount());
+    }
+
+    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<Material>& material)
+    {
+        BindVertexArray(vertexArray);
+        BindIndexBuffer(indexBuffer);
+        BindMaterial(material);
+
+        glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::DrawMesh(const SharedPtr<Mesh>& mesh, const Transform& transform)
+    {
+        BindVertexArray(mesh->GetVertexArray());
+        for(uint32_t i = 0; i < mesh->GetSubMeshCount(); i++)
+        {
+            mesh->GetMaterial(i)->GetShader()->SetMat4("u_Model", transform.GetMatrix());
+            BindIndexBuffer(mesh->GetIndexBuffer(i));
+            BindMaterial(mesh->GetMaterial(i));
+
+            glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer(i)->GetCount(), GL_UNSIGNED_INT, nullptr);
         }
     }
 
-    void Renderer::DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Shader& shader)
+    void Renderer::DrawBackground(const glm::vec4& color)
     {
-        vertexArray.Bind();
-        indexBuffer.Bind();
-        shader.Use();
-        glDrawElements(GL_TRIANGLES, (GLsizei)indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+        glClearColor(color.r, color.g, color.b, color.a);
     }
-
-    void Renderer::DrawElements(const VertexArray& vertexArray, const IndexBuffer& indexBuffer, const Material& material)
-    {
-        DrawElements(vertexArray, indexBuffer, material.GetShader());
-    }
-
-    void Renderer::SetViewProj(const glm::mat4& viewProj)
-    {
-        _viewProj = viewProj;
-        //TODO: Create Uniform Buffer Class
-        _quadBatch.GetDefaultShader().Use();
-        _quadBatch.GetDefaultShader().SetMat4("u_ViewProj", _viewProj);
-        _lineShader.Use();
-        _lineShader.SetMat4("u_ViewProj", _viewProj);
-    }
-
-    void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
-    {        
-        const std::vector<float> vertices = CreateLine(start, end, color);
-
-        _lineVertexArray.GetVertexBuffer().SetData(0, vertices);
-        _lineVertexArray.Bind();
-        _lineShader.Use();
-        
-        glDrawArrays(GL_LINES, 0, (GLsizei)vertices.size());
-    }
-
-    void Renderer::DrawQuad(const Transform& transform, const glm::vec4& color) { DrawQuad(transform, _quadBatch.GetDefaultTexture(), color); }
-    void Renderer::DrawQuad(const Transform& transform, Texture2D& texture, const glm::vec4& color)
-    {
-        if(_quadBatch.IsFull())
-            Flush();
-        
-        const std::array<float, 8> uvs
-        {
-           0.0f, 0.0f,
-           1.0f, 0.0f,
-           1.0f, 1.0f,
-           0.0f, 1.0f,
-        };
-        const float texIndex = _quadBatch.GetTextureIndex(texture);
-        const std::vector<float> vertices = CreateQuad(transform.GetMatrix(), uvs, color, texIndex);
-
-        _quadBatch.AddElement(vertices);
-    }
-
-    void Renderer::DrawQuad(const Transform& transform, Texture2DAtlas& textureAtlas, const int32_t x, const int32_t y, const glm::vec4& color)
-    {
-        if(_quadBatch.IsFull())
-            Flush();
-        
-        const std::array<float, 8> uvs = textureAtlas.GetUVs(x, y);
-        const float texIndex = _quadBatch.GetTextureIndex(textureAtlas);
-        const std::vector<float> vertices = CreateQuad(transform.GetMatrix(), uvs, color, texIndex);
-
-        _quadBatch.AddElement(vertices);
-    }
-
-    void Renderer::Flush()
-    {
-        if(_quadBatch.GetIndicesCount() <= 0)
-            return;
-        
-        for(uint32_t i = 0; i < _quadBatch.GetBoundTextureCount(); i++)
-            _quadBatch.GetBoundTexture(i).Bind(i);
-    
-        DrawElements(_quadBatch.GetVertexArray(), _quadBatch.GetIndexBuffer(), _quadBatch.GetDefaultShader());
-        _quadBatch.Reset();
-    }
-
-    void Renderer::DrawBackground(const glm::vec4& color) const { glClearColor(color.r, color.g, color.b, color.a); }
 }

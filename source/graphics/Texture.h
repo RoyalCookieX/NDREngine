@@ -1,4 +1,5 @@
 #pragma once
+#include "NDRTypes.h"
 
 namespace NDR
 {
@@ -43,19 +44,14 @@ namespace NDR
     class Texture
     {
     public:
-        virtual ~Texture() { }
+        virtual ~Texture() = default;
 
-        virtual uint32_t GetTextureID() const = 0;
-        virtual void Bind(uint32_t slot = 0) const = 0;
-
-        bool operator==(const Texture& other) const;
-        bool operator!=(const Texture& other) const;
+        virtual RendererID GetRendererID() const = 0;
     };
 
     class Texture2D : public Texture
     {
     public:
-        Texture2D();
         Texture2D(const TextureProperties& properties);
         Texture2D(const TextureProperties& properties, uint8_t* buffer);
         virtual ~Texture2D() override;
@@ -63,36 +59,28 @@ namespace NDR
         Texture2D(const Texture2D&) = delete;
         Texture2D& operator=(const Texture2D&) = delete;
 
-        Texture2D(Texture2D&& other) noexcept;
-        Texture2D& operator=(Texture2D&& other) noexcept;
-
-        virtual uint32_t GetTextureID() const override;
-        virtual void Bind(uint32_t slot) const override;
+        virtual uint32_t GetRendererID() const override { return _rendererID; }
 
     private:
-        uint32_t _id;
+        RendererID _rendererID;
         TextureProperties _properties;
     };
 
     class Texture2DAtlas : public Texture
     {
     public:
-        Texture2DAtlas();
         Texture2DAtlas(const TextureAtlasProperties& properties);
         Texture2DAtlas(const TextureAtlasProperties& properties, uint8_t* buffer);
+        virtual ~Texture2DAtlas() override; 
 
         Texture2DAtlas(const Texture&) = delete;
         Texture2DAtlas& operator=(const Texture2DAtlas&) = delete;
 
-        Texture2DAtlas(Texture2DAtlas&& other) noexcept;
-        Texture2DAtlas& operator=(Texture2DAtlas&& other) noexcept;
-
+        virtual uint32_t GetRendererID() const override { return _rendererID; }
         virtual std::array<float, 8> GetUVs(uint32_t x, uint32_t y) const;
-        virtual uint32_t GetTextureID() const override;
-        virtual void Bind(uint32_t slot) const override;
 
     private:
-        uint32_t _id;
+        RendererID _rendererID;
         TextureAtlasProperties _properties;
     };
 }

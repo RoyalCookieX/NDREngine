@@ -1,6 +1,20 @@
 #include "ndrpch.h"
 #include "AssetManager.h"
+
+#include "Time.h"
 #include "core/Config.h"
+#include "core/Log.h"
+
+namespace tinyobj
+{
+    bool operator==(const index_t& left, const index_t& right)
+    {
+        return
+        left.vertex_index == right.vertex_index &&
+        left.texcoord_index == right.texcoord_index &&
+        left.normal_index == right.normal_index;
+    }
+}
 
 namespace NDR
 {
@@ -17,7 +31,7 @@ namespace NDR
         return ss.str();
     }
 
-    Shader LoadShader(const std::string& assetPath, AssetRoot root)
+    SharedPtr<Shader> LoadShader(const std::string& assetPath, AssetRoot root)
     {
         int index = -1;
         std::string line;
@@ -37,71 +51,134 @@ namespace NDR
             else if(index != -1)
                 sources[index] << line << std::endl;
         }
-        return Shader(sources[0].str(), sources[1].str());
+        return CreateSharedPtr<Shader>(sources[0].str(), sources[1].str());
     }
 
-    // Mesh LoadMesh(const std::string& assetPath, AssetRoot root)
-    // {
-    //     tinyobj::attrib_t attributes;
-    //     std::vector<tinyobj::shape_t> shapes;
-    //     std::vector<tinyobj::material_t> materials;
-    //     std::string errorMsg;
-    //
-    //     if(!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorMsg, GetAssetRootPath(assetPath, root).c_str()))
-    //     {
-    //         std::cout << "[Tiny OBJ Loader Error]: " << errorMsg;
-    //         return Mesh();
-    //     }
-    //     
-    //     tinyobj::mesh_t mesh = shapes[0].mesh;
-    //     std::unordered_set<uint32_t> indexCache;
-    //     std::vector<float> verts;
-    //     std::vector<uint32_t> indices;
-    //
-    //     for(uint32_t i = 0; i < mesh.indices.size(); i++)
-    //     {
-    //         tinyobj::index_t index = mesh.indices[i];
-    //         const int posIndex = index.vertex_index;
-    //         const int texIndex = index.texcoord_index;
-    //         const int nmlIndex = index.normal_index;
-    //
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 0]);
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 1]);
-    //         verts.push_back(attributes.vertices[posIndex * 3 + 2]);
-    //
-    //         verts.push_back(attributes.texcoords[texIndex * 2 + 0]);
-    //         verts.push_back(attributes.texcoords[texIndex * 2 + 1]);
-    //
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 0]);
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 1]);
-    //         verts.push_back(attributes.normals[nmlIndex * 3 + 2]);
-    //     }
-    //
-    //     VertexLayout layout;
-    //     layout
-    //     .AddAttribute({3, false})  // position
-    //     .AddAttribute({2, false})  // tex coords
-    //     .AddAttribute({3, false}); // normals
-    //     VertexBuffer vb(verts, layout);
-    //     IndexBuffer ib(indices);
-    //     VertexArray vertexArray(std::move(vb), std::move(ib));        
-    //
-    //     return Mesh(std::move(vertexArray), LoadShader("assets/shaders/Cube.shader"));
-    // }
+    // From https://github.com/tinyobjloader/tinyobjloader
+    SharedPtr<Mesh> LoadMesh(const std::string& assetPath, AssetRoot root)
+    {
+        float startTime = Time::GetTime();
+        
+        // parse .obj file and check for warnings/errors
+        tinyobj::ObjReaderConfig readerConfig;
+        readerConfig.mtl_search_path = "./";
+        readerConfig.triangulate = true;
+        
+        tinyobj::ObjReader reader;
+        if(!reader.ParseFromFile(GetAssetRootPath(assetPath, root), readerConfig))
+        {
+            if(!reader.Error().empty())
+                NDR_LOGERROR("[AssetManager]: %s", reader.Error());
+            if(!reader.Warning().empty())
+                NDR_LOGWARN("[AssetManager]: %s", reader.Warning());
+            return {};
+        }
 
-    Texture2D LoadTexture2D(const std::string& assetPath, AssetRoot root)
+        const tinyobj::attrib_t& assetAttributes = reader.GetAttrib();
+        const std::vector<tinyobj::shape_t>& assetShapes = reader.GetShapes();
+        const std::vector<tinyobj::material_t>& assetMaterials = reader.GetMaterials();
+        std::vector<tinyobj::index_t> meshIndexCache;
+
+        VertexLayout layout;
+        layout.AddAttribute({3, false}); // position
+        layout.AddAttribute({2, false}); // tex coords
+        layout.AddAttribute({3, false}); // normals
+        std::vector<float> vertices;
+        std::vector<SubMesh> subMeshes;
+
+        const bool hasTexCoords = assetAttributes.texcoords.size() > 0;
+        const bool hasNormals = assetAttributes.normals.size() > 0;
+        for(size_t shapeIndex = 0; shapeIndex < assetShapes.size(); shapeIndex++)
+        {
+            size_t indexOffset = 0;
+            const tinyobj::mesh_t& mesh = assetShapes[shapeIndex].mesh;
+
+            std::vector<uint32_t> indices;
+            
+            for(size_t faceIndex = 0; faceIndex < mesh.num_face_vertices.size(); faceIndex++)
+            {
+                size_t verticesPerFace = (size_t)mesh.num_face_vertices[faceIndex];
+                for(size_t vertexIndex = 0; vertexIndex < verticesPerFace; vertexIndex++)
+                {
+                    const tinyobj::index_t vertexAttributeIndex = mesh.indices[indexOffset + vertexIndex];
+                    const auto& indexLocation = std::find(meshIndexCache.begin(), meshIndexCache.end(), vertexAttributeIndex);
+                    if(indexLocation == meshIndexCache.end())
+                    {
+                        // add new vertex to vertexBuffer
+                        size_t posIndex = 3 * (size_t)vertexAttributeIndex.vertex_index;
+                        size_t texIndex = 2 * (size_t)vertexAttributeIndex.texcoord_index * hasTexCoords;
+                        size_t nmlIndex = 3 * (size_t)vertexAttributeIndex.normal_index * hasNormals;
+                    
+                        // position
+                        vertices.push_back(assetAttributes.vertices[posIndex + 0]);
+                        vertices.push_back(assetAttributes.vertices[posIndex + 1]);
+                        vertices.push_back(assetAttributes.vertices[posIndex + 2]);
+
+                        // tex coords
+                        if(hasTexCoords)
+                        {
+                            vertices.push_back(assetAttributes.texcoords[texIndex + 0]);
+                            vertices.push_back(assetAttributes.texcoords[texIndex + 1]);
+                        }
+                        else
+                        {
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                        }
+
+                        // normals
+                        if(hasNormals)
+                        {
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 0]);
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 1]);
+                            vertices.push_back(assetAttributes.normals[nmlIndex + 2]);
+                        }
+                        else
+                        {
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                            vertices.push_back(0.0f);
+                        }
+                        // add new indices to indexBuffer & update cache
+                        indices.push_back((uint32_t)meshIndexCache.size());
+                        meshIndexCache.push_back(vertexAttributeIndex);
+                    }
+                    else
+                    {
+                        // vertex is already defined, add that index to indexBuffer
+                        indices.push_back((uint32_t)std::distance(meshIndexCache.begin(), indexLocation));
+                    }
+                }
+                indexOffset += verticesPerFace;
+            }
+            NDR_LOGDEBUG("Index Count: %d", indices.size());
+            SharedPtr<IndexBuffer> indexBuffer = CreateSharedPtr<IndexBuffer>(indices);
+            SharedPtr<Material> material = CreateSharedPtr<Material>(
+                LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
+                ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
+            subMeshes.emplace_back(std::move(indexBuffer), std::move(material));
+        }
+        NDR_LOGDEBUG("Vertex Count: %d", vertices.size() / layout.GetAttributeComponentCount());
+        SharedPtr<VertexBuffer> vertexBuffer = CreateSharedPtr<VertexBuffer>(vertices, layout);
+        
+        float currentTime = Time::GetTime();
+        NDR_LOGDEBUG("OBJ Loaded: %f ms", (currentTime - startTime) * 1000.0f);
+        return CreateSharedPtr<Mesh>(std::move(vertexBuffer), std::move(subMeshes));
+    }
+
+    SharedPtr<Texture2D> LoadTexture2D(const std::string& assetPath, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return Texture2D({width, height, bpp}, buffer);
+        return CreateSharedPtr<Texture2D>(TextureProperties(width, height, bpp), buffer);
     }
 
-    Texture2DAtlas LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root)
+    SharedPtr<Texture2DAtlas> LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return Texture2DAtlas({width, height, cellWidth, cellHeight, bpp}, buffer);
+        return CreateSharedPtr<Texture2DAtlas>(TextureAtlasProperties(width, height, cellWidth, cellHeight, bpp), buffer);
     }
 }

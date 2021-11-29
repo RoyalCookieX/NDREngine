@@ -4,7 +4,7 @@
 #if NDR_DEBUG
 #define NDR_LOGDEBUG(message, ...) NDR::LogMessage(NDR::LogLevel::NDRDEBUG, message, __VA_ARGS__)
 #else
-#define NDR_LOGDEBUG()
+#define NDR_LOGDEBUG(message, ...)
 #endif
 #define NDR_LOGINFO(message, ...) NDR::LogMessage(NDR::LogLevel::NDRINFO, message, __VA_ARGS__)
 #define NDR_LOGWARN(message, ...) NDR::LogMessage(NDR::LogLevel::NDRWARN, message, __VA_ARGS__)

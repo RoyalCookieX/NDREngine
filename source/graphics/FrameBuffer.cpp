@@ -1,5 +1,6 @@
 #include "ndrpch.h"
 #include "Framebuffer.h"
+#include "core/Assert.h"
 
 namespace NDR
 {
@@ -36,49 +37,11 @@ namespace NDR
         glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, _width, _height);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthAttachment, 0);
 
-        assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+        NDR_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     Framebuffer::~Framebuffer() { glDeleteFramebuffers(1, &_id); }
-
-    Framebuffer::Framebuffer(Framebuffer&& other) noexcept:
-        _id(other._id),
-        _colorAttachment(other._colorAttachment),
-        _depthAttachment(other._depthAttachment),
-        _mode(other._mode),
-        _width(other._width),
-        _height(other._height)
-    {
-        other._id = 0;
-        other._colorAttachment = 0;
-        other._depthAttachment = 0;
-        other._width = 0;
-        other._height = 0;
-    }
-
-    Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept
-    {
-        if(*this != other)
-        {
-            _id = other._id;
-            _colorAttachment = other._colorAttachment;
-            _depthAttachment = other._depthAttachment;
-            _mode = other._mode;
-            _width = other._width;
-            _height = other._height;
-
-            other._id = 0;
-            other._colorAttachment = 0;
-            other._depthAttachment = 0;
-            other._width = 0;
-            other._height = 0;
-        }
-        return *this;
-    }
-
-    bool Framebuffer::operator==(const Framebuffer& other) const { return _id == other._id; }
-    bool Framebuffer::operator!=(const Framebuffer& other) const { return !(*this == other); }
 
     void Framebuffer::Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, _id); }
     void Framebuffer::Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }

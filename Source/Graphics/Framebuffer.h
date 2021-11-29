@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 
 namespace NDR
 {
@@ -15,7 +16,7 @@ namespace NDR
     {
     public:
         Framebuffer();
-        Framebuffer(const FramebufferMode& mode, int32_t width, int32_t height);
+        Framebuffer(const FramebufferMode& mode, Int32 width, Int32 height);
         ~Framebuffer();
 
         Framebuffer(const Framebuffer&) = delete;
@@ -24,12 +25,12 @@ namespace NDR
         void Bind() const;
         void Unbind() const;
 
-        uint32_t GetColorAttachmentID() const;
-        uint32_t GetDepthAttachmentID() const;
+        UInt32 GetColorAttachmentID() const;
+        UInt32 GetDepthAttachmentID() const;
 
     private:
-        uint32_t _id, _colorAttachment, _depthAttachment;
+        UInt32 _id, _colorAttachment, _depthAttachment;
         FramebufferMode _mode;
-        int32_t _width, _height;
+        Int32 _width, _height;
     };
 }

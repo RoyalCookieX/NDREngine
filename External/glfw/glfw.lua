@@ -37,9 +37,9 @@ project "glfw"
             "_GLFW_WIN32",
             "_CRT_SECURE_NO_WARNINGS"
         }
-    filter "configurations:debug"
+    filter "configurations:Debug"
         runtime "Debug"
         symbols "On"
-    filter "configurations:release"
+    filter "configurations:Release"
         runtime "Release"
         optimize "On"

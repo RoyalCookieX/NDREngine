@@ -1,6 +1,12 @@
 #include "ndrpch.h"
 #include "Renderer.h"
 
+#include "Buffer.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Vertex.h"
 #include "core/Log.h"
 #include "utility/AssetManager.h"
 
@@ -37,10 +43,10 @@ namespace NDR
         void Initalize()
         {
             initialized = true;
-            vertexArray = CreateSharedPtr<VertexArray>();
-            shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
+            vertexArray = CreateShared<VertexArray>();
+            shader = LoadShader("Assets/Shaders/Line.shader", AssetRoot::ENGINE);
             
-            cameraBuffer = CreateSharedPtr<UniformBuffer>(sizeof(CameraUBOData), 0);
+            cameraBuffer = CreateShared<UniformBuffer>(sizeof(CameraUBOData), 0);
         }
 
         void Shutdown()
@@ -50,27 +56,27 @@ namespace NDR
 
         bool initialized;
         
-        SharedPtr<VertexArray> vertexArray;
-        SharedPtr<Shader> shader;
-        SharedPtr<UniformBuffer> cameraBuffer;
+        SPointer<VertexArray> vertexArray;
+        SPointer<Shader> shader;
+        SPointer<UniformBuffer> cameraBuffer;
     };
     static RendererData sRendererData;
     
-    static void BindVertexBuffer(const SharedPtr<VertexBuffer>& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID()); }
-    static void BindIndexBuffer(const SharedPtr<IndexBuffer>& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer->GetRendererID()); }
-    static void BindVertexArray(const SharedPtr<VertexArray>& vertexArray)
+    void BindVertexBuffer(const SPointer<VertexBuffer>& vertexBuffer) { glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID()); }
+    void BindIndexBuffer(const SPointer<IndexBuffer>& indexBuffer) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer->GetRendererID()); }
+    void BindVertexArray(const SPointer<VertexArray>& vertexArray)
     {
         glBindVertexArray(vertexArray->GetRendererID());
-        for(uint32_t i = 0; i < vertexArray->GetVertexBufferCount(); i++)
+        for(UInt32 i = 0; i < vertexArray->GetVertexBufferCount(); i++)
             BindVertexBuffer(vertexArray->GetVertexBuffer(i));
     }
-    static void BindShader(const SharedPtr<Shader>& shader) { glUseProgram(shader->GetRendererID()); }
-    static void BindTexture(const SharedPtr<Texture>& texture, uint32_t slot = 0)
+    void BindShader(const SPointer<Shader>& shader) { glUseProgram(shader->GetRendererID()); }
+    void BindTexture(const SPointer<Texture>& texture, UInt32 slot = 0)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture->GetRendererID());
     }
-    static void BindMaterial(const SharedPtr<Material>& material)
+    void BindMaterial(const SPointer<Material>& material)
     {
         // bind textures
         auto it = material->GetBoundTextures().begin();
@@ -133,7 +139,7 @@ namespace NDR
         VertexLayout lineLayout;
         lineLayout.AddAttribute({3, false}); // position
         lineLayout.AddAttribute({4, false}); // color
-        SharedPtr<VertexBuffer> lineVertexBuffer = CreateSharedPtr<VertexBuffer>(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
+        SPointer<VertexBuffer> lineVertexBuffer = CreateShared<VertexBuffer>(lineLayout.GetAttributeComponentCount() * 2, lineLayout);
         sRendererData.vertexArray->AddVertexBuffer(std::move(lineVertexBuffer));
     }
 
@@ -172,7 +178,7 @@ namespace NDR
         glDrawArrays(GL_LINES, 0, sRendererData.vertexArray->GetVertexBuffer()->GetCount());
     }
 
-    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<Material>& material)
+    void Renderer::DrawTriangles(const SPointer<VertexArray>& vertexArray, const SPointer<Material>& material)
     {
         BindVertexArray(vertexArray);
         BindMaterial(material);
@@ -180,7 +186,7 @@ namespace NDR
         glDrawArrays(GL_TRIANGLES, 0, vertexArray->GetVertexBuffer()->GetCount());
     }
 
-    void Renderer::DrawTriangles(const SharedPtr<VertexArray>& vertexArray, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<Material>& material)
+    void Renderer::DrawTriangles(const SPointer<VertexArray>& vertexArray, const SPointer<IndexBuffer>& indexBuffer, const SPointer<Material>& material)
     {
         BindVertexArray(vertexArray);
         BindIndexBuffer(indexBuffer);
@@ -189,10 +195,10 @@ namespace NDR
         glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
-    void Renderer::DrawMesh(const SharedPtr<Mesh>& mesh, const Transform& transform)
+    void Renderer::DrawMesh(const SPointer<Mesh>& mesh, const Transform& transform)
     {
         BindVertexArray(mesh->GetVertexArray());
-        for(uint32_t i = 0; i < mesh->GetSubMeshCount(); i++)
+        for(UInt32 i = 0; i < mesh->GetSubMeshCount(); i++)
         {
             mesh->GetMaterial(i)->GetShader()->SetMat4("u_Model", transform.GetMatrix());
             BindIndexBuffer(mesh->GetIndexBuffer(i));

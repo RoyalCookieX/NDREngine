@@ -1,14 +1,15 @@
 #pragma once
-#include "input/Event.h"
-#include "utility/Memory.h"
+#include "Defines.h"
 
 namespace NDR
 {
+    struct Event;
+    
     struct WindowProps
     {
     public:
-        uint32_t width;
-        uint32_t height;
+        UInt32 width;
+        UInt32 height;
         std::string name;
         bool isVsync;
 
@@ -26,7 +27,7 @@ namespace NDR
     class Window
     {
     public:
-        virtual ~Window() { }
+        virtual ~Window() = default;
 
         virtual void AddCallback(EventFunc callback) = 0;
         virtual void SetContextCurrent() const = 0;
@@ -37,10 +38,10 @@ namespace NDR
         virtual void SwapBuffers() const = 0;
         virtual void PollEvents() const = 0;
 
-        virtual uint32_t GetWidth() const = 0;
-        virtual uint32_t GetHeight() const = 0;
+        virtual UInt32 GetWidth() const = 0;
+        virtual UInt32 GetHeight() const = 0;
 
-        static UniquePtr<Window> Create(const WindowProps& props);
+        static UPointer<Window> Create(const WindowProps& props);
     protected:
         virtual void Dispatch(Event* event) const = 0;
     };

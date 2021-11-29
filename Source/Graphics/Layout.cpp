@@ -10,7 +10,7 @@ namespace NDR
     {
     }
 
-    VertexAttribute::VertexAttribute(uint32_t count, bool normalized):
+    VertexAttribute::VertexAttribute(UInt32 count, bool normalized):
         _count(count),
         _normalized(normalized)
     {
@@ -19,9 +19,9 @@ namespace NDR
 #endif
     }
 
-    uint32_t VertexAttribute::GetCount() const { return _count; }
+    UInt32 VertexAttribute::GetCount() const { return _count; }
     bool VertexAttribute::IsNormalized() const { return _normalized; }
-    uint32_t VertexAttribute::GetStride() const { return _count * sizeof(float); }
+    UInt32 VertexAttribute::GetStride() const { return _count * sizeof(float); }
 
     VertexLayout::VertexLayout():
         _attributeComponentCount(0)
@@ -36,13 +36,13 @@ namespace NDR
             _attributeComponentCount += attribute.GetCount();
     }
 
-    VertexAttribute& VertexLayout::operator[](int32_t index) { return GetAttribute(index); }
+    VertexAttribute& VertexLayout::operator[](Int32 index) { return GetAttribute(index); }
 
     size_t VertexLayout::GetVertexSize() const { return _attributeComponentCount * sizeof(float); }
-    uint32_t VertexLayout::GetAttributeComponentCount() const { return _attributeComponentCount; }
-    uint32_t VertexLayout::GetAttributeCount() const { return (uint32_t)_attributes.size(); }
+    UInt32 VertexLayout::GetAttributeComponentCount() const { return _attributeComponentCount; }
+    UInt32 VertexLayout::GetAttributeCount() const { return (UInt32)_attributes.size(); }
 
-    VertexAttribute& VertexLayout::GetAttribute(int32_t index) { return _attributes[index]; }
+    VertexAttribute& VertexLayout::GetAttribute(Int32 index) { return _attributes[index]; }
     VertexLayout& VertexLayout::AddAttribute(const VertexAttribute& attribute)
     {
         _attributes.push_back(attribute);

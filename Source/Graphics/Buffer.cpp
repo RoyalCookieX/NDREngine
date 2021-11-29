@@ -6,7 +6,7 @@
 namespace NDR
 {
     // VertexBuffer
-    VertexBuffer::VertexBuffer(const uint32_t count, const VertexLayout& layout):
+    VertexBuffer::VertexBuffer(const UInt32 count, const VertexLayout& layout):
         _count(count),
         _layout(layout)
     {
@@ -16,7 +16,7 @@ namespace NDR
     }
 
     VertexBuffer::VertexBuffer(const std::vector<float>& vertices, const VertexLayout& layout):
-        _count((uint32_t)vertices.size()),
+        _count((UInt32)vertices.size()),
         _layout(layout)
     {
         glCreateBuffers(1, &_rendererID);
@@ -31,7 +31,7 @@ namespace NDR
         _count = 0;
     }
 
-    void VertexBuffer::SetData(const uint32_t offset, std::vector<float> vertices)
+    void VertexBuffer::SetData(const UInt32 offset, std::vector<float> vertices)
     {
 #ifdef NDR_DEBUG
         const size_t usedSize = (vertices.size() * sizeof(float)) + offset;
@@ -43,8 +43,8 @@ namespace NDR
     }
 
     // IndexBuffer
-    IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices):
-        _count((uint32_t)indices.size())
+    IndexBuffer::IndexBuffer(const std::vector<UInt32>& indices):
+        _count((UInt32)indices.size())
     {
         glCreateBuffers(1, &_rendererID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _rendererID);
@@ -59,7 +59,7 @@ namespace NDR
     }
 
     // UniformBuffer
-    UniformBuffer::UniformBuffer(size_t size, uint32_t binding):
+    UniformBuffer::UniformBuffer(size_t size, UInt32 binding):
         _size(size)
     {
         glCreateBuffers(1, &_rendererID);

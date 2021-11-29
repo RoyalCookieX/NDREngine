@@ -18,8 +18,8 @@ namespace NDR
         virtual void Close() override;
         virtual void SwapBuffers() const override;
         virtual void PollEvents() const override;
-        virtual uint32_t GetWidth() const override;
-        virtual uint32_t GetHeight() const override;
+        virtual UInt32 GetWidth() const override;
+        virtual UInt32 GetHeight() const override;
     
     protected:
         virtual void Dispatch(Event* event) const override;
@@ -29,6 +29,6 @@ namespace NDR
         bool _active;
         std::vector<EventFunc> _callbacks;
         
-        inline static uint32_t _windowCount = 0;
+        inline static UInt32 _windowCount = 0;
     };
 }

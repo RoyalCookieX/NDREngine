@@ -5,7 +5,7 @@
 
 namespace NDR
 {
-    ShaderType GetShaderType(uint32_t shaderType)
+    ShaderType GetShaderType(UInt32 shaderType)
     {
         switch (shaderType)
         {
@@ -22,7 +22,7 @@ namespace NDR
         }
     }
     
-    ShaderUniform::ShaderUniform(const std::string& name, int32_t location, uint32_t count, ShaderType type):
+    ShaderUniform::ShaderUniform(const std::string& name, Int32 location, UInt32 count, ShaderType type):
         _name(name),
         _location(location),
         _count(count),
@@ -31,15 +31,15 @@ namespace NDR
     }
 
     std::string ShaderUniform::GetName() const { return _name; }
-    int32_t ShaderUniform::GetLocation() const { return _location; }
+    Int32 ShaderUniform::GetLocation() const { return _location; }
     ShaderType ShaderUniform::GetType() const { return _type; }
 
     Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     {
         // create shader and its stages
         _rendererID = glCreateProgram();
-        const uint32_t vs = CompileSource(VERTEX, vertexSource);
-        const uint32_t fs = CompileSource(FRAGMENT, fragmentSource);
+        const UInt32 vs = CompileSource(VERTEX, vertexSource);
+        const UInt32 fs = CompileSource(FRAGMENT, fragmentSource);
 
         // compile/link shader
         glAttachShader(_rendererID, vs);
@@ -52,19 +52,19 @@ namespace NDR
         glDeleteShader(fs);
 
         // get uniforms from shader
-        int32_t maxLength;
+        Int32 maxLength;
         glGetProgramiv(_rendererID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
         char* name = new char[maxLength + 1];
 
         // add uniforms to _uniformData
-        int32_t uniformCount;
+        Int32 uniformCount;
         glGetProgramiv(_rendererID, GL_ACTIVE_UNIFORMS, &uniformCount);
         _uniformData.reserve(uniformCount);
-        int32_t offset = 0;
-        for(int32_t i = 0; i < uniformCount; i++)
+        Int32 offset = 0;
+        for(Int32 i = 0; i < uniformCount; i++)
         {
-            int32_t size;
-            uint32_t type;
+            Int32 size;
+            UInt32 type;
             glGetActiveUniform(_rendererID, i, maxLength, nullptr, &size, &type, name);
             std::string uniformName(name);
             
@@ -99,56 +99,56 @@ namespace NDR
     bool Shader::operator==(const Shader& other) const { return _rendererID == other._rendererID; }
     bool Shader::operator!=(const Shader& other) const { return !(*this == other); }
 
-    void Shader::SetInt(const std::string& uniformName, const int32_t value) const
+    void Shader::SetInt(const std::string& uniformName, const Int32 value) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform1i(id, value);
     }
 
-    void Shader::SetIntArray(const std::string& uniformName, int32_t* values, uint32_t count) const
+    void Shader::SetIntArray(const std::string& uniformName, Int32* values, UInt32 count) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform1iv(id, count, values);
     }
 
     void Shader::SetFloat(const std::string& uniformName, float const value) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform1f(id, value);
     }
 
     void Shader::SetVec2(const std::string& uniformName, const glm::vec2& vec2) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform2f(id, vec2.x, vec2.y);
     }
 
     void Shader::SetVec3(const std::string& uniformName, const glm::vec3& vec3) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform3f(id, vec3.x, vec3.y, vec3.z);
     }
     
     void Shader::SetVec4(const std::string& uniformName, const glm::vec4& vec4) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniform4f(id, vec4.x, vec4.y, vec4.z, vec4.w);
     }
 
     void Shader::SetMat4(const std::string& uniformName, const glm::mat4& mat4) const
     {
         glUseProgram(_rendererID);
-        const uint32_t id = GetUniformLocation(uniformName);
+        const UInt32 id = GetUniformLocation(uniformName);
         glUniformMatrix4fv(id, 1, false, glm::value_ptr(mat4));
     }
 
-    int32_t Shader::GetUniformLocation(const std::string& uniformName) const
+    Int32 Shader::GetUniformLocation(const std::string& uniformName) const
     {
         //TODO: Fix Uniform Location Issue
         return glGetUniformLocation(_rendererID, uniformName.c_str());
@@ -160,11 +160,11 @@ namespace NDR
         // return -1;
     }
 
-    int32_t Shader::CompileSource(ShaderStage stage, const std::string& source)
+    Int32 Shader::CompileSource(ShaderStage stage, const std::string& source)
     {
         const char* src = source.c_str();
         char* shaderTypeName;
-        uint32_t shaderType = 0;
+        UInt32 shaderType = 0;
         switch(stage)
         {
             case VERTEX:
@@ -185,11 +185,11 @@ namespace NDR
                     break;
                 }
         }
-        const uint32_t id = glCreateShader(shaderType);
+        const UInt32 id = glCreateShader(shaderType);
         glShaderSource(id, 1, &src, nullptr);
         glCompileShader(id);
 
-        int32_t result;
+        Int32 result;
         glGetShaderiv(id, GL_COMPILE_STATUS, &result);
         if(result == GL_FALSE)
         {
@@ -207,8 +207,8 @@ namespace NDR
         switch (type)
         {
             case ShaderType::BOOL:  return sizeof(bool);
-            case ShaderType::INT:   return sizeof(int32_t);
-            case ShaderType::UINT:  return sizeof(uint32_t);
+            case ShaderType::INT:   return sizeof(Int32);
+            case ShaderType::UINT:  return sizeof(UInt32);
             case ShaderType::FLOAT: return sizeof(float);
             case ShaderType::VEC2:  return sizeof(glm::vec2);
             case ShaderType::VEC3:  return sizeof(glm::vec3);

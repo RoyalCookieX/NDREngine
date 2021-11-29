@@ -6,7 +6,7 @@
 namespace NDR
 {
     /*
-    RenderBatch::RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader):
+    RenderBatch::RenderBatch(UInt32 maxElements, UInt32 verticesPerElement, UInt32 indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader):
         _maxElements(maxElements),
         _verticesPerElement(verticesPerElement),
         _indicesPerElement(indicesPerElement),
@@ -20,14 +20,14 @@ namespace NDR
         // get number of texture slots
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
         _textureIndexes.reserve(_maxTextureSlots);
-        for(int32_t i = 0; i < _maxTextureSlots; i++)
+        for(Int32 i = 0; i < _maxTextureSlots; i++)
             _textureIndexes.push_back(i);
 
         // setup index buffer
-        std::vector<uint32_t> indices;
+        std::vector<UInt32> indices;
         indices.reserve(GetMaxIndices());
-        uint32_t index = 0;
-        for (uint32_t i = 0; i < GetMaxIndices(); i += 6)
+        UInt32 index = 0;
+        for (UInt32 i = 0; i < GetMaxIndices(); i += 6)
         {
             indices.push_back(index + 0);
             indices.push_back(index + 1);
@@ -45,7 +45,7 @@ namespace NDR
         _defaultTexture = CreateSharedPtr<Texture2D>(texture);
         _defaultShader = CreateSharedPtr<Shader>(shader);
         glUseProgram(_defaultShader->GetRendererID());
-        _defaultShader->SetIntArray("u_Textures", _textureIndexes.data(), (uint32_t)_textureIndexes.size());
+        _defaultShader->SetIntArray("u_Textures", _textureIndexes.data(), (UInt32)_textureIndexes.size());
     }
 
     RenderBatch::~RenderBatch()
@@ -85,7 +85,7 @@ namespace NDR
         }
         if(texIndex == -1.0f)
         {
-            const int32_t newIndex = (int32_t)_boundTextures.size();
+            const Int32 newIndex = (Int32)_boundTextures.size();
             _boundTextures.push_back(&texture);
             texIndex = (float)newIndex;
         }

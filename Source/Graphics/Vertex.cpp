@@ -13,7 +13,7 @@ namespace NDR
         glDeleteVertexArrays(1, &_rendererID);
     }
 
-    void VertexArray::AddVertexBuffer(SharedPtr<VertexBuffer>&& vertexBuffer)
+    void VertexArray::AddVertexBuffer(SPointer<VertexBuffer>&& vertexBuffer)
     {
         glBindVertexArray(_rendererID);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->GetRendererID());
@@ -21,7 +21,7 @@ namespace NDR
         // setup vertex attributes
         auto offset = 0;
         VertexLayout layout = vertexBuffer->GetLayout();
-        for(uint32_t attributeIndex = 0; attributeIndex < vertexBuffer->GetLayout().GetAttributeCount(); attributeIndex++)
+        for(UInt32 attributeIndex = 0; attributeIndex < vertexBuffer->GetLayout().GetAttributeCount(); attributeIndex++)
         {
             VertexAttribute attribute = layout[attributeIndex];
             glEnableVertexAttribArray(attributeIndex);

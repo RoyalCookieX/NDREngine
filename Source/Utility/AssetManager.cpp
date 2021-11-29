@@ -2,8 +2,13 @@
 #include "AssetManager.h"
 
 #include "Time.h"
-#include "core/Config.h"
-#include "core/Log.h"
+#include "Core/Config.h"
+#include "Core/Log.h"
+#include "Graphics/Layout.h"
+#include "Graphics/Material.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Shader.h"
 
 namespace tinyobj
 {
@@ -31,7 +36,7 @@ namespace NDR
         return ss.str();
     }
 
-    SharedPtr<Shader> LoadShader(const std::string& assetPath, AssetRoot root)
+    SPointer<Shader> LoadShader(const std::string& assetPath, AssetRoot root)
     {
         int index = -1;
         std::string line;
@@ -51,11 +56,11 @@ namespace NDR
             else if(index != -1)
                 sources[index] << line << std::endl;
         }
-        return CreateSharedPtr<Shader>(sources[0].str(), sources[1].str());
+        return CreateShared<Shader>(sources[0].str(), sources[1].str());
     }
 
     // From https://github.com/tinyobjloader/tinyobjloader
-    SharedPtr<Mesh> LoadMesh(const std::string& assetPath, AssetRoot root)
+    SPointer<Mesh> LoadMesh(const std::string& assetPath, AssetRoot root)
     {
         float startTime = Time::GetTime();
         
@@ -93,7 +98,7 @@ namespace NDR
             size_t indexOffset = 0;
             const tinyobj::mesh_t& mesh = assetShapes[shapeIndex].mesh;
 
-            std::vector<uint32_t> indices;
+            std::vector<UInt32> indices;
             
             for(size_t faceIndex = 0; faceIndex < mesh.num_face_vertices.size(); faceIndex++)
             {
@@ -140,45 +145,45 @@ namespace NDR
                             vertices.push_back(0.0f);
                         }
                         // add new indices to indexBuffer & update cache
-                        indices.push_back((uint32_t)meshIndexCache.size());
+                        indices.push_back((UInt32)meshIndexCache.size());
                         meshIndexCache.push_back(vertexAttributeIndex);
                     }
                     else
                     {
                         // vertex is already defined, add that index to indexBuffer
-                        indices.push_back((uint32_t)std::distance(meshIndexCache.begin(), indexLocation));
+                        indices.push_back((UInt32)std::distance(meshIndexCache.begin(), indexLocation));
                     }
                 }
                 indexOffset += verticesPerFace;
             }
             NDR_LOGDEBUG("Index Count: %d", indices.size());
-            SharedPtr<IndexBuffer> indexBuffer = CreateSharedPtr<IndexBuffer>(indices);
-            SharedPtr<Material> material = CreateSharedPtr<Material>(
+            SPointer<IndexBuffer> indexBuffer = CreateShared<IndexBuffer>(indices);
+            SPointer<Material> material = CreateShared<Material>(
                 LoadShader("assets/shaders/Mesh.shader", AssetRoot::ENGINE),
                 ENABLECULLING | CULLBACK | ENABLEBLENDING | TRANSPARENT);
             subMeshes.emplace_back(std::move(indexBuffer), std::move(material));
         }
         NDR_LOGDEBUG("Vertex Count: %d", vertices.size() / layout.GetAttributeComponentCount());
-        SharedPtr<VertexBuffer> vertexBuffer = CreateSharedPtr<VertexBuffer>(vertices, layout);
+        SPointer<VertexBuffer> vertexBuffer = CreateShared<VertexBuffer>(vertices, layout);
         
         float currentTime = Time::GetTime();
         NDR_LOGDEBUG("OBJ Loaded: %f ms", (currentTime - startTime) * 1000.0f);
-        return CreateSharedPtr<Mesh>(std::move(vertexBuffer), std::move(subMeshes));
+        return CreateShared<Mesh>(std::move(vertexBuffer), std::move(subMeshes));
     }
 
-    SharedPtr<Texture2D> LoadTexture2D(const std::string& assetPath, AssetRoot root)
+    SPointer<Texture2D> LoadTexture2D(const std::string& assetPath, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return CreateSharedPtr<Texture2D>(TextureProperties(width, height, bpp), buffer);
+        return CreateShared<Texture2D>(TextureProperties(width, height, bpp), buffer);
     }
 
-    SharedPtr<Texture2DAtlas> LoadTexture2DAtlas(const std::string& assetPath, uint32_t cellWidth, uint32_t cellHeight, AssetRoot root)
+    SPointer<Texture2DAtlas> LoadTexture2DAtlas(const std::string& assetPath, UInt32 cellWidth, UInt32 cellHeight, AssetRoot root)
     {
         int width, height, bpp;
         stbi_set_flip_vertically_on_load(1);
         unsigned char* buffer = stbi_load(GetAssetRootPath(assetPath, root).c_str(), &width, &height, &bpp, 4);
-        return CreateSharedPtr<Texture2DAtlas>(TextureAtlasProperties(width, height, cellWidth, cellHeight, bpp), buffer);
+        return CreateShared<Texture2DAtlas>(TextureAtlasProperties(width, height, cellWidth, cellHeight, bpp), buffer);
     }
 }

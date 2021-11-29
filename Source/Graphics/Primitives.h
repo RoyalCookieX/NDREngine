@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 
 namespace NDR
 {

@@ -1,4 +1,4 @@
-include "defines"
+include "Defines"
 
 project "glad"
     kind "StaticLib"
@@ -17,9 +17,9 @@ project "glad"
     }
     filter "platforms:x64"
         architecture "x64"
-    filter "configurations:debug"
+    filter "configurations:Debug"
         runtime "Debug"
         symbols "On"
-    filter "configurations:release"
+    filter "configurations:Release"
         runtime "Release"
         optimize "On"

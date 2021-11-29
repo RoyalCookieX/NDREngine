@@ -9,9 +9,8 @@ project "Engine"
     staticruntime "On"
     targetdir (TARGET_DIR)
     objdir (OBJECT_DIR)
-    pchheader "Ndrpch.h"
+    pchheader "ndrpch.h"
     pchsource "Source/ndrpch.cpp"
-    defines "NDR_GRAPHICSAPI_OPENGL"
     files
     {
         "Source/**.h", "Source/**.cpp",
@@ -40,6 +39,8 @@ project "Engine"
         "tiny_obj_loader",
         "opengl32"
     }
+    filter "platforms:x64"
+    architecture "x64"
     filter "system:windows"
         defines "NDR_PLATFORM_WINDOWS"
         files 
@@ -47,10 +48,6 @@ project "Engine"
             "Source/ndrpch.cpp",
             "Source/API/Platform/*_win32.h", "Source/API/Platform/*_win32.cpp",
         }
-    filter "platforms:x64"
-        architecture "x64"
-    filter "system:windows"
-        defines "NDR_PLATFORM_WINDOWS"
     filter "configurations:Debug"
         defines "NDR_DEBUG"
         runtime "Debug"

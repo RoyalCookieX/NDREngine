@@ -1,7 +1,6 @@
 #pragma once
-#include "NDRTypes.h"
+#include "Defines.h"
 #include "Buffer.h"
-#include "utility/Memory.h"
 
 namespace NDR
 {
@@ -15,13 +14,13 @@ namespace NDR
         VertexArray& operator=(const VertexArray&) = delete;
 
         RendererID GetRendererID() const { return _rendererID; }
-        SharedPtr<VertexBuffer>& GetVertexBuffer(int32_t index = 0) { return _vertexBuffers[index]; }
-        const SharedPtr<VertexBuffer>& GetVertexBuffer(int32_t index = 0) const { return _vertexBuffers[index]; }
-        uint32_t GetVertexBufferCount() const { return (uint32_t)_vertexBuffers.size(); }
+        SPointer<VertexBuffer>& GetVertexBuffer(Int32 index = 0) { return _vertexBuffers[index]; }
+        const SPointer<VertexBuffer>& GetVertexBuffer(Int32 index = 0) const { return _vertexBuffers[index]; }
+        UInt32 GetVertexBufferCount() const { return (UInt32)_vertexBuffers.size(); }
 
-        void AddVertexBuffer(SharedPtr<VertexBuffer>&& vertexBuffer);
+        void AddVertexBuffer(SPointer<VertexBuffer>&& vertexBuffer);
     private:
         RendererID _rendererID;
-        std::vector<SharedPtr<VertexBuffer>> _vertexBuffers;
+        std::vector<SPointer<VertexBuffer>> _vertexBuffers;
     };
 }

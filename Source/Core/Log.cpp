@@ -15,7 +15,7 @@ namespace NDR
         std::memset(levelMsg, 0, sizeof(levelMsg));
         std::memset(message, 0, sizeof(message));
         
-        sprintf_s(levelMsg, sizeof(levelMsg), "%s%s\n", logLevels[(int32_t)level], format);
+        sprintf_s(levelMsg, sizeof(levelMsg), "%s%s\n", logLevels[(Int32)level], format);
         vsprintf_s(message, sizeof(message), levelMsg, args);
         PrintToConsole(level, message);
         

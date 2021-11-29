@@ -30,10 +30,10 @@ namespace NDR
         return json[section][key].get<bool>();
     }
 
-    int32_t Config::GetInt(const std::string& filepath, const std::string& section, const std::string& key)
+    Int32 Config::GetInt(const std::string& filepath, const std::string& section, const std::string& key)
     {
         auto json = LoadJSON(filepath);
-        return json[section][key].get<int32_t>();
+        return json[section][key].get<Int32>();
     }
 
     float Config::GetFloat(const std::string& filepath, const std::string& section, const std::string& key)
@@ -55,7 +55,7 @@ namespace NDR
         SaveJSON(filepath, json);
     }
 
-    void Config::SetInt(const std::string& filepath, const std::string& section, const std::string& key, const int32_t value)
+    void Config::SetInt(const std::string& filepath, const std::string& section, const std::string& key, const Int32 value)
     {
         auto json = LoadJSON(filepath);
         json[section][key] = value;

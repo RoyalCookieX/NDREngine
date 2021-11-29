@@ -1,3 +1,4 @@
+@echo off
 set COMPILER=vs2019
 set MODULES_PATH=scripts\premake5\modules
 

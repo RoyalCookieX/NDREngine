@@ -1,4 +1,4 @@
-
+@echo off
 :: Set project variables here
 set PROJECT_NAME=
 set ENGINE_PATH=

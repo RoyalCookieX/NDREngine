@@ -3,15 +3,9 @@
 
 #include "Log.h"
 
-#if _MSC_VER
-    #define DEBUGBREAK __debugbreak()
-#else
-    #define DEBUGBREAK
-#endif
-
 namespace NDR
 {
-    void AssertMessage(bool expression, const char* message, const char* file, int32_t line)
+    void AssertMessage(bool expression, const char* message, const char* file, Int32 line)
     {
         if(!expression)
         {

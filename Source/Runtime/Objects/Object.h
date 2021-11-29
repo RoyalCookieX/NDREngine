@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 #include "math/Transform.h"
 
 namespace NDR

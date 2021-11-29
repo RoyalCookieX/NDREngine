@@ -9,7 +9,7 @@ namespace NDR
 {
     void PrintToConsole(LogLevel level, const char* message)
     {
-        const int32_t logColors[5] =
+        const Int32 logColors[5] =
         {
             FOREGROUND_INTENSITY,                   // text grey
             FOREGROUND_GREEN,                       // text green
@@ -19,7 +19,7 @@ namespace NDR
         };
         
         HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-        SetConsoleTextAttribute(console, logColors[(int32_t)level]);
+        SetConsoleTextAttribute(console, logColors[(Int32)level]);
         OutputDebugStringA(message);
         size_t length = strlen(message);
         LPDWORD number_written = 0;

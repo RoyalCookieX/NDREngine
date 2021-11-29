@@ -10,7 +10,7 @@ namespace NDR
     struct RenderBatch
     {
     public:
-        RenderBatch(uint32_t maxElements, uint32_t verticesPerElement, uint32_t indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader);
+        RenderBatch(UInt32 maxElements, UInt32 verticesPerElement, UInt32 indicesPerElement, const VertexLayout& layout, const SharedPtr<Texture>& texture, const SharedPtr<Shader>& shader);
         ~RenderBatch();
 
         RenderBatch(const RenderBatch&) = delete;
@@ -25,28 +25,28 @@ namespace NDR
         const SharedPtr<VertexArray>& GetVertexArray() const { return _va; }
         const SharedPtr<IndexBuffer>& GetIndexBuffer() const { return _ib; }
         
-        uint32_t GetElementCount() const { return _elementCount; }
-        uint32_t GetIndicesCount() const { return _indicesCount; }
-        uint32_t GetVerticesPerElement() const { return _verticesPerElement; }
-        uint32_t GetIndiciesPerElement() const { return _indicesPerElement; }
-        uint32_t GetMaxElements() const { return _maxElements; }
-        uint32_t GetMaxVertices() const { return _maxElements * GetVerticesPerElement(); }
-        uint32_t GetMaxIndices() const { return _maxElements * GetIndiciesPerElement(); }
-        void SetMaxElements(uint32_t maxQuads) { _maxElements = maxQuads; }
+        UInt32 GetElementCount() const { return _elementCount; }
+        UInt32 GetIndicesCount() const { return _indicesCount; }
+        UInt32 GetVerticesPerElement() const { return _verticesPerElement; }
+        UInt32 GetIndiciesPerElement() const { return _indicesPerElement; }
+        UInt32 GetMaxElements() const { return _maxElements; }
+        UInt32 GetMaxVertices() const { return _maxElements * GetVerticesPerElement(); }
+        UInt32 GetMaxIndices() const { return _maxElements * GetIndiciesPerElement(); }
+        void SetMaxElements(UInt32 maxQuads) { _maxElements = maxQuads; }
 
-        uint32_t GetBoundTextureCount() const { return (uint32_t)_boundTextures.size(); }
-        int32_t GetMaxTextureSlots() const { return _maxTextureSlots; }
+        UInt32 GetBoundTextureCount() const { return (UInt32)_boundTextures.size(); }
+        Int32 GetMaxTextureSlots() const { return _maxTextureSlots; }
         Texture& GetBoundTexture(uint64_t index) { return *_boundTextures[index]; }
         SharedPtr<Texture2D>& GetDefaultTexture() { return _defaultTexture; }
         SharedPtr<Shader>& GetDefaultShader() { return _defaultShader; }
     private:
-        uint32_t _maxElements, _verticesPerElement, _indicesPerElement;
-        uint32_t _elementCount, _indicesCount;
-        int32_t _maxTextureSlots;
+        UInt32 _maxElements, _verticesPerElement, _indicesPerElement;
+        UInt32 _elementCount, _indicesCount;
+        Int32 _maxTextureSlots;
 
         SharedPtr<VertexArray> _va;
         SharedPtr<IndexBuffer> _ib;
-        std::vector<int32_t> _textureIndexes;
+        std::vector<Int32> _textureIndexes;
         std::vector<Texture*> _boundTextures;
 
         SharedPtr<Texture2D> _defaultTexture;

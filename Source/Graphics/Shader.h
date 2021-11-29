@@ -1,5 +1,5 @@
 #pragma once
-#include "NDRTypes.h"
+#include "Defines.h"
 
 namespace NDR
 {
@@ -29,15 +29,15 @@ namespace NDR
     struct ShaderUniform
     {
     public:
-        ShaderUniform(const std::string& name, int32_t location, uint32_t count, ShaderType type);
+        ShaderUniform(const std::string& name, Int32 location, UInt32 count, ShaderType type);
 
         std::string GetName() const;
-        int32_t GetLocation() const;
+        Int32 GetLocation() const;
         ShaderType GetType() const;
     private:
         std::string _name;
-        int32_t _location;
-        uint32_t _count;
+        Int32 _location;
+        UInt32 _count;
         ShaderType _type;
     };
     
@@ -58,17 +58,17 @@ namespace NDR
         
         RendererID GetRendererID() const { return _rendererID; }
 
-        void SetInt(const std::string& uniformName, int32_t value) const;
-        void SetIntArray(const std::string& uniformName, int32_t* value, uint32_t count) const;
+        void SetInt(const std::string& uniformName, Int32 value) const;
+        void SetIntArray(const std::string& uniformName, Int32* value, UInt32 count) const;
         void SetFloat(const std::string& uniformName, float value) const;
         void SetVec2(const std::string& uniformName, const glm::vec2& vec2) const;
         void SetVec3(const std::string& uniformName, const glm::vec3& vec3) const;
         void SetVec4(const std::string& uniformName, const glm::vec4& vec4) const;
         void SetMat4(const std::string& uniformName, const glm::mat4& mat4) const;
         
-        static int32_t CompileSource(ShaderStage stage, const std::string& source);
+        static Int32 CompileSource(ShaderStage stage, const std::string& source);
     private:
-        int32_t GetUniformLocation(const std::string& uniformName) const;
+        Int32 GetUniformLocation(const std::string& uniformName) const;
         
         RendererID _rendererID;
         std::vector<ShaderUniform> _uniformData;

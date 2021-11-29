@@ -3,12 +3,12 @@
 
 namespace NDR
 {
-    static void InitalizeTexture(uint32_t& id, const TextureProperties* properties, uint8_t* buffer)
+    static void InitalizeTexture(UInt32& id, const TextureProperties* properties, uint8_t* buffer)
     {
         glCreateTextures(GL_TEXTURE_2D, 1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
 
-        int32_t filter = 0, wrap = 0;
+        Int32 filter = 0, wrap = 0;
         switch(properties->filter)
         {
             case TextureFilter::NEAREST: filter = GL_NEAREST; break;
@@ -73,7 +73,7 @@ namespace NDR
 
     Texture2DAtlas::~Texture2DAtlas() { glDeleteTextures(1, &_rendererID); }
 
-    std::array<float, 8> Texture2DAtlas::GetUVs(uint32_t x, uint32_t y) const
+    std::array<float, 8> Texture2DAtlas::GetUVs(UInt32 x, UInt32 y) const
     {
         const float uOffset = ((float)_properties.cellWidth / (float)_properties.width);
         const float vOffset = ((float)_properties.cellHeight / (float)_properties.height);

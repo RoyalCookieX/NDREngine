@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 
 #define VEC3_ZERO glm::vec3(0.0f)
 #define VEC3_ONE glm::vec3(1.0f)

@@ -14,7 +14,7 @@ namespace NDR
     {
     }
 
-    Framebuffer::Framebuffer(const FramebufferMode& mode, int32_t width, int32_t height):
+    Framebuffer::Framebuffer(const FramebufferMode& mode, Int32 width, Int32 height):
         _id(0),
         _colorAttachment(0),
         _depthAttachment(0),
@@ -46,6 +46,6 @@ namespace NDR
     void Framebuffer::Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, _id); }
     void Framebuffer::Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    uint32_t Framebuffer::GetColorAttachmentID() const { return _colorAttachment; }
-    uint32_t Framebuffer::GetDepthAttachmentID() const { return _depthAttachment; }
+    UInt32 Framebuffer::GetColorAttachmentID() const { return _colorAttachment; }
+    UInt32 Framebuffer::GetDepthAttachmentID() const { return _depthAttachment; }
 }

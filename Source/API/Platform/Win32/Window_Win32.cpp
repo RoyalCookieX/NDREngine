@@ -5,9 +5,9 @@
 
 namespace NDR
 {
-    UniquePtr<Window> Window::Create(const WindowProps& props)
+    UPointer<Window> Window::Create(const WindowProps& props)
     {
-        return UniquePtr<Window>(new Window_win32(props));
+        return UPointer<Window>(new Window_win32(props));
     }
     
     Window_win32::Window_win32(const WindowProps& properties):
@@ -70,8 +70,8 @@ namespace NDR
     void Window_win32::SwapBuffers() const { glfwSwapBuffers(_window); }
     void Window_win32::PollEvents() const { glfwPollEvents(); }
 
-    uint32_t Window_win32::GetWidth() const { return _properties.width; }
-    uint32_t Window_win32::GetHeight() const { return _properties.height; }
+    UInt32 Window_win32::GetWidth() const { return _properties.width; }
+    UInt32 Window_win32::GetHeight() const { return _properties.height; }
 
     void Window_win32::Dispatch(Event* event) const { for (auto callback : _callbacks) callback(event); }
 }

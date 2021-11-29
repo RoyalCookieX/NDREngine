@@ -1,7 +1,8 @@
 #pragma once
+#include "Defines.h"
 #include "math/Transform.h"
 
-#if NDR_DEBUG
+#if defined(NDR_DEBUG)
 #define NDR_LOGDEBUG(message, ...) NDR::LogMessage(NDR::LogLevel::NDRDEBUG, message, __VA_ARGS__)
 #else
 #define NDR_LOGDEBUG(message, ...)

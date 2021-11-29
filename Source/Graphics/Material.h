@@ -1,10 +1,11 @@
 #pragma once
-#include "Shader.h"
-#include "Texture.h"
-#include "utility/Memory.h"
+#include "Defines.h"
 
 namespace NDR
 {
+    class Texture;
+    class Shader;
+    
     enum MaterialFlags
     {
         NOFLAGS         = 0,
@@ -23,9 +24,9 @@ namespace NDR
     class Material
     {
     public:
-        using BoundTextureMap = std::map<std::string, SharedPtr<Texture>>;
+        using BoundTextureMap = std::map<std::string, SPointer<Texture>>;
         
-        Material(const SharedPtr<Shader>& shader, int32_t flags = 0);
+        Material(const SPointer<Shader>& shader, Int32 flags = 0);
         ~Material();
 
         Material(const Material&) = delete;
@@ -33,16 +34,16 @@ namespace NDR
 
         BoundTextureMap& GetBoundTextures() { return _boundTextures; }
         const BoundTextureMap& GetBoundTextures() const { return _boundTextures; }
-        SharedPtr<Shader>& GetShader() { return _shader; }
-        const SharedPtr<Shader>& GetShader() const { return _shader; }
+        SPointer<Shader>& GetShader() { return _shader; }
+        const SPointer<Shader>& GetShader() const { return _shader; }
         
-        bool HasFlags(int32_t flags) const { return _flags & flags; }
-        void EnableFlags(int32_t flags) { _flags = _flags | flags; }
-        void DisableFlags(int32_t flags) { _flags = _flags & ~flags; }
-        void SetTexture(const std::string& textureName, const SharedPtr<Texture>& texture) const;
+        bool HasFlags(Int32 flags) const { return _flags & flags; }
+        void EnableFlags(Int32 flags) { _flags = _flags | flags; }
+        void DisableFlags(Int32 flags) { _flags = _flags & ~flags; }
+        void SetTexture(const std::string& textureName, const SPointer<Texture>& texture) const;
     private:
-        SharedPtr<Shader> _shader;
-        int32_t _flags;
+        SPointer<Shader> _shader;
+        Int32 _flags;
         mutable BoundTextureMap _boundTextures;
     };
 }

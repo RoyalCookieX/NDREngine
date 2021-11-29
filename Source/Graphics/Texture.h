@@ -1,5 +1,5 @@
 #pragma once
-#include "NDRTypes.h"
+#include "Defines.h"
 
 namespace NDR
 {
@@ -9,7 +9,7 @@ namespace NDR
     struct TextureProperties
     {
     public:
-        TextureProperties(int32_t width, int32_t height, int32_t bitsPerPixel,
+        TextureProperties(Int32 width, Int32 height, Int32 bitsPerPixel,
             TextureFilter filter = TextureFilter::NEAREST, TextureWrap wrap = TextureWrap::CLAMPTOEDGE):
 
             width(width),
@@ -20,7 +20,7 @@ namespace NDR
         {
         }
         
-        int32_t width, height, bitsPerPixel;
+        Int32 width, height, bitsPerPixel;
         TextureFilter filter;
         TextureWrap wrap;
     };
@@ -28,8 +28,8 @@ namespace NDR
     struct TextureAtlasProperties : TextureProperties
     {
     public:
-        TextureAtlasProperties(int32_t width, int32_t height,
-            uint32_t cellWidth, uint32_t cellHeight, int32_t bitsPerPixel,
+        TextureAtlasProperties(Int32 width, Int32 height,
+            UInt32 cellWidth, UInt32 cellHeight, Int32 bitsPerPixel,
             TextureFilter filter = TextureFilter::NEAREST, TextureWrap wrap = TextureWrap::CLAMPTOEDGE):
 
             TextureProperties(width, height, bitsPerPixel, filter, wrap),
@@ -38,7 +38,7 @@ namespace NDR
         {
         }
 
-        uint32_t cellWidth, cellHeight;
+        UInt32 cellWidth, cellHeight;
     };
     
     class Texture
@@ -59,7 +59,7 @@ namespace NDR
         Texture2D(const Texture2D&) = delete;
         Texture2D& operator=(const Texture2D&) = delete;
 
-        virtual uint32_t GetRendererID() const override { return _rendererID; }
+        virtual UInt32 GetRendererID() const override { return _rendererID; }
 
     private:
         RendererID _rendererID;
@@ -76,8 +76,8 @@ namespace NDR
         Texture2DAtlas(const Texture&) = delete;
         Texture2DAtlas& operator=(const Texture2DAtlas&) = delete;
 
-        virtual uint32_t GetRendererID() const override { return _rendererID; }
-        virtual std::array<float, 8> GetUVs(uint32_t x, uint32_t y) const;
+        virtual UInt32 GetRendererID() const override { return _rendererID; }
+        virtual std::array<float, 8> GetUVs(UInt32 x, UInt32 y) const;
 
     private:
         RendererID _rendererID;

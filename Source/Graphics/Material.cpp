@@ -3,7 +3,7 @@
 
 namespace NDR
 {
-    Material::Material(const SharedPtr<Shader>& shader, int32_t flags):
+    Material::Material(const SPointer<Shader>& shader, Int32 flags):
         _shader(shader),
         _flags(flags)
     {
@@ -13,7 +13,7 @@ namespace NDR
     {
     }
 
-    void Material::SetTexture(const std::string& textureName, const SharedPtr<Texture>& texture) const
+    void Material::SetTexture(const std::string& textureName, const SPointer<Texture>& texture) const
     {
         auto it = _boundTextures.find(textureName);
         if(it != _boundTextures.end())

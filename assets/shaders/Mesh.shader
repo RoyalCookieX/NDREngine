@@ -12,21 +12,32 @@ layout(std140, binding = 0) uniform Camera
 } camera;
 uniform mat4 u_Model;
 
-out vec2 v_TexCoord;
-out vec3 v_Normal;
+out VERTEX_OUTPUT
+{
+    vec2 texCoord;
+    vec3 normal;  
+    vec4 color;  
+} v_Out;
 
 void main()
 {
     gl_Position = camera.projection * camera.view * u_Model * vec4(a_Position, 1.0);
-    v_TexCoord = a_TexCoord;
-    v_Normal = a_Normal;
+    v_Out.texCoord = a_TexCoord;
+    v_Out.normal = a_Normal;
+    
+    vec3 worldNormal = normalize(mat3(u_Model) * a_Normal);
+    v_Out.color = vec4(worldNormal, 1.0);
 }
 
 #fragment
 #version 420 core
 
-layout(location = 0) in vec2 v_TexCoord;
-layout(location = 1) in vec3 v_Normal;
+in VERTEX_OUTPUT
+{
+    vec2 texCoord;
+    vec3 normal; 
+    vec4 color;   
+} f_In;
 
 uniform sampler2D u_Texture;
 
@@ -34,6 +45,9 @@ out vec4 f_Color;
 
 void main()
 {
-    f_Color = texture2D(u_Texture, v_TexCoord);
+    vec4 fragColor = f_In.color * texture2D(u_Texture, f_In.texCoord);
+    if(fragColor.a < 0.001)
+        discard;
+    f_Color = fragColor;
 }
 

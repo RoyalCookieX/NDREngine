@@ -17,6 +17,7 @@ namespace NDR
         RendererID GetRendererID() const { return _rendererID; }
         SharedPtr<VertexBuffer>& GetVertexBuffer(int32_t index = 0) { return _vertexBuffers[index]; }
         const SharedPtr<VertexBuffer>& GetVertexBuffer(int32_t index = 0) const { return _vertexBuffers[index]; }
+        uint32_t GetVertexBufferCount() const { return (uint32_t)_vertexBuffers.size(); }
 
         void AddVertexBuffer(SharedPtr<VertexBuffer>&& vertexBuffer);
     private:

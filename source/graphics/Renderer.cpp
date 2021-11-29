@@ -36,11 +36,19 @@ namespace NDR
     public:
         void Initalize()
         {
+            initialized = true;
             vertexArray = CreateSharedPtr<VertexArray>();
             shader = LoadShader("assets/shaders/Line.shader", AssetRoot::ENGINE);
             
             cameraBuffer = CreateSharedPtr<UniformBuffer>(sizeof(CameraUBOData), 0);
         }
+
+        void Shutdown()
+        {
+            initialized = false;
+        }
+
+        bool initialized;
         
         SharedPtr<VertexArray> vertexArray;
         SharedPtr<Shader> shader;
@@ -53,7 +61,8 @@ namespace NDR
     static void BindVertexArray(const SharedPtr<VertexArray>& vertexArray)
     {
         glBindVertexArray(vertexArray->GetRendererID());
-        BindVertexBuffer(vertexArray->GetVertexBuffer(0));
+        for(uint32_t i = 0; i < vertexArray->GetVertexBufferCount(); i++)
+            BindVertexBuffer(vertexArray->GetVertexBuffer(i));
     }
     static void BindShader(const SharedPtr<Shader>& shader) { glUseProgram(shader->GetRendererID()); }
     static void BindTexture(const SharedPtr<Texture>& texture, uint32_t slot = 0)
@@ -98,11 +107,9 @@ namespace NDR
         BindShader(material->GetShader());
     }
 
-    static bool sInitialized;
-
     void Renderer::Initialize()
     {
-        if(sInitialized)
+        if(sRendererData.initialized)
             return;
         
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -132,8 +139,9 @@ namespace NDR
 
     void Renderer::Shutdown()
     {
-        if(!sInitialized)
+        if(!sRendererData.initialized)
             return;
+        sRendererData.Shutdown();
     }
 
     void Renderer::Clear()
@@ -149,7 +157,7 @@ namespace NDR
         sRendererData.cameraBuffer->SetData(0, sizeof(CameraUBOData), &cameraUBO);
     }
 
-    void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
+    void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color, const float width)
     {
         std::vector<float> vertices
         {
@@ -160,6 +168,7 @@ namespace NDR
         BindShader(sRendererData.shader);
         sRendererData.vertexArray->GetVertexBuffer()->SetData(0, vertices);
 
+        glLineWidth(width);
         glDrawArrays(GL_LINES, 0, sRendererData.vertexArray->GetVertexBuffer()->GetCount());
     }
 
@@ -182,10 +191,14 @@ namespace NDR
 
     void Renderer::DrawMesh(const SharedPtr<Mesh>& mesh, const Transform& transform)
     {
+        BindVertexArray(mesh->GetVertexArray());
         for(uint32_t i = 0; i < mesh->GetSubMeshCount(); i++)
         {
             mesh->GetMaterial(i)->GetShader()->SetMat4("u_Model", transform.GetMatrix());
-            DrawTriangles(mesh->GetVertexArray(), mesh->GetIndexBuffer(i), mesh->GetMaterial(i));
+            BindIndexBuffer(mesh->GetIndexBuffer(i));
+            BindMaterial(mesh->GetMaterial(i));
+
+            glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer(i)->GetCount(), GL_UNSIGNED_INT, nullptr);
         }
     }
 

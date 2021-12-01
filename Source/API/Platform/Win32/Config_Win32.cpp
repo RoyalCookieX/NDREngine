@@ -1,6 +1,6 @@
-#include <ndrpch.h>
-#include "core/Config.h"
-#include "core/Log.h"
+#include "ndrpch.h"
+#include "Core/Config.h"
+#include "Core/Log.h"
 
 namespace NDR
 {

@@ -1,7 +1,7 @@
 #include "ndrpch.h"
 #include "Shader.h"
 
-#include "core/Log.h"
+#include "Core/Log.h"
 
 namespace NDR
 {

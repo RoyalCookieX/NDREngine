@@ -1,7 +1,7 @@
 #include "ndrpch.h"
 #include "RenderBatch.h"
 
-#include "utility/AssetManager.h"
+#include "Utility/AssetManager.h"
 
 namespace NDR
 {

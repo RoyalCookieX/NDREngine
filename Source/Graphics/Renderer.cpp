@@ -7,8 +7,8 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Vertex.h"
-#include "core/Log.h"
-#include "utility/AssetManager.h"
+#include "Core/Log.h"
+#include "Utility/AssetManager.h"
 
 namespace NDR
 {

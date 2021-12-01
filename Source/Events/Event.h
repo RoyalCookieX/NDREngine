@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Defines.h"
-#include "core/Keycodes.h"
+#include "Core/Keycodes.h"
 
 namespace NDR
 {

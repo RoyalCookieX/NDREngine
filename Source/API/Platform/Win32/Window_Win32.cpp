@@ -1,7 +1,7 @@
 #include "ndrpch.h"
 #include "Window_Win32.h"
 
-#include "core/Log.h"
+#include "Core/Log.h"
 #include "Events/EventDispatcher.h"
 
 #define NDR_CAST_WIN32WINDOW(GLFWwindowPtr, name) Win32Window* name = static_cast<Win32Window*>(glfwGetWindowUserPointer(GLFWwindowPtr))

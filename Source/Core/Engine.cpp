@@ -2,9 +2,9 @@
 #include "Engine.h"
 
 #include "Window.h"
-#include "graphics/Renderer.h"
+#include "Graphics/Renderer.h"
 #include "Core/Input.h"
-#include "utility/Time.h"
+#include "Utility/Time.h"
 #include "Events/EventDispatcher.h"
 
 namespace NDR

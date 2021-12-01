@@ -1,6 +1,6 @@
 #include "ndrpch.h"
 #include "Framebuffer.h"
-#include "core/Assert.h"
+#include "Core/Assert.h"
 
 namespace NDR
 {

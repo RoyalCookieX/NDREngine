@@ -1,7 +1,7 @@
 #include "ndrpch.h"
 #include "Camera.h"
 
-#include "input/Input.h"
+#include "Core/Input.h"
 
 namespace NDR
 {
@@ -63,27 +63,27 @@ namespace NDR
 
     void Camera::Tick(const float deltaTime)
     {
-        if(Input::GetKey(NDR_KEY_W))
-            _position += GetForwardAxis() * moveSpeed * deltaTime;
-        if(Input::GetKey(NDR_KEY_A))
-            _position += -GetRightAxis() * moveSpeed * deltaTime;
-        if(Input::GetKey(NDR_KEY_S))
-            _position += -GetForwardAxis() * moveSpeed * deltaTime;
-        if(Input::GetKey(NDR_KEY_D))
-            _position += GetRightAxis() * moveSpeed * deltaTime;
-        if(Input::GetKey(NDR_KEY_Q))
-            _position += -GetUpAxis() * moveSpeed * deltaTime;
-        if(Input::GetKey(NDR_KEY_E))
-            _position += GetUpAxis() * moveSpeed * deltaTime;
-
-        if(Input::GetKey(NDR_KEY_I))
-            AddYawPitch(glm::vec2(0.0f, rotationSpeed) * deltaTime);
-        if(Input::GetKey(NDR_KEY_J))
-            AddYawPitch(glm::vec2(rotationSpeed, 0.0f) * deltaTime);
-        if(Input::GetKey(NDR_KEY_K))
-            AddYawPitch(glm::vec2(0.0f, -rotationSpeed) * deltaTime);
-        if(Input::GetKey(NDR_KEY_L))
-            AddYawPitch(glm::vec2(-rotationSpeed, 0.0f) * deltaTime);
+        // if(Input::GetKey(NDR_KEY_W))
+        //     _position += GetForwardAxis() * moveSpeed * deltaTime;
+        // if(Input::GetKey(NDR_KEY_A))
+        //     _position += -GetRightAxis() * moveSpeed * deltaTime;
+        // if(Input::GetKey(NDR_KEY_S))
+        //     _position += -GetForwardAxis() * moveSpeed * deltaTime;
+        // if(Input::GetKey(NDR_KEY_D))
+        //     _position += GetRightAxis() * moveSpeed * deltaTime;
+        // if(Input::GetKey(NDR_KEY_Q))
+        //     _position += -GetUpAxis() * moveSpeed * deltaTime;
+        // if(Input::GetKey(NDR_KEY_E))
+        //     _position += GetUpAxis() * moveSpeed * deltaTime;
+        //
+        // if(Input::GetKey(NDR_KEY_I))
+        //     AddYawPitch(glm::vec2(0.0f, rotationSpeed) * deltaTime);
+        // if(Input::GetKey(NDR_KEY_J))
+        //     AddYawPitch(glm::vec2(rotationSpeed, 0.0f) * deltaTime);
+        // if(Input::GetKey(NDR_KEY_K))
+        //     AddYawPitch(glm::vec2(0.0f, -rotationSpeed) * deltaTime);
+        // if(Input::GetKey(NDR_KEY_L))
+        //     AddYawPitch(glm::vec2(-rotationSpeed, 0.0f) * deltaTime);
     }
 
     void Camera::SetProjection(const glm::mat4& projMatrix) { _projMatrix = projMatrix; }

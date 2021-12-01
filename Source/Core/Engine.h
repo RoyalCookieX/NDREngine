@@ -4,6 +4,7 @@
 namespace NDR
 {
     class Window;
+    class EventDispatcher;
     
     class Engine
     {
@@ -24,5 +25,6 @@ namespace NDR
         void PostShutdown();
     
         UPointer<Window> _window;
+        SPointer<EventDispatcher> _dispatcher;
     };
 }

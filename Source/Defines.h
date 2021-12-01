@@ -24,7 +24,7 @@ namespace NDR
     struct Int32Pair
     {
     public:
-        Int32Pair(Int32 x, Int32 y): data{x, y} { }	
+        Int32Pair(Int32 x = 0, Int32 y = 0): data{x, y} { }	
         union
         {
             struct { Int32 x, y; };
@@ -36,7 +36,7 @@ namespace NDR
     struct UInt32Pair
     {
     public:
-        UInt32Pair(UInt32 x, UInt32 y): data{x, y} { }
+        UInt32Pair(UInt32 x = 0, UInt32 y = 0): data{x, y} { }
         union
         {
             struct { UInt32 x, y; };

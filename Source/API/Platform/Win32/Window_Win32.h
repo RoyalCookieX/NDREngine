@@ -1,34 +1,37 @@
 #pragma once
-#include "core/Window.h"
+#include "Core/Window.h"
 
 namespace NDR
 {
-    class Window_win32 : public Window
+    class EventDispatcher;
+    
+    class Win32Window : public Window
     {
     public:
-        Window_win32(const WindowProps& properties);
-        virtual ~Window_win32() override;
-        
-        explicit operator GLFWwindow*() const;
+        Win32Window(const WindowProps& properties, const SPointer<EventDispatcher>& dispatcher);
+        virtual ~Win32Window() override;
 
-        virtual void AddCallback(EventFunc callback) override;
+        Win32Window(const Win32Window&) = delete;
+        Win32Window& operator=(const Win32Window&) = delete;
+
+        explicit operator GLFWwindow*() const { return _window; }
+
+        virtual UInt32Pair GetSize() const override { return _properties.size; }
+        virtual bool IsActive() const override { return _active; }
+        virtual const SPointer<EventDispatcher>& GetDispatcher() override { return _dispatcher; }
+        
         virtual void SetContextCurrent() const override;
         virtual void SetVSync(bool vSync) override;
-        virtual bool Active() const override;
         virtual void Close() override;
         virtual void SwapBuffers() const override;
         virtual void PollEvents() const override;
-        virtual UInt32 GetWidth() const override;
-        virtual UInt32 GetHeight() const override;
-    
-    protected:
-        virtual void Dispatch(Event* event) const override;
+
     private:
+        virtual void OnEvent(const SPointer<Event>& e) override;
+        
         GLFWwindow* _window;
         WindowProps _properties;
+        SPointer<EventDispatcher> _dispatcher;
         bool _active;
-        std::vector<EventFunc> _callbacks;
-        
-        inline static UInt32 _windowCount = 0;
     };
 }

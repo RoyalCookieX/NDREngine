@@ -5,6 +5,6 @@ class ExampleApplication : public NDR::Engine
 {
 public:
     virtual void Initialize() override;
-    virtual void Tick(float deltaTime) override;
+    virtual void Tick() override;
     virtual void Shutdown() override;
 };

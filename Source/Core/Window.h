@@ -6,7 +6,7 @@ namespace NDR
     struct Event;
     class EventDispatcher;
     
-    struct WindowProps
+    struct WindowProperties
     {
     public:
         UInt32Pair position;
@@ -14,7 +14,7 @@ namespace NDR
         std::string name;
         bool isVsync;
 
-        WindowProps(UInt32Pair position, UInt32Pair size, const std::string& name, bool isVsync):
+        WindowProperties(UInt32Pair position, UInt32Pair size, const std::string& name, bool isVsync):
             position(position),
             size(size),
             name(name),
@@ -38,7 +38,7 @@ namespace NDR
         virtual void SwapBuffers() const = 0;
         virtual void PollEvents() const = 0;
         
-        static UPointer<Window> Create(const WindowProps& props, const SPointer<EventDispatcher>& dispatcher);
+        static UPointer<Window> Create(const WindowProperties& properties, const SPointer<EventDispatcher>& dispatcher);
     private:
         virtual void OnEvent(const SPointer<Event>& e) = 0;
     };

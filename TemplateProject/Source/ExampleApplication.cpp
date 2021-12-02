@@ -6,8 +6,10 @@ void ExampleApplication::Initialize()
     NDR_LOGDEBUG("DEBUG MODE");
 }
 
-void ExampleApplication::Tick(float deltaTime)
+void ExampleApplication::Tick()
 {
+    if(NDR::Input::OnKeyPressed(NDR::Keycode::ESCAPE))
+        GetWindow()->Close();
 }
 
 void ExampleApplication::Shutdown()

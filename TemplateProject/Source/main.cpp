@@ -1,9 +1,8 @@
 #include <NDREngine.h>
 #include <ExampleApplication.h>
 
-int main()
+void main()
 {
-    NDR::UniquePtr<ExampleApplication> app = NDR::CreateUniquePtr<ExampleApplication>();
+    NDR::UPointer<ExampleApplication> app = NDR::CreateUnique<ExampleApplication>();
     app->Run();
-    return 0;
 }

@@ -6,10 +6,10 @@
 
 namespace NDR
 {
-    UPointer<Window> Window::Create(const WindowProps& props, const SPointer<EventDispatcher>& dispatcher)
+    UPointer<Window> Window::Create(const WindowProperties& properties, const SPointer<EventDispatcher>& dispatcher)
     {
 #if NDR_PLATFORM_WINDOWS
-        return CreateUnique<Win32Window>(props, dispatcher);
+        return CreateUnique<Win32Window>(properties, dispatcher);
 #else
         NDR_LOGFATAL("[Window]: Failed to create Window!");
         return {};

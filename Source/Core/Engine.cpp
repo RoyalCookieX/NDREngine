@@ -1,10 +1,10 @@
 #include "ndrpch.h"
 #include "Engine.h"
 
+#include "Config.h"
 #include "Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Input.h"
-#include "Utility/Time.h"
 #include "Events/EventDispatcher.h"
 
 namespace NDR
@@ -12,7 +12,20 @@ namespace NDR
     void Engine::PreInitialize()
     {
         _dispatcher = CreateShared<EventDispatcher>();
-        _window = Window::Create({{100, 100}, {800, 600}, "NDREngine", false}, _dispatcher);
+        WindowProperties properties
+        (
+            {
+                (UInt32)Config::GetInt(NDR_APP_CONFIG_PATH, "WindowProperties", "XPosition"),
+                (UInt32)Config::GetInt(NDR_APP_CONFIG_PATH, "WindowProperties", "YPosition"),
+            },
+            {
+                (UInt32)Config::GetInt(NDR_APP_CONFIG_PATH, "WindowProperties", "Width"),
+                (UInt32)Config::GetInt(NDR_APP_CONFIG_PATH, "WindowProperties", "Height"),
+            },
+            Config::GetString(NDR_APP_CONFIG_PATH, "WindowProperties", "AppName"),
+            Config::GetBool(NDR_APP_CONFIG_PATH, "WindowProperties", "VSync")
+        );
+        _window = Window::Create(properties, _dispatcher);
         Input::Initialize(_dispatcher);
         Renderer::Initialize();
     }
@@ -25,11 +38,8 @@ namespace NDR
         while(_window->IsActive())
         {
             _window->PollEvents();
-            if(Input::OnKeyPressed(Keycode::ESCAPE))
-                _window->Close();
-
             Renderer::Clear();
-            Tick(Time::GetDeltaTime());
+            Tick();
             _window->SwapBuffers();
             Input::Tick();
         }

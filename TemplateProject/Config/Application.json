@@ -1,0 +1,11 @@
+{
+    "WindowProperties":
+    {
+        "XPosition": 100,
+        "YPosition": 100,
+        "Width": 800,
+        "Height": 600,
+        "AppName": "Test Application",
+        "VSync": false
+    }
+}

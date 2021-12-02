@@ -13,6 +13,7 @@
 
 #include "Defines.h"
 #include "Core/Engine.h"
+#include "Core/Input.h"
 #include "Core/Window.h"
 #include "Core/Log.h"
 #include "Graphics/Buffer.h"

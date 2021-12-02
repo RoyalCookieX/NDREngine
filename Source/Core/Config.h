@@ -2,7 +2,7 @@
 #include "Defines.h"
 
 #define NDR_ENGINE_CONFIG_PATH "Config/Engine.json"
-#define NDR_GAME_CONFIG_PATH "Config/Game.json"
+#define NDR_APP_CONFIG_PATH "Config/Application.json"
 
 namespace NDR
 {

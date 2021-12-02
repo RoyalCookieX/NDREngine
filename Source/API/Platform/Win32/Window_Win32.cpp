@@ -10,7 +10,7 @@ namespace NDR
 {
     static Int32 sWindowCount;
     
-    Win32Window::Win32Window(const WindowProps& properties, const SPointer<EventDispatcher>& dispatcher):
+    Win32Window::Win32Window(const WindowProperties& properties, const SPointer<EventDispatcher>& dispatcher):
         _properties(properties),
         _dispatcher(dispatcher)
     {

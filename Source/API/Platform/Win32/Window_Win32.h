@@ -8,7 +8,7 @@ namespace NDR
     class Win32Window : public Window
     {
     public:
-        Win32Window(const WindowProps& properties, const SPointer<EventDispatcher>& dispatcher);
+        Win32Window(const WindowProperties& properties, const SPointer<EventDispatcher>& dispatcher);
         virtual ~Win32Window() override;
 
         Win32Window(const Win32Window&) = delete;
@@ -30,7 +30,7 @@ namespace NDR
         virtual void OnEvent(const SPointer<Event>& e) override;
         
         GLFWwindow* _window;
-        WindowProps _properties;
+        WindowProperties _properties;
         SPointer<EventDispatcher> _dispatcher;
         bool _active;
     };
